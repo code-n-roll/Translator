@@ -5,8 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.karanchuk.roman.testtranslate.Favorites.FavoritesFragment;
+import com.karanchuk.roman.testtranslate.favorites.FavoritesFragment;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,8 +71,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
 
         getSupportFragmentManager().
                 beginTransaction().
@@ -76,7 +81,27 @@ public class MainActivity extends AppCompatActivity {
                         new TranslateFragment(), TRANSLATE_FRAGMENT).
                 commit();
 
+        KeyboardVisibilityEvent.setEventListener(
+                this,
+                new KeyboardVisibilityEventListener() {
+                    @Override
+                    public void onVisibilityChanged(boolean isOpen) {
+                        // some code depending on keyboard visiblity status
+                        if (navigation.isShown() && isOpen){
+                            navigation.setVisibility(View.INVISIBLE);
+                        } else if (!navigation.isShown() && !isOpen){
+                            navigation.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
     }
+
+
+
+
+
+
 
 //    if (getSupportActionBar() != null) {
 //        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);

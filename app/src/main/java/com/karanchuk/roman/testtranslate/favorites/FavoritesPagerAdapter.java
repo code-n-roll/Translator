@@ -1,9 +1,8 @@
-package com.karanchuk.roman.testtranslate.Favorites;
+package com.karanchuk.roman.testtranslate.favorites;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 
 import java.util.List;
 
@@ -13,10 +12,12 @@ import java.util.List;
 
 public class FavoritesPagerAdapter extends FragmentPagerAdapter {
     private List<Fragment> mFragments;
+    private List<String> mFragmentTitles;
 
-    public FavoritesPagerAdapter(FragmentManager fm, List<Fragment> fragments){
+    public FavoritesPagerAdapter(FragmentManager fm, List<Fragment> fragments, List<String> titles){
         super(fm);
         mFragments = fragments;
+        mFragmentTitles = titles;
     }
     @Override
     public Fragment getItem(int position) {
@@ -26,5 +27,15 @@ public class FavoritesPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return mFragments.size();
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position){
+        return mFragmentTitles.get(position);
+    }
+
+    public void addFragment(Fragment fragment, String title){
+        mFragments.add(fragment);
+        mFragmentTitles.add(title);
     }
 }

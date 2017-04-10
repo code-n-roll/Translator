@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.Favorites;
+package com.karanchuk.roman.testtranslate.favorites;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

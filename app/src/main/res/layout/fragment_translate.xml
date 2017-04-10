@@ -2,37 +2,99 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/general_container"
     >
 
-    <EditText
-        android:id="@+id/editText"
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="10dp"
-        android:ems="10"
-        android:inputType="textMultiLine"/>
+        android:id="@+id/container_edittext"
+        >
+        <com.karanchuk.roman.testtranslate.CustomEditText
+            android:id="@+id/edittext"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_margin="10dp"
+            android:ems="10"
+            android:inputType="textMultiLine"
+            android:hint="@string/translate_hint"
+            android:scrollbars="vertical"
+            android:background="@layout/edittext_border"
+            android:gravity="top|start"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="55dp"
+            android:paddingEnd="55dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="35dp"
+            android:imeOptions="actionNone"
+        />
+        <ImageButton
+            android:id="@+id/clearEditText"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/cancel"
+            android:background="@android:color/transparent"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="20dp"
+            />
+        <ImageButton
+            android:id="@+id/getVoiceRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/microphone"
+            android:background="@android:color/transparent"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="15dp"
+            />
+        <ImageButton
+            android:id="@+id/getAudioSpelling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/photocamera"
+            android:background="@android:color/transparent"
+            android:layout_gravity="right"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="60dp"
+            />
+    </FrameLayout>
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editText"
-        android:layout_marginTop="23dp"
-        android:text="TextView"
-        android:layout_alignRight="@+id/editText"
-        android:layout_alignEnd="@+id/editText"
-        android:layout_alignLeft="@+id/editText"
-        android:layout_alignStart="@+id/editText"/>
-
-    <android.support.v7.widget.RecyclerView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:layout_below="@+id/textView"
-        android:layout_margin="10dp"/>
+        android:layout_height="match_parent"
+        android:id="@+id/translate_result_container"
+        android:layout_alignRight="@id/container_edittext"
+        android:layout_alignEnd="@+id/container_edittext"
+        android:layout_alignLeft="@+id/container_edittext"
+        android:layout_alignStart="@+id/container_edittext"
+        android:layout_below="@+id/container_edittext"
+        >
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="23dp"
+            android:text="TextView"
 
+           />
+
+        <android.support.v7.widget.RecyclerView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView"
+            android:layout_alignStart="@+id/textView"
+            android:layout_below="@+id/textView"
+            android:layout_margin="10dp"/>
+    </RelativeLayout>
 </RelativeLayout>

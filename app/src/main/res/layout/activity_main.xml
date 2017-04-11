@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.karanchuk.roman.testtranslate.MainActivity"
+    android:background="@android:color/holo_orange_dark"
     >
 
     <LinearLayout
@@ -14,17 +12,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@android:color/holo_green_dark"
         >
-
     </LinearLayout>
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@android:color/white"
+        android:layout_gravity="bottom"
+        android:background="@android:color/holo_red_dark"
         app:menu="@menu/navigation"
         />
 
-</RelativeLayout>
+</FrameLayout>

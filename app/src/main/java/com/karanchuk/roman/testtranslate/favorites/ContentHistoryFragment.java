@@ -45,7 +45,7 @@ public class ContentHistoryFragment extends Fragment {
 
         mItems = new ArrayList<>();
         for (int i = 0; i < 100; i++)
-            mItems.add(i, new TranslatedItem("RU","FR","привет", "bonjour", false));
+            mItems.add(i, new TranslatedItem("RU","FR","привет", "bonjour", false, null));
 
         FavoritesRecyclerAdapter.OnItemClickListener itemClickListener = new
                 FavoritesRecyclerAdapter.OnItemClickListener() {

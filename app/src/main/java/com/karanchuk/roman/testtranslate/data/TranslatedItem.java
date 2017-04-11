@@ -13,30 +13,33 @@ public class TranslatedItem {
     private String mSrcMeaning;
     private String mTrgMeaning;
     private boolean mIsFavorite;
+    private String mDictDefinition;
+
 
     public TranslatedItem(String id, String srcLanguage,
                           String trgLanguage,
                           String srcMeaning,
                           String trgMeaning,
-                          boolean isFavorite) {
+                          boolean isFavorite,
+                          String dictDefinition) {
         mId = id;
         mSrcLanguage = srcLanguage;
         mTrgLanguage = trgLanguage;
         mSrcMeaning = srcMeaning;
         mTrgMeaning = trgMeaning;
         mIsFavorite = isFavorite;
+        mDictDefinition = dictDefinition;
     }
 
     public TranslatedItem(String srcLanguage,
                           String trgLanguage,
                           String srcMeaning,
                           String trgMeaning,
-                          boolean isFavorite){
+                          boolean isFavorite,
+                          String dictDefinition){
         this(UUID.randomUUID().toString(), srcLanguage,
-                trgLanguage, srcMeaning, trgMeaning, isFavorite);
+                trgLanguage, srcMeaning, trgMeaning, isFavorite, dictDefinition);
     }
-
-
 
     public String getId() {
         return mId;
@@ -86,5 +89,11 @@ public class TranslatedItem {
         mIsFavorite = favorite;
     }
 
+    public String getDictDefinition() {
+        return mDictDefinition;
+    }
 
+    public void setDictDefinition(String dictDefinition) {
+        mDictDefinition = dictDefinition;
+    }
 }

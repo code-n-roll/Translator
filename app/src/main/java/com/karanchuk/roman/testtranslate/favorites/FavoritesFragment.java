@@ -1,6 +1,5 @@
 package com.karanchuk.roman.testtranslate.favorites;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TabHost;
 
 import com.karanchuk.roman.testtranslate.R;
 
@@ -25,7 +23,6 @@ public class FavoritesFragment extends Fragment implements
         ViewPager.OnPageChangeListener{
     private ViewPager mViewPager;
     private FavoritesPagerAdapter mFavoritesAdapter;
-//    private TabHost mTabHost;
     private TabLayout mTabLayout;
     private List<Fragment> mFragments;
     private List<String> mTitles;
@@ -66,20 +63,6 @@ public class FavoritesFragment extends Fragment implements
         mViewPager.setAdapter(mFavoritesAdapter);
         mViewPager.addOnPageChangeListener(this);
     }
-
-
-
-    private void initTabHost(View view){
-//        mTabHost = (TabHost) view.findViewById(R.id.tab_host_favorites);
-//        mTabHost.setup();
-//
-//        mTabHost.addTab(mTabHost.newTabSpec("tab_favorites_tag").setIndicator("Favorites").setContent(new FakeContent(getContext())));
-//        mTabHost.addTab(mTabHost.newTabSpec("tab_history_tag").setIndicator("History").setContent(new FakeContent(getContext())));
-//
-//        mTabHost.setOnTabChangedListener(this);
-    }
-
-
 
 
     @Override

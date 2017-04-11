@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate;
+package com.karanchuk.roman.testtranslate.source_lang;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.karanchuk.roman.testtranslate.data.TranslatedItem;
+import com.karanchuk.roman.testtranslate.R;
 
 import java.util.ArrayList;
 
@@ -55,6 +55,7 @@ public class ChooseSrcLangRecyclerAdapter extends RecyclerView.Adapter<ChooseSrc
             mLanguage = (TextView) view.findViewById(R.id.choose_src_lang);
             mIsSelected = (ImageView) view.findViewById(R.id.selected_choose_src_lang);
         }
+
 
         public void bind(final String item,
                          final ChooseSrcLangRecyclerAdapter.OnItemClickListener listener){

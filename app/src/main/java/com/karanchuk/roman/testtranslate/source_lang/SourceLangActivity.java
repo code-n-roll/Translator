@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate;
+package com.karanchuk.roman.testtranslate.source_lang;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.karanchuk.roman.testtranslate.R;
 
 import java.io.IOException;
 import java.io.InputStream;

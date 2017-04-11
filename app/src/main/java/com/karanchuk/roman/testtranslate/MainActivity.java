@@ -3,12 +3,12 @@ package com.karanchuk.roman.testtranslate;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.karanchuk.roman.testtranslate.favorites.FavoritesFragment;
+import com.karanchuk.roman.testtranslate.translate.TranslateFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;

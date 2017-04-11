@@ -46,7 +46,7 @@ public class ContentFavoritesFragment extends Fragment {
 
         mItems = new ArrayList<>();
         for (int i = 0; i < 10; i++)
-            mItems.add(i, new TranslatedItem("RU","FR","привет", "bonjour", false));
+            mItems.add(i, new TranslatedItem("RU","FR","привет", "bonjour", false, null));
 
         FavoritesRecyclerAdapter.OnItemClickListener itemClickListener = new
             FavoritesRecyclerAdapter.OnItemClickListener() {

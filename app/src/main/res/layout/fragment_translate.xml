@@ -4,11 +4,8 @@
                 android:layout_height="match_parent"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/general_container"
+                android:background="@android:color/holo_blue_bright"
     >
-
-
-
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,7 +30,7 @@
             android:paddingEnd="55dp"
             android:paddingTop="4dp"
             android:paddingBottom="35dp"
-            android:imeOptions="actionNone"
+            android:imeOptions="actionDone"
         />
         <ImageButton
             android:id="@+id/clearEditText"
@@ -79,9 +76,10 @@
         android:layout_alignLeft="@+id/container_edittext"
         android:layout_alignStart="@+id/container_edittext"
         android:layout_below="@+id/container_edittext"
+        android:layout_alignParentBottom="true"
         >
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textview_translate_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="23dp"
@@ -90,12 +88,13 @@
            />
 
         <android.support.v7.widget.RecyclerView
-
-            android:layout_width="match_parent"
+            android:id="@+id/container_dict_defin"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView"
-            android:layout_alignStart="@+id/textView"
-            android:layout_below="@+id/textView"
-            android:layout_margin="10dp"/>
+            android:layout_below="@+id/textview_translate_result"
+            android:layout_margin="10dp"
+            android:scrollbars="vertical"
+
+            />
     </RelativeLayout>
 </RelativeLayout>

@@ -6,6 +6,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.karanchuk.roman.testtranslate.favorites.FavoritesFragment;
 import com.karanchuk.roman.testtranslate.translate.TranslateFragment;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
 
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -81,23 +83,6 @@ public class MainActivity extends AppCompatActivity {
                 replace(R.id.main_activity_container,
                         new TranslateFragment(), TRANSLATE_FRAGMENT).
                 commit();
-
-        KeyboardVisibilityEvent.setEventListener(
-                this,
-                new KeyboardVisibilityEventListener() {
-                    @Override
-                    public void onVisibilityChanged(boolean isOpen) {
-                        // some code depending on keyboard visiblity status
-                        if (navigation.isShown() && isOpen){
-                            navigation.setVisibility(View.INVISIBLE);
-                        } else if (!navigation.isShown() && !isOpen){
-                            navigation.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-
-
-
     }
 
 

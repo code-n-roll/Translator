@@ -26,8 +26,14 @@ public class SettingsFragment extends Fragment {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setShowHideAnimationEnabled(false);
-            actionBar.show();
             actionBar.setElevation(0);
+
+            actionBar.setDisplayShowCustomEnabled(false);
+
+            actionBar.setTitle("Settings");
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_TITLE);
+
+            actionBar.show();
         }
     }
 }

@@ -1,8 +1,10 @@
 package com.karanchuk.roman.testtranslate;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,9 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -32,18 +36,24 @@ import java.io.IOException;
  */
 
 public class TranslateFragment extends Fragment{
-    private View mView;
+    private View mView, mViewActionBar;
     private CustomEditText mCustomEditText;
     private ImageButton mGetPhoto, mGetVoiceRequest, mClearEditText;
     private RelativeLayout mTranslateResult;
-
-
+    private ActionBar mActionBar;
+    private Button mButtonSrcLang, mButtonTrgLang;
+    private ImageButton mButtonSwitchLang;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_translate, container, false);
         initToolbar();
+
+        mViewActionBar = mActionBar.getCustomView();
+        mButtonSrcLang = (Button) mViewActionBar.findViewById(R.id.left_actionbar_button);
+        mButtonSwitchLang = (ImageButton) mViewActionBar.findViewById(R.id.center_actionbar_button);
+        mButtonTrgLang = (Button) mViewActionBar.findViewById(R.id.right_actionbar_button);
 
         mCustomEditText = (CustomEditText) mView.findViewById(R.id.edittext);
         mClearEditText = (ImageButton) mView.findViewById(R.id.clearEditText);
@@ -53,6 +63,9 @@ public class TranslateFragment extends Fragment{
 
         mGetPhoto = (ImageButton) mView.findViewById(R.id.getAudioSpelling);
         mGetVoiceRequest = (ImageButton) mView.findViewById(R.id.getVoiceRequest);
+
+
+
 
         View.OnClickListener editTextClickListener = new View.OnClickListener() {
             @Override
@@ -153,21 +166,48 @@ public class TranslateFragment extends Fragment{
                     }
                 });
 
+        mButtonSrcLang.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SourceLangActivity.class);
+                startActivity(intent);
+            }
+        });
+        mButtonSwitchLang.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String srcText = mButtonSrcLang.getText().toString(),
+                        trgText = mButtonTrgLang.getText().toString();
+                mButtonSrcLang.setText(trgText);
+                mButtonTrgLang.setText(srcText);
+            }
+        });
+        mButtonTrgLang.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), TargetLangActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         return mView;
     }
 
 
-
-
     public void initToolbar(){
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if ( actionBar != null) {
-            actionBar.setShowHideAnimationEnabled(false);
-            actionBar.show();
-            actionBar.setElevation(0);
-            actionBar.setTitle("");
+        mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if ( mActionBar != null) {
+            mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            mActionBar.setDisplayShowCustomEnabled(true);
+            mActionBar.setCustomView(R.layout.actionbar_translate);
+
+            mActionBar.setShowHideAnimationEnabled(false);
+            mActionBar.setElevation(0);
+            mActionBar.setTitle("");
+            mActionBar.show();
         }
     }
-
-
 }
+
+

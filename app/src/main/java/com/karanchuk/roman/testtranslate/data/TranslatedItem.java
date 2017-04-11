@@ -9,31 +9,31 @@ import java.util.UUID;
 public class TranslatedItem {
     private String mId;
     private String mSrcLanguage;
-    private String mDstLanguage;
+    private String mTrgLanguage;
     private String mSrcMeaning;
-    private String mDstMeaning;
+    private String mTrgMeaning;
     private boolean mIsFavorite;
 
     public TranslatedItem(String id, String srcLanguage,
-                          String dstLanguage,
+                          String trgLanguage,
                           String srcMeaning,
-                          String dstMeaning,
+                          String trgMeaning,
                           boolean isFavorite) {
         mId = id;
         mSrcLanguage = srcLanguage;
-        mDstLanguage = dstLanguage;
+        mTrgLanguage = trgLanguage;
         mSrcMeaning = srcMeaning;
-        mDstMeaning = dstMeaning;
+        mTrgMeaning = trgMeaning;
         mIsFavorite = isFavorite;
     }
 
     public TranslatedItem(String srcLanguage,
-                          String dstLanguage,
+                          String trgLanguage,
                           String srcMeaning,
-                          String dstMeaning,
+                          String trgMeaning,
                           boolean isFavorite){
         this(UUID.randomUUID().toString(), srcLanguage,
-                dstLanguage, srcMeaning, dstMeaning, isFavorite);
+                trgLanguage, srcMeaning, trgMeaning, isFavorite);
     }
 
 
@@ -54,12 +54,12 @@ public class TranslatedItem {
         mSrcLanguage = srcLanguage;
     }
 
-    public String getDstLanguage() {
-        return mDstLanguage;
+    public String getTrgLanguage() {
+        return mTrgLanguage;
     }
 
-    public void setDstLanguage(String dstLanguage) {
-        mDstLanguage = dstLanguage;
+    public void setTrgLanguage(String trgLanguage) {
+        mTrgLanguage = trgLanguage;
     }
 
     public String getSrcMeaning() {
@@ -70,12 +70,12 @@ public class TranslatedItem {
         mSrcMeaning = srcMeaning;
     }
 
-    public String getDstMeaning() {
-        return mDstMeaning;
+    public String getTrgMeaning() {
+        return mTrgMeaning;
     }
 
-    public void setDstMeaning(String dstMeaning) {
-        mDstMeaning = dstMeaning;
+    public void setTrgMeaning(String trgMeaning) {
+        mTrgMeaning = trgMeaning;
     }
 
     public boolean isFavorite() {

@@ -6,28 +6,39 @@
              android:gravity="center"
     >
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/left_actionbar_button"
-            android:background="@android:color/transparent"
-            android:text="Left"
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_centerInParent="true"
+            android:textAppearance="@style/firstCapitalizeTabTextTheme"
+            android:text="Russian"
+            android:textColor="@android:color/black"
+            android:background="?attr/selectableItemBackgroundBorderless"
             />
-        <Button
+        <ImageButton
             android:id="@+id/center_actionbar_button"
             android:layout_toRightOf="@id/left_actionbar_button"
             android:layout_toEndOf="@id/left_actionbar_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:text="Center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_centerInParent="true"
+            android:src="@drawable/double_arrow24"
+            android:background="?attr/selectableItemBackgroundBorderless"
             />
         <Button
             android:id="@+id/right_actionbar_button"
             android:layout_toRightOf="@id/center_actionbar_button"
             android:layout_toEndOf="@id/center_actionbar_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Right"
-            android:background="@android:color/transparent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_centerInParent="true"
+            android:text="English"
+            android:textAppearance="@style/firstCapitalizeTabTextTheme"
+            android:textColor="@android:color/black"
+            android:background="?attr/selectableItemBackgroundBorderless"
             />
 </RelativeLayout>
+
+

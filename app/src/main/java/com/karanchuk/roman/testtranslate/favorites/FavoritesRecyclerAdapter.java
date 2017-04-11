@@ -49,8 +49,8 @@ public class FavoritesRecyclerAdapter extends RecyclerView.Adapter<FavoritesRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         private ImageView mIsFavoriteView;
-        private TextView mSrcLanguage, mDstLanguage,
-                        mSrcMeaning, mDstMeaning;
+        private TextView mSrcLanguage, mTrgLanguage,
+                        mSrcMeaning, mTrgMeaning;
         private View mView;
 
         public ViewHolder(View view){
@@ -58,9 +58,9 @@ public class FavoritesRecyclerAdapter extends RecyclerView.Adapter<FavoritesRecy
             mView = view;
             mIsFavoriteView = (ImageView) view.findViewById(R.id.image_favorite);
             mSrcLanguage = (TextView) view.findViewById(R.id.src_language);
-            mDstLanguage = (TextView) view.findViewById(R.id.dst_language);
+            mTrgLanguage = (TextView) view.findViewById(R.id.trg_meaning);
             mSrcMeaning = (TextView) view.findViewById(R.id.src_meaning);
-            mDstMeaning = (TextView) view.findViewById(R.id.dst_meaning);
+            mTrgMeaning = (TextView) view.findViewById(R.id.trg_meaning);
         }
 
         public void bind(final TranslatedItem item, final OnItemClickListener listener){
@@ -68,9 +68,9 @@ public class FavoritesRecyclerAdapter extends RecyclerView.Adapter<FavoritesRecy
             } else {
             }
             mSrcLanguage.setText(item.getSrcLanguage());
-            mDstLanguage.setText(item.getDstLanguage());
+            mTrgLanguage.setText(item.getTrgLanguage());
             mSrcMeaning.setText(item.getSrcMeaning());
-            mDstMeaning.setText(item.getDstMeaning());
+            mTrgMeaning.setText(item.getTrgMeaning());
 
             mView.setOnClickListener(new View.OnClickListener(){
                @Override public void onClick(View v){

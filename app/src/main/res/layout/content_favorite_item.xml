@@ -2,13 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="wrap_content"
                 android:layout_height="70dp"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <ImageView
         android:id="@+id/image_favorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_home_black_24dp"
+        android:src="@drawable/light_bookmark"
         android:layout_centerVertical="true"
         android:layout_margin="10dp"
         />
@@ -24,16 +23,19 @@
             android:id="@+id/src_meaning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="some text"
+            android:text="text src lang"
             />
         <TextView
-            android:id="@+id/dst_meaning"
+            android:id="@+id/trg_meaning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="some text"
+            android:text="text trg lang"
             />
     </LinearLayout>
-    <RelativeLayout
+
+    <TextView
+        android:id="@+id/src_language"
+        android:text="src lang - trg lang"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -41,28 +43,5 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
-        >
-        <TextView
-            android:id="@+id/src_language"
-            android:text="src lang"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/dash"
-            android:text=" - "
-            android:layout_toRightOf="@id/src_language"
-            android:layout_toEndOf="@id/src_language"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/dst_language"
-            android:text="dst lang"
-            android:layout_toRightOf="@id/dash"
-            android:layout_toEndOf="@id/dash"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-    </RelativeLayout>
+        />
 </RelativeLayout>

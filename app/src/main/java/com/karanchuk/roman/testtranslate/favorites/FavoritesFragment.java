@@ -1,6 +1,7 @@
 package com.karanchuk.roman.testtranslate.favorites;
 
 import android.os.Bundle;
+import android.support.annotation.RestrictTo;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -43,7 +44,7 @@ public class FavoritesFragment extends Fragment implements
         mTabLayout = (TabLayout) view.findViewById(R.id.tablayout_favorites);
         mTabLayout.setupWithViewPager(mViewPager);
     }
-
+    
     public void initToolbar(){
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {

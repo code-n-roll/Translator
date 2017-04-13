@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
-import com.karanchuk.roman.testtranslate.data.DictDefinItem;
+import com.karanchuk.roman.testtranslate.data.DictDefinition;
 
 import java.util.ArrayList;
 
@@ -16,9 +16,9 @@ import java.util.ArrayList;
  */
 
 public class TranslateRecyclerAdapter extends RecyclerView.Adapter<TranslateRecyclerAdapter.ViewHolder>{
-    private ArrayList<DictDefinItem> mItems;
+    private ArrayList<DictDefinition> mItems;
 
-    public TranslateRecyclerAdapter(ArrayList<DictDefinItem> items){
+    public TranslateRecyclerAdapter(ArrayList<DictDefinition> items){
         mItems = items;
     }
 
@@ -55,7 +55,7 @@ public class TranslateRecyclerAdapter extends RecyclerView.Adapter<TranslateRecy
             mExprDictDefinItem = (TextView) mView.findViewById(R.id.expr_dict_defin_item);
         }
 
-        public void bind(DictDefinItem item){
+        public void bind(DictDefinition item){
             mNumberDictDefinItem.setText(item.getNumber());
             mTranslDictDefinItem.setText(item.getTranslation());
             mMeanDictDefinItem.setText(item.getMeaning());

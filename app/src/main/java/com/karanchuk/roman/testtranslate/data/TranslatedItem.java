@@ -12,15 +12,24 @@ public class TranslatedItem {
     private String mTrgLanguage;
     private String mSrcMeaning;
     private String mTrgMeaning;
-    private boolean mIsFavorite;
+    private String mIsFavorite;
     private String mDictDefinition;
 
+    public TranslatedItem(TranslatedItem translatedItem){
+        mId = translatedItem.getId();
+        mSrcLanguage = translatedItem.getSrcLanguage();
+        mTrgLanguage = translatedItem.getTrgLanguage();
+        mSrcMeaning = translatedItem.getSrcMeaning();
+        mTrgMeaning = translatedItem.getTrgMeaning();
+        mIsFavorite = translatedItem.isFavorite();
+        mDictDefinition = translatedItem.getDictDefinition();
+    }
 
     public TranslatedItem(String id, String srcLanguage,
                           String trgLanguage,
                           String srcMeaning,
                           String trgMeaning,
-                          boolean isFavorite,
+                          String isFavorite,
                           String dictDefinition) {
         mId = id;
         mSrcLanguage = srcLanguage;
@@ -31,11 +40,13 @@ public class TranslatedItem {
         mDictDefinition = dictDefinition;
     }
 
+
+
     public TranslatedItem(String srcLanguage,
                           String trgLanguage,
                           String srcMeaning,
                           String trgMeaning,
-                          boolean isFavorite,
+                          String isFavorite,
                           String dictDefinition){
         this(UUID.randomUUID().toString(), srcLanguage,
                 trgLanguage, srcMeaning, trgMeaning, isFavorite, dictDefinition);
@@ -81,13 +92,14 @@ public class TranslatedItem {
         mTrgMeaning = trgMeaning;
     }
 
-    public boolean isFavorite() {
+    public String isFavorite() {
         return mIsFavorite;
     }
 
-    public void setFavorite(boolean favorite) {
-        mIsFavorite = favorite;
+    public void setIsFavorite(String isFavorite) {
+        mIsFavorite = isFavorite;
     }
+
 
     public String getDictDefinition() {
         return mDictDefinition;
@@ -95,5 +107,17 @@ public class TranslatedItem {
 
     public void setDictDefinition(String dictDefinition) {
         mDictDefinition = dictDefinition;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        TranslatedItem item = (TranslatedItem) obj;
+        if (this.mSrcMeaning.equals(item.mSrcMeaning) &&
+                this.mTrgMeaning.equals(item.mTrgMeaning) &&
+                this.mSrcLanguage.equals(item.mSrcLanguage) &&
+                this.mTrgLanguage.equals(item.mTrgLanguage)){
+            return true;
+        }
+        return false;
     }
 }

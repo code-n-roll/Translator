@@ -4,15 +4,15 @@ package com.karanchuk.roman.testtranslate.data;
  * Created by roman on 11.4.17.
  */
 
-public class DictDefinItem {
+public class DictDefinition {
     private String mNumber;
     private String mTranslation;
     private String mMeaning;
     private String mExpression;
 
 
-    public DictDefinItem(String number, String translation,
-                         String meaning, String expression){
+    public DictDefinition(String number, String translation,
+                          String meaning, String expression){
         mNumber = number;
         mTranslation = translation;
         mMeaning = meaning;

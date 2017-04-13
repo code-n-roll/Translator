@@ -34,7 +34,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/src_language"
+        android:id="@+id/src_trg_languages"
         android:text="src lang - trg lang"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

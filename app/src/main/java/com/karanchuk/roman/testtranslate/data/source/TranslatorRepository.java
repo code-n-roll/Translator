@@ -23,8 +23,7 @@ public class TranslatorRepository  implements TranslatorDataSource{
     private List<TranslatedItemsRepositoryObserver> mObservers = new ArrayList<>();
 
     private Map<String, TranslatedItem> mCachedTranslatedItems,
-                                        mCurCachedTranslatedItems,
-                                        mNotUniqueCurCachedTranslatedItems;
+                                        mCurCachedTranslatedItems;
 
     private boolean mCacheTranslatedItemsIsDirty = true;
 
@@ -62,7 +61,7 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     public void removeContentObserver(TranslatedItemsRepositoryObserver observer){
-        if (!mObservers.contains(observer)){
+        if (mObservers.contains(observer)){
             mObservers.remove(observer);
         }
     }
@@ -78,13 +77,9 @@ public class TranslatorRepository  implements TranslatorDataSource{
         if (mCurCachedTranslatedItems == null){
             mCurCachedTranslatedItems = new LinkedHashMap<>();
         }
-        if (mNotUniqueCurCachedTranslatedItems == null){
-            mNotUniqueCurCachedTranslatedItems = new LinkedHashMap<>();
-        }
 
-        if (!mNotUniqueCurCachedTranslatedItems.containsValue(translatedItem)) {
+        if (!mCurCachedTranslatedItems.containsValue(translatedItem)) {
             mCurCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
-            mNotUniqueCurCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
         } else {
             mCurCachedTranslatedItems.values().remove(translatedItem);
             mCurCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
@@ -94,6 +89,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
         notifyTranslatedItemsChanged();
         return true;
     }
+
+
 
     @Override
     public void deleteTranslatedItem(@NonNull TranslatedItem translatedItem) {
@@ -122,6 +119,20 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
             return items;
         }
+    }
+
+    @Override
+    public void deleteTranslatedItems() {
+        mTranslatorLocalDataSource.deleteTranslatedItems();
+
+        if (mCachedTranslatedItems != null && !mCachedTranslatedItems.isEmpty()){
+            mCachedTranslatedItems.clear();
+        }
+
+        if (mCurCachedTranslatedItems != null && !mCurCachedTranslatedItems.isEmpty()){
+            mCurCachedTranslatedItems.clear();
+        }
+        notifyTranslatedItemsChanged();
     }
 
     public interface TranslatedItemsRepositoryObserver {

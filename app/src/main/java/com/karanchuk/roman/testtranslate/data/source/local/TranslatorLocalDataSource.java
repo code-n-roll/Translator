@@ -84,6 +84,15 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         db.close();
     }
 
+    @Override
+    public void deleteTranslatedItems(){
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        String clearTable = "DELETE FROM " + TranslatedItemEntry.TABLE_NAME;
+        db.execSQL(clearTable);
+        db.close();
+    }
+
     @NonNull
     @Override
     public List<TranslatedItem> getTranslatedItems() {

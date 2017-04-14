@@ -17,4 +17,6 @@ public interface TranslatorDataSource {
 
     @NonNull
     List<TranslatedItem> getTranslatedItems();
+
+    void deleteTranslatedItems();
 }

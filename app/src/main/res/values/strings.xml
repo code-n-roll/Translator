@@ -1,13 +1,14 @@
 <resources>
     <string name="app_name">TestTranslate</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
     <string name="action_settings">Settings</string>
     <string name="action_favorite">Favorites</string>
     <string name="translate_hint">Type text or a site address</string>
-    <string name="dialog_clear_history">Are you sure you want to clear your history?</string>
+    <string name="dialog_clear">Are you sure you want to clear your</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="empty_history">No translations in History</string>
+    <string name="empty_favorites">No translations in Favorites</string>
+    <string name="app_label">appLabel</string>
+    <string name="history_search_hint">Search in History</string>
+    <string name="favorites_search_hint">Search in Favorites</string>
 </resources>

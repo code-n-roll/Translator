@@ -21,11 +21,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract;
 import com.karanchuk.roman.testtranslate.ui.view.CustomEditText;
 import com.karanchuk.roman.testtranslate.ui.fullscreen.FullscreenActivity;
 import com.karanchuk.roman.testtranslate.R;
@@ -37,6 +38,7 @@ import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.source_lang.SourceLangActivity;
 import com.karanchuk.roman.testtranslate.utils.TranslatorAPIUtils;
+import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -51,12 +53,13 @@ import java.util.List;
  * Created by roman on 8.4.17.
  */
 
-public class TranslatorFragment extends Fragment implements TranslatorRepository.TranslatedItemsRepositoryObserver{
+public class TranslatorFragment extends Fragment implements
+        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver {
     private View mView, mViewActionBar;
     private CustomEditText mCustomEditText;
     private ImageButton mGetPhoto,
-            mButtonGetVoiceRequest,
-            mButtonGetTranslatedVoice,
+            mButtonGetSourceVoice,
+            mButtonGetTargetVoice,
             mButtonSetFavorite,
             mButtonShare,
             mButtonFullscreen,
@@ -65,7 +68,7 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
     private ActionBar mActionBar;
     private Button mButtonSrcLang, mButtonTrgLang;
     private ImageButton mButtonSwitchLang;
-    private TextView mTranslateResult, mTvLink;
+    private TextView mTranslatedResult, mTvLink;
     private RecyclerView mTranslateRecyclerView;
     private ArrayList<DictDefinition> mDictDefinitions;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -73,6 +76,7 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
     private Handler mMainHandler;
     private List<TranslatedItem> mTranslatedItems;
     private RelativeLayout mContainerEdittext;
+
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -82,10 +86,8 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
 
         mRepository = TranslatorRepository.getInstance(localDataSource);
-        mRepository.addContentObserver(this);
-
-        if (mTranslatedItems == null)
-            mTranslatedItems = mRepository.getTranslatedItems();
+        mRepository.addHistoryContentObserver(this);
+        mTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
 
 
         mMainHandler = new Handler(getContext().getMainLooper());
@@ -108,13 +110,18 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
         mClearEditText.setVisibility(View.INVISIBLE);
 
         mGetPhoto = (ImageButton) mView.findViewById(R.id.getAudioSpelling);
-        mButtonGetVoiceRequest = (ImageButton) mView.findViewById(R.id.getVoiceRequest);
+        mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
 
-        mTranslateResult = (TextView) mView.findViewById(R.id.textview_translate_result);
+        mTranslatedResult = (TextView) mView.findViewById(R.id.textview_translate_result);
 
         mButtonFullscreen = (ImageButton) mView.findViewById(R.id.fullscreen_translated_word);
 
         mContainerEdittext = (RelativeLayout) mView.findViewById(R.id.container_edittext);
+
+        mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
+        mButtonGetTargetVoice = (ImageButton) mView.findViewById(R.id.get_target_voice);
+        mButtonSetFavorite = (ImageButton) mView.findViewById(R.id.set_favorite);
+        mButtonShare = (ImageButton) mView.findViewById(R.id.share_translated_word);
 
 
         mTranslateRecyclerView = (RecyclerView) mView.findViewById(R.id.container_dict_defin);
@@ -134,6 +141,7 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FullscreenActivity.class);
+                intent.putExtra("translated_result", mTranslatedResult.getText().toString());
                 startActivity(intent);
             }
         });
@@ -170,6 +178,31 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
             }
         });
 
+        mButtonGetSourceVoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "get source voice was clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mButtonGetTargetVoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "get target voice was clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mButtonSetFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "set favorite was clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+        mButtonShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "share was clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
 
 //        mTvLink = (TextView) mView.findViewById(R.id.tv_link);
@@ -181,7 +214,7 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
     @Override
     public void onStop() {
         super.onStop();
-        mRepository.removeContentObserver(this);
+        mRepository.removeHistoryContentObserver(this);
     }
 
 
@@ -213,7 +246,6 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
                                                 getResources(),
                                                 getResources().getLayout(R.layout.edittext_border_active)));
                                 mCustomEditText.setCursorVisible(true);
-                                mCustomEditText.requestFocus();
                             } catch (XmlPullParserException | IOException e) {
                                 e.printStackTrace();
                             }
@@ -253,7 +285,7 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE && mCustomEditText.getText().length() != 0) {
                     try {
-                        TranslatorAPIUtils.getTranslate(mCustomEditText.getText().toString(), "ru-en", mTranslateResult);
+                        TranslatorAPIUtils.getTranslate(mCustomEditText.getText().toString(), "ru-en", mTranslatedResult);
                     } catch (IOException e){
                         e.printStackTrace();
                     }
@@ -309,10 +341,16 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
                     mButtonSrcLang.getText().toString(),
                     mButtonTrgLang.getText().toString(),
                     mCustomEditText.getText().toString(),
-                    mTranslateResult.getText().toString(),
+                    mTranslatedResult.getText().toString(),
                     "false",
                     mDictDefinitions.toString());
-            mRepository.saveTranslatedItem(item);
+            if (!mTranslatedItems.contains(item)) {
+                mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+            } else {
+                int index = mTranslatedItems.indexOf(item);
+                item.setIsFavorite(mTranslatedItems.get(index).getIsFavorite());
+                mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+            }
         }
     }
 
@@ -320,11 +358,11 @@ public class TranslatorFragment extends Fragment implements TranslatorRepository
 
 
     @Override
-    public void onTranslatedItemsChanged() {
+    public void onHistoryTranslatedItemsChanged() {
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mTranslatedItems = mRepository.getTranslatedItems();
+                mTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
             }
         });
     }

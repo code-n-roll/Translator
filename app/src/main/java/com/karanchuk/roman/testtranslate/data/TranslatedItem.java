@@ -21,7 +21,7 @@ public class TranslatedItem {
         mTrgLanguage = translatedItem.getTrgLanguage();
         mSrcMeaning = translatedItem.getSrcMeaning();
         mTrgMeaning = translatedItem.getTrgMeaning();
-        mIsFavorite = translatedItem.isFavorite();
+        mIsFavorite = translatedItem.getIsFavorite();
         mDictDefinition = translatedItem.getDictDefinition();
     }
 
@@ -92,8 +92,24 @@ public class TranslatedItem {
         mTrgMeaning = trgMeaning;
     }
 
-    public String isFavorite() {
+    public String getIsFavorite() {
         return mIsFavorite;
+    }
+
+    public boolean isFavorite() {
+        if (mIsFavorite.equals("1")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void isFavoriteUp(boolean isFavoriteUp){
+        if (isFavoriteUp){
+            mIsFavorite = "1";
+        } else {
+            mIsFavorite = "0";
+        }
     }
 
     public void setIsFavorite(String isFavorite) {

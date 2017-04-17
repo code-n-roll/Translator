@@ -18,8 +18,8 @@ public class TablesDbHelper extends SQLiteOpenHelper{
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
 
-    private static final String SQL_CREATE_TABLE_TRANSLATED_ITEMS =
-            "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME + " (" +
+    private static final String SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS =
+            "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME_HISTORY + " (" +
                     TranslatedItemEntry._ID + INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_SRC_LANG + TEXT_TYPE + COMMA_SEP +
@@ -29,18 +29,32 @@ public class TablesDbHelper extends SQLiteOpenHelper{
                     TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION + TEXT_TYPE +
             " );";
+    private static final String SQL_CREATE_TABLE_FAVORITES_TRANSLATED_ITEMS =
+            "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME_FAVORITES + " (" +
+                    TranslatedItemEntry._ID + INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_TRG_MEAN + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION + TEXT_TYPE +
+                    " );";
 
     TablesDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_TABLE_TRANSLATED_ITEMS);
+        db.execSQL(SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS);
+        db.execSQL(SQL_CREATE_TABLE_FAVORITES_TRANSLATED_ITEMS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TranslatedItemEntry.TABLE_NAME);
-        db.execSQL(SQL_CREATE_TABLE_TRANSLATED_ITEMS);
+        db.execSQL("DROP TABLE IF EXISTS " + TranslatedItemEntry.TABLE_NAME_HISTORY);
+        db.execSQL(SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS);
+        db.execSQL("DROP TABLE IF EXISTS " + TranslatedItemEntry.TABLE_NAME_FAVORITES);
+        db.execSQL(SQL_CREATE_TABLE_FAVORITES_TRANSLATED_ITEMS);
     }
 }

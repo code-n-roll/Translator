@@ -47,9 +47,9 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
     }
 
     @Override
-    public boolean saveTranslatedItem(@NonNull TranslatedItem translatedItem) {
+    public boolean saveTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        if (isEntryExist(db, TranslatedItemEntry.TABLE_NAME, TranslatedItemEntry.COLUMN_NAME_ENTRY_ID,
+        if (isEntryExist(db, tableName, TranslatedItemEntry.COLUMN_NAME_ENTRY_ID,
                 translatedItem.getId())){
             return false;
         }
@@ -63,39 +63,56 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         values.put(TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE, translatedItem.isFavorite());
         values.put(TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION, translatedItem.getDictDefinition());
 
-        db.insert(TranslatedItemEntry.TABLE_NAME,null, values);
+        db.insert(tableName,null, values);
         db.close();
 
         return true;
     }
 
 
-    @Override
-    public void deleteTranslatedItem(@NonNull TranslatedItem translatedItem) {
+    public void deleteTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String selection = TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + " LIKE ? AND " +
                             TranslatedItemEntry.COLUMN_NAME_SRC_LANG + " LIKE ? AND " +
                             TranslatedItemEntry.COLUMN_NAME_TRG_LANG + " LIKE ?";
-        String[] selectionArgs = {translatedItem.getSrcMeaning(),
+        String[] selectionArgs = {
+                translatedItem.getSrcMeaning(),
                 translatedItem.getSrcLanguage(),
                 translatedItem.getTrgLanguage()};
-        db.delete(TranslatedItemEntry.TABLE_NAME, selection, selectionArgs);
+        db.delete(tableName, selection, selectionArgs);
         db.close();
     }
 
-    @Override
-    public void deleteTranslatedItems(){
+    public void deleteTranslatedItems(@NonNull String tableName){
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        String clearTable = "DELETE FROM " + TranslatedItemEntry.TABLE_NAME;
+        String clearTable = "DELETE FROM " + tableName;
         db.execSQL(clearTable);
+        db.close();
+    }
+
+    public void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem item) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, item.getId());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG, item.getSrcLanguage());
+        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG, item.getTrgLanguage());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN, item.getSrcMeaning());
+        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_MEAN, item.getTrgMeaning());
+        values.put(TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE, item.isFavorite());
+        values.put(TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION, item.getDictDefinition());
+
+        String whereClause = TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + " = ? ";
+        String[] whereArgs = {item.getId()};
+        db.update(tableName, values, whereClause, whereArgs);
         db.close();
     }
 
     @NonNull
     @Override
-    public List<TranslatedItem> getTranslatedItems() {
+    public List<TranslatedItem> getTranslatedItems(@NonNull String tableName) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         List<TranslatedItem> items = new ArrayList<>();
         String[] projection = {
@@ -108,7 +125,7 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
                 TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION
         };
 
-        Cursor c = db.query(TranslatedItemEntry.TABLE_NAME, projection, null, null, null, null, null);
+        Cursor c = db.query(tableName, projection, null, null, null, null, null);
         if (c != null && c.getCount() > 0){
             while(c.moveToNext()){
                 String itemId =

@@ -14,42 +14,45 @@ import com.karanchuk.roman.testtranslate.R;
  * Created by roman on 14.4.17.
  */
 
-public class ClearHistoryDialogFragment extends DialogFragment {
-    public interface ClearHistoryDialogListener {
-        void onDialogPositiveClick(ClearHistoryDialogFragment dialog);
-        void onDialogNegativeClick(ClearHistoryDialogFragment dialog);
+public class ClearStoredDialogFragment extends DialogFragment {
+    private ClearStoredDialogListener mListener;
+    private String mCurTitle;
+
+    public interface ClearStoredDialogListener {
+        void onDialogPositiveClick(ClearStoredDialogFragment dialog);
+        void onDialogNegativeClick(ClearStoredDialogFragment dialog);
     }
 
-    ClearHistoryDialogListener mListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
         try{
-            mListener = (ClearHistoryDialogListener) context;
+            mListener = (ClearStoredDialogListener) context;
         } catch (ClassCastException e){
             throw new ClassCastException(context.toString() +
-            " must implement ClearHistoryDialogListener");
+            " must implement ClearStoredDialogListener");
         }
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        mCurTitle = getArguments().getString("title");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("History")
-                .setMessage(R.string.dialog_clear_history)
+        builder.setTitle(mCurTitle)
+                .setMessage(getResources().getString(R.string.dialog_clear)+mCurTitle+"?")
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogPositiveClick(ClearHistoryDialogFragment.this);
+                        mListener.onDialogPositiveClick(ClearStoredDialogFragment.this);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogNegativeClick(ClearHistoryDialogFragment.this);
+                        mListener.onDialogNegativeClick(ClearStoredDialogFragment.this);
                     }
                 });
         return builder.create();

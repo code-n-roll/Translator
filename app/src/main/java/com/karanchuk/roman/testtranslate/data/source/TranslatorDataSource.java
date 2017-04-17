@@ -11,12 +11,14 @@ import java.util.List;
  */
 
 public interface TranslatorDataSource {
-    boolean saveTranslatedItem(@NonNull TranslatedItem translatedItem);
+    boolean saveTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
 
-    void deleteTranslatedItem(@NonNull TranslatedItem translatedItem);
+    void deleteTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
 
     @NonNull
-    List<TranslatedItem> getTranslatedItems();
+    List<TranslatedItem> getTranslatedItems(@NonNull String tableName);
 
-    void deleteTranslatedItems();
+    void deleteTranslatedItems(@NonNull String tableName);
+
+    void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
 }

@@ -9,18 +9,20 @@
         android:padding="15dp"
         android:scaleType="fitCenter"
         android:background="@android:color/transparent"
-        android:layout_gravity="top|right"
+        android:layout_gravity="top|end"
         android:src="@drawable/cancel_dark512"
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
         />
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="time"
-        android:textSize="145sp"
+        android:id="@+id/textview_fullscreen_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="70dp"
+        android:gravity="center"
+        android:text="время"
+        android:textSize="90sp"
         android:textColor="@android:color/black"
         />
 

@@ -3,6 +3,7 @@ package com.karanchuk.roman.testtranslate.data.source;
 import android.support.annotation.NonNull;
 
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
+import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -20,12 +21,14 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
     private final TranslatorDataSource mTranslatorLocalDataSource;
 
-    private List<TranslatedItemsRepositoryObserver> mObservers = new ArrayList<>();
+    private List<HistoryTranslatedItemsRepositoryObserver> mHistoryObservers = new ArrayList<>();
+    private List<FavoritesTranslatedItemsRepositoryObserver> mFavoritesObservers = new ArrayList<>();
 
-    private Map<String, TranslatedItem> mCachedTranslatedItems,
-                                        mCurCachedTranslatedItems;
+    private Map<String, TranslatedItem> mHistoryCachedTranslatedItems,
+                                        mFavoritesCachedTranslatedItems;
 
-    private boolean mCacheTranslatedItemsIsDirty = true;
+    private boolean mHistoryCacheTranslatedItemsIsDirty = true,
+                    mFavoritesCacheTranslatedItemsIdDirty = true;
 
     public static TranslatorRepository getInstance(TranslatorDataSource translatorLocalDataSource){
         if (INSTANCE == null){
@@ -40,102 +43,188 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
 
 
-    private List<TranslatedItem> getCachedTranslatedItems(){
-        if (mCurCachedTranslatedItems == null){
-            mCurCachedTranslatedItems = new LinkedHashMap<>();
+    private List<TranslatedItem> getHistoryCachedTranslatedItems(){
+        if (mHistoryCachedTranslatedItems == null){
+            mHistoryCachedTranslatedItems = new LinkedHashMap<>();
         }
-        if (mCachedTranslatedItems == null ) {
+        if (mHistoryCachedTranslatedItems == null ) {
             return new ArrayList<>();
         } else {
-            ArrayList<TranslatedItem> old = new ArrayList<>(mCachedTranslatedItems.values());
-            old.addAll(mCurCachedTranslatedItems.values());
-            return old;
+            return new ArrayList<>(mHistoryCachedTranslatedItems.values());
         }
     }
 
 
-    public void addContentObserver(TranslatedItemsRepositoryObserver observer){
-        if (!mObservers.contains(observer)){
-            mObservers.add(observer);
+    public void addHistoryContentObserver(HistoryTranslatedItemsRepositoryObserver observer){
+        if (!mHistoryObservers.contains(observer)){
+            mHistoryObservers.add(observer);
         }
     }
 
-    public void removeContentObserver(TranslatedItemsRepositoryObserver observer){
-        if (mObservers.contains(observer)){
-            mObservers.remove(observer);
+    public void removeHistoryContentObserver(HistoryTranslatedItemsRepositoryObserver observer){
+        if (mHistoryObservers.contains(observer)){
+            mHistoryObservers.remove(observer);
         }
     }
 
-    private void notifyTranslatedItemsChanged(){
-        for (TranslatedItemsRepositoryObserver observer : mObservers){
-            observer.onTranslatedItemsChanged();
+    private void notifyHistoryTranslatedItemsChanged(){
+        for (HistoryTranslatedItemsRepositoryObserver observer : mHistoryObservers){
+            observer.onHistoryTranslatedItemsChanged();
         }
     }
 
     @Override
-    public boolean saveTranslatedItem(@NonNull TranslatedItem translatedItem) {
-        if (mCurCachedTranslatedItems == null){
-            mCurCachedTranslatedItems = new LinkedHashMap<>();
-        }
+    public boolean saveTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+        if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)){
+            if (mHistoryCachedTranslatedItems == null){
+                mHistoryCachedTranslatedItems = new LinkedHashMap<>();
+            }
 
-        if (!mCurCachedTranslatedItems.containsValue(translatedItem)) {
-            mCurCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
-        } else {
-            mCurCachedTranslatedItems.values().remove(translatedItem);
-            mCurCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
-            mTranslatorLocalDataSource.deleteTranslatedItem(translatedItem);
+            if (!mHistoryCachedTranslatedItems.containsValue(translatedItem)) {
+                mHistoryCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
+            } else {
+                mHistoryCachedTranslatedItems.values().remove(translatedItem);
+                mHistoryCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
+                mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
+            }
+            mTranslatorLocalDataSource.saveTranslatedItem(tableName, translatedItem);
+            notifyHistoryTranslatedItemsChanged();
+        } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
+            if (mFavoritesCachedTranslatedItems == null){
+                mFavoritesCachedTranslatedItems = new LinkedHashMap<>();
+            }
+
+            if (!mFavoritesCachedTranslatedItems.containsValue(translatedItem)){
+                mFavoritesCachedTranslatedItems.put(translatedItem.getId(), translatedItem);
+                mTranslatorLocalDataSource.saveTranslatedItem(tableName, translatedItem);
+            }
+            notifyFavoritesTranslatedItemsChanged();
         }
-        mTranslatorLocalDataSource.saveTranslatedItem(translatedItem);
-        notifyTranslatedItemsChanged();
         return true;
     }
 
 
 
     @Override
-    public void deleteTranslatedItem(@NonNull TranslatedItem translatedItem) {
-        mTranslatorLocalDataSource.deleteTranslatedItem(translatedItem);
+    public void deleteTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+        if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
+            mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
 
-        if (mCachedTranslatedItems != null && mCachedTranslatedItems.containsKey(translatedItem.getId())){
-            mCachedTranslatedItems.remove(translatedItem.getId());
+            if (mHistoryCachedTranslatedItems != null && mHistoryCachedTranslatedItems.containsKey(translatedItem.getId())) {
+                mHistoryCachedTranslatedItems.remove(translatedItem.getId());
+            }
+
+            notifyHistoryTranslatedItemsChanged();
+        } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
+            mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
+
+            if (mFavoritesCachedTranslatedItems != null && mFavoritesCachedTranslatedItems.containsKey(translatedItem.getId())){
+                mFavoritesCachedTranslatedItems.remove(translatedItem.getId());
+            }
+
+            notifyFavoritesTranslatedItemsChanged();
         }
-
-        notifyTranslatedItemsChanged();
     }
 
     @NonNull
     @Override
-    public List<TranslatedItem> getTranslatedItems() {
-        if (!mCacheTranslatedItemsIsDirty){
-            return getCachedTranslatedItems();
-        } else {
-            List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems();
-
-            mCachedTranslatedItems = new LinkedHashMap<>();
-            for (TranslatedItem item : items) {
-                mCachedTranslatedItems.put(item.getId(), item);
+    public List<TranslatedItem> getTranslatedItems(@NonNull String tableName) {
+        if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
+            if (!mHistoryCacheTranslatedItemsIsDirty) {
+                return getHistoryCachedTranslatedItems();
             }
-            mCacheTranslatedItemsIsDirty = false;
+            List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems(tableName);
+
+            mHistoryCachedTranslatedItems = new LinkedHashMap<>();
+            for (TranslatedItem item : items) {
+                mHistoryCachedTranslatedItems.put(item.getId(), item);
+            }
+            mHistoryCacheTranslatedItemsIsDirty = false;
 
             return items;
+
+        }
+        if (!mFavoritesCacheTranslatedItemsIdDirty){
+            return getFavoritesCachedTranslatedItems();
+        }
+        List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems(tableName);
+
+        mFavoritesCachedTranslatedItems = new LinkedHashMap<>();
+        for (TranslatedItem item : items) {
+            mFavoritesCachedTranslatedItems.put(item.getId(), item);
+        }
+        mFavoritesCacheTranslatedItemsIdDirty = false;
+
+        return items;
+    }
+
+    @Override
+    public void deleteTranslatedItems(@NonNull String tableName) {
+        if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
+            mTranslatorLocalDataSource.deleteTranslatedItems(tableName);
+
+            if (mHistoryCachedTranslatedItems != null && !mHistoryCachedTranslatedItems.isEmpty()) {
+                mHistoryCachedTranslatedItems.clear();
+            }
+
+            notifyHistoryTranslatedItemsChanged();
+        } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
+            mTranslatorLocalDataSource.deleteTranslatedItems(tableName);
+
+            if (mFavoritesCachedTranslatedItems != null && !mFavoritesCachedTranslatedItems.isEmpty()){
+                mFavoritesCachedTranslatedItems.clear();
+            }
+            notifyFavoritesTranslatedItemsChanged();
         }
     }
 
     @Override
-    public void deleteTranslatedItems() {
-        mTranslatorLocalDataSource.deleteTranslatedItems();
-
-        if (mCachedTranslatedItems != null && !mCachedTranslatedItems.isEmpty()){
-            mCachedTranslatedItems.clear();
+    public void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+        if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
+            mTranslatorLocalDataSource.updateTranslatedItem(tableName, translatedItem);
+            notifyHistoryTranslatedItemsChanged();
+        } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
+            mTranslatorLocalDataSource.updateTranslatedItem(tableName, translatedItem);
+            notifyFavoritesTranslatedItemsChanged();
         }
-
-        if (mCurCachedTranslatedItems != null && !mCurCachedTranslatedItems.isEmpty()){
-            mCurCachedTranslatedItems.clear();
-        }
-        notifyTranslatedItemsChanged();
     }
 
-    public interface TranslatedItemsRepositoryObserver {
-        void onTranslatedItemsChanged();
+
+
+
+
+    public void addFavoritesContentObserver(FavoritesTranslatedItemsRepositoryObserver observer){
+        if (!mFavoritesObservers.contains(observer)){
+            mFavoritesObservers.add(observer);
+        }
+    }
+
+    public void removeFavoritesContentObserver(FavoritesTranslatedItemsRepositoryObserver observer){
+        if (mFavoritesObservers.contains(observer)){
+            mFavoritesObservers.remove(observer);
+        }
+    }
+
+    private void notifyFavoritesTranslatedItemsChanged(){
+        for (FavoritesTranslatedItemsRepositoryObserver observer : mFavoritesObservers){
+            observer.onFavoritesTranslatedItemsChanged();
+        }
+    }
+
+    private List<TranslatedItem> getFavoritesCachedTranslatedItems() {
+        if (mFavoritesCachedTranslatedItems == null){
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>(mFavoritesCachedTranslatedItems.values());
+        }
+    }
+
+
+    public interface HistoryTranslatedItemsRepositoryObserver {
+        void onHistoryTranslatedItemsChanged();
+    }
+
+    public interface FavoritesTranslatedItemsRepositoryObserver {
+        void onFavoritesTranslatedItemsChanged();
     }
 }

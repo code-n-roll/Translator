@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -15,22 +14,26 @@ import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.ui.stored.StoredFragment;
 import com.karanchuk.roman.testtranslate.ui.settings.SettingsFragment;
+import com.karanchuk.roman.testtranslate.ui.stored.StoredFragment;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
-import com.karanchuk.roman.testtranslate.ui.view.ClearHistoryDialogFragment;
+import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
+import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
+import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        ClearHistoryDialogFragment.ClearHistoryDialogListener,
-        TranslatorRepository.TranslatedItemsRepositoryObserver{
+        ClearStoredDialogFragment.ClearStoredDialogListener,
+        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
+        TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver{
 
     private String mCurFragment = "TRANSLATOR_FRAGMENT";
     public static String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT",
                         STORED_FRAGMENT = "STORED_FRAGMENT",
                         SETTINGS_FRAGMENT = "SETTINGS_FRAGMENT";
-    private List<TranslatedItem> mTranslatedItems;
+    private List<TranslatedItem> mHistoryTranslatedItems,
+                                mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
 
@@ -103,45 +106,68 @@ public class MainActivity extends AppCompatActivity implements
         super.onStart();
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(this);
         mRepository = TranslatorRepository.getInstance(localDataSource);
-        mRepository.addContentObserver(this);
-        mTranslatedItems = mRepository.getTranslatedItems();
-
+        mRepository.addHistoryContentObserver(this);
+        mRepository.addFavoritesContentObserver(this);
+        mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+        mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mRepository.removeContentObserver(this);
+        mRepository.removeHistoryContentObserver(this);
+        mRepository.removeFavoritesContentObserver(this);
     }
 
 
     @Override
-    public void onDialogPositiveClick(ClearHistoryDialogFragment dialog) {
+    public void onDialogPositiveClick(ClearStoredDialogFragment dialog) {
         Toast.makeText(this, "yes was clicked", Toast.LENGTH_SHORT).show();
-        if (!mTranslatedItems.isEmpty())
-            mRepository.deleteTranslatedItems();
-        Fragment storedFragment = getSupportFragmentManager().findFragmentByTag(STORED_FRAGMENT);
-        if (storedFragment != null){
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .detach(storedFragment)
-                    .attach(storedFragment)
-                    .commit();
+        String curTitle = dialog.getArguments().getString("title");
+        if (curTitle != null) {
+            switch (curTitle) {
+                case " History":
+                    if (!mHistoryTranslatedItems.isEmpty()) {
+                        mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+                        UIUtils.updateUIFragment(getSupportFragmentManager(), STORED_FRAGMENT);
+                    }
+                    break;
+                case " Favorites":
+                    if (!mFavoritesTranslatedItems.isEmpty()) {
+                        mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+                        UIUtils.updateUIFragment(getSupportFragmentManager(), STORED_FRAGMENT);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
+
+
     @Override
-    public void onDialogNegativeClick(ClearHistoryDialogFragment dialog) {
+    public void onDialogNegativeClick(ClearStoredDialogFragment dialog) {
         Toast.makeText(this,"cancel was clicked", Toast.LENGTH_SHORT).show();
 
     }
 
     @Override
-    public void onTranslatedItemsChanged() {
+    public void onHistoryTranslatedItemsChanged() {
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mTranslatedItems = mRepository.getTranslatedItems();
+                mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+            }
+        });
+    }
+
+    @Override
+    public void onFavoritesTranslatedItemsChanged() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
             }
         });
     }

@@ -27,10 +27,10 @@
             android:layout_toRightOf="@id/number_dict_defin_item"
             android:layout_toEndOf="@id/number_dict_defin_item"
             android:text="время ср, раз м, момент м, срок м, пора ж, период м"
-            android:textIsSelectable="true"
             android:layout_alignParentTop="true"
             android:textSize="18sp"
             android:textColor="@color/colorTransl"
+            android:textIsSelectable="true"
             />
     </RelativeLayout>
 
@@ -42,9 +42,9 @@
         android:text="(period, time, moment, pore)"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:textIsSelectable="true"
         android:textSize="18sp"
         android:textColor="@color/colorMean"
+        android:textIsSelectable="true"
         />
     <TextView
         android:layout_below="@id/mean_dict_defin_item"
@@ -54,10 +54,10 @@
         android:text="dayling saving time -- летнее время\ntake some time -- занять некоторое время"
         android:layout_marginLeft="30dp"
         android:layout_marginStart="30dp"
-        android:textIsSelectable="true"
         android:textSize="18sp"
         android:textStyle="italic"
         android:textColor="@color/colorExpr"
+        android:textIsSelectable="true"
         />
 
 </RelativeLayout>

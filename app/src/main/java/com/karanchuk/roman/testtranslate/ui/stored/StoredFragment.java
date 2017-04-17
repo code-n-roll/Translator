@@ -1,6 +1,8 @@
 package com.karanchuk.roman.testtranslate.ui.stored;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -13,16 +15,18 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.karanchuk.roman.testtranslate.R;
+import com.karanchuk.roman.testtranslate.data.TranslatedItem;
+import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
+import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract;
+import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.favorites.FavoritesFragment;
 import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
-import com.karanchuk.roman.testtranslate.utils.UIUtils;
+import com.karanchuk.roman.testtranslate.utils.ContentManager;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.karanchuk.roman.testtranslate.ui.main.MainActivity.STORED_FRAGMENT;
 
 /**
  * Created by roman on 8.4.17.
@@ -30,33 +34,52 @@ import static com.karanchuk.roman.testtranslate.ui.main.MainActivity.STORED_FRAG
 
 public class StoredFragment extends Fragment implements
         ViewPager.OnPageChangeListener,
-        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver {
+        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
+        TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver
+{
     private ViewPager mViewPager;
     private StoredPagerAdapter mFavoritesAdapter;
     private TabLayout mTabLayout;
     private List<Fragment> mFragments;
     private List<String> mTitles;
-    private ImageButton mClearHistory;
+    private ImageButton mClearStored;
     private View mView;
     private TranslatorRepository mRepository;
     private ClearStoredDialogFragment mClearHistoryDialog;
     private static String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG",
                     CLEAR_HISTORY_FAVORITES = "CLEAR_HISTORY_FAVORITES";
+    private ContentManager mContentManager;
+    private int curPosition = 0;
+    private Handler mMainHandler;
+    private List<TranslatedItem> mFavoritesItems, mHistoryItems;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_stored, container, false);
 
-//        TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
-//        mRepository = TranslatorRepository.getInstance(localDataSource);
-//        mRepository.addHistoryContentObserver(this);
+        mMainHandler = new Handler(Looper.getMainLooper());
+
+        mContentManager = ContentManager.getInstance();
+        TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
+        mRepository = TranslatorRepository.getInstance(localDataSource);
+        mRepository.addHistoryContentObserver(this);
+        mRepository.addFavoritesContentObserver(this);
+        mFavoritesItems = mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES);
+        mHistoryItems = mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
+
 
         mClearHistoryDialog = new ClearStoredDialogFragment();
         final Bundle bundle = new Bundle();
 
 
-        mClearHistory = (ImageButton) mView.findViewById(R.id.imagebutton_clear_history);
-        mClearHistory.setOnClickListener(new View.OnClickListener() {
+        mClearStored = (ImageButton) mView.findViewById(R.id.imagebutton_clear_stored);
+        if (mHistoryItems.isEmpty()){
+            mClearStored.setVisibility(View.INVISIBLE);
+        } else {
+            mClearStored.setVisibility(View.VISIBLE);
+        }
+        mClearStored.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch(mViewPager.getCurrentItem()) {
@@ -81,6 +104,13 @@ public class StoredFragment extends Fragment implements
         initToolbar();
 
         return mView;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mRepository.removeFavoritesContentObserver(this);
+        mRepository.removeHistoryContentObserver(this);
     }
 
     private void initTabLayout(View view){
@@ -120,6 +150,19 @@ public class StoredFragment extends Fragment implements
 
     @Override
     public void onPageSelected(int position) {
+        if (position == 0 && mHistoryItems.isEmpty() ||
+                position == 1 && mFavoritesItems.isEmpty()){
+            mClearStored.setVisibility(View.INVISIBLE);
+        } else {
+            mClearStored.setVisibility(View.VISIBLE);
+        }
+
+        if (curPosition != position){
+            mContentManager.notifyTranslatedItemChanged();
+        }
+        curPosition = position;
+
+
         Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
     }
 
@@ -129,7 +172,24 @@ public class StoredFragment extends Fragment implements
     }
 
     @Override
-    public void onHistoryTranslatedItemsChanged() {
+    public void onFavoritesTranslatedItemsChanged() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mFavoritesItems.clear();
+                mFavoritesItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES));
+            }
+        });
+    }
 
+    @Override
+    public void onHistoryTranslatedItemsChanged() {
+        mMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mHistoryItems.clear();
+                mHistoryItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY));
+            }
+        });
     }
 }

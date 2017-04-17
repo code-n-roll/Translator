@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.ui.source_lang;
+package com.karanchuk.roman.testtranslate.ui.target_lang;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,23 +8,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
-import com.karanchuk.roman.testtranslate.data.Language;
 
 import java.util.ArrayList;
 
 /**
- * Created by roman on 11.4.17.
+ * Created by roman on 17.4.17.
  */
 
-public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRecyclerAdapter.ViewHolder>{
+public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRecyclerAdapter.ViewHolder>{
     public interface OnItemClickListener {
-        void onItemClick(Language item);
+        void onItemClick(String item);
     }
 
-    private final ArrayList<Language> mItems;
+    private final ArrayList<String> mItems;
     private final OnItemClickListener mListener;
 
-    public SourceLangRecyclerAdapter(ArrayList<Language> items, OnItemClickListener listener){
+    public TargetLangRecyclerAdapter(ArrayList<String> items, OnItemClickListener listener){
         mItems = items;
         mListener = listener;
     }
@@ -58,15 +57,11 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
         }
 
 
-        public void bind(final Language item,
-                         final SourceLangRecyclerAdapter.OnItemClickListener listener){
+        public void bind(final String item,
+                         final OnItemClickListener listener){
 
-            mLanguage.setText(item.getName());
-            if (mLanguage.isSelected()){
-                mIsSelected.setVisibility(View.VISIBLE);
-            } else {
-                mIsSelected.setVisibility(View.GONE);
-            }
+            mLanguage.setText(item);
+            mIsSelected.setVisibility(View.GONE);
             mView.setOnClickListener(new View.OnClickListener(){
                 @Override public void onClick(View v){
                     listener.onItemClick(item);
@@ -76,5 +71,3 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
         }
     }
 }
-
-

@@ -21,14 +21,11 @@ import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.utils.UIUtils;
+import com.karanchuk.roman.testtranslate.utils.ContentManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.MissingResourceException;
-
-import static com.karanchuk.roman.testtranslate.ui.main.MainActivity.STORED_FRAGMENT;
 
 /**
  * Created by roman on 9.4.17.
@@ -37,7 +34,8 @@ import static com.karanchuk.roman.testtranslate.ui.main.MainActivity.STORED_FRAG
 public class FavoritesFragment extends Fragment implements
         SearchView.OnQueryTextListener,
         TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver,
-        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver
+        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
+        ContentManager.TranslatedItemChanged
 {
     private RecyclerView mFavoritesRecycler;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -48,16 +46,19 @@ public class FavoritesFragment extends Fragment implements
     private List<TranslatedItem> mFavoritesTranslatedItems,
                                     mHistoryTranslatedItems;
     private Handler mMainHandler;
-    private View mView;
+    private View mView, mEmptyView, mContentView;
     private TextView mTextViewEmptyFavorites;
     private ImageView mImageViewEmptyFavorites;
+    private ContentManager mContentManager;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         mMainHandler = new Handler(getContext().getMainLooper());
+
+        mContentManager = ContentManager.getInstance();
+        mContentManager.addContentObserver(this);
 
 //        mFavoritesTranslatedItems = new ArrayList<>();
 //        for (int i = 0; i < 10; i++) {
@@ -73,18 +74,14 @@ public class FavoritesFragment extends Fragment implements
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
         Collections.reverse(mFavoritesTranslatedItems);
 
-        if (!mFavoritesTranslatedItems.isEmpty()) {
-            mView = inflater.inflate(R.layout.content_favorites, container, false);
-        } else {
-            mView = inflater.inflate(R.layout.content_empty_item_list, container, false);
-            mTextViewEmptyFavorites = (TextView) mView.findViewById(R.id.textview_empty_item_list);
-            mTextViewEmptyFavorites.setText(R.string.empty_favorites);
-            mImageViewEmptyFavorites = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
-            mImageViewEmptyFavorites.setImageResource(R.drawable.bookmark_black_shape_light512);
+        mView = inflater.inflate(R.layout.content_favorites, container, false);
+        mEmptyView =  mView.findViewById(R.id.include_content_favorites_empty_item_list);
+        mContentView = mView.findViewById(R.id.include_content_favorites_full_item_list);
 
-            return mView;
-        }
-
+        mTextViewEmptyFavorites = (TextView) mView.findViewById(R.id.textview_empty_item_list);
+        mTextViewEmptyFavorites.setText(R.string.empty_favorites);
+        mImageViewEmptyFavorites = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
+        mImageViewEmptyFavorites.setImageResource(R.drawable.bookmark_black_shape_light512);
 
         mButtonIsFavorite = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
 
@@ -125,6 +122,7 @@ public class FavoritesFragment extends Fragment implements
                 }
                 mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
                 mFavoritesRecycler.getAdapter().notifyDataSetChanged();
+
                 Toast.makeText(getContext(),"isFavorite was clicked in favorites", Toast.LENGTH_SHORT).show();
             }
         };
@@ -133,8 +131,20 @@ public class FavoritesFragment extends Fragment implements
                 new SearchListRecyclerAdapter(mFavoritesTranslatedItems, itemClickListener, isFavoriteClickListener));
 
 
+        chooseCurView();
+
 
         return mView;
+    }
+
+    public void chooseCurView(){
+        if (!mFavoritesTranslatedItems.isEmpty()){
+            mEmptyView.setVisibility(View.GONE);
+            mContentView.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyView.setVisibility(View.VISIBLE);
+            mContentView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -142,6 +152,7 @@ public class FavoritesFragment extends Fragment implements
         super.onStop();
         mRepository.removeFavoritesContentObserver(this);
         mRepository.removeHistoryContentObserver(this);
+        mContentManager.removeContentObserver(this);
     }
 
     @Override
@@ -171,7 +182,8 @@ public class FavoritesFragment extends Fragment implements
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+                mFavoritesTranslatedItems.clear();
+                mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
             }
         });
     }
@@ -181,8 +193,17 @@ public class FavoritesFragment extends Fragment implements
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+                mHistoryTranslatedItems.clear();
+                mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
             }
         });
+    }
+
+    @Override
+    public void onTranslatedItemChanged() {
+        if (mFavoritesRecycler != null) {
+            chooseCurView();
+            mFavoritesRecycler.getAdapter().notifyDataSetChanged();
+        }
     }
 }

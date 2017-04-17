@@ -1,14 +1,20 @@
 package com.karanchuk.roman.testtranslate.utils;
 
+import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -23,10 +29,19 @@ import okhttp3.Response;
 public class TranslatorAPIUtils {
 
     public static void getTranslate(String translatedText,
-                                      String translDirection,
+                                      AssetManager manager,
+                                      String srcLang,
+                                      String trgLang,
                                       final TextView tvTranslateResult) throws IOException{
         OkHttpClient client = new OkHttpClient();
         final Handler mHandler = new Handler(Looper.getMainLooper());
+
+        JsonObject langs = JsonUtils.readJson(manager, "langs.json");
+
+
+        String translDirection = langs.get(srcLang.toLowerCase()).getAsString().
+                concat("-").
+                concat(langs.get(trgLang.toLowerCase()).getAsString());
 
         String url = "https://translate.yandex.net/api/v1.5/tr.json/translate?"+
                 "key=trnsl.1.1.20170410T011338Z.07c9f77e0dd5777b.400bcbcacf7bdafcdaa1a38cfa576dbc9fae4010"+

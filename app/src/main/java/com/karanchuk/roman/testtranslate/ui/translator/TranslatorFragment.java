@@ -158,7 +158,7 @@ public class TranslatorFragment extends Fragment implements
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), SourceLangActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,1);
             }
         });
         mButtonSwitchLang.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +174,7 @@ public class TranslatorFragment extends Fragment implements
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), TargetLangActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,2);
             }
         });
 
@@ -285,7 +285,11 @@ public class TranslatorFragment extends Fragment implements
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE && mCustomEditText.getText().length() != 0) {
                     try {
-                        TranslatorAPIUtils.getTranslate(mCustomEditText.getText().toString(), "ru-en", mTranslatedResult);
+                        TranslatorAPIUtils.getTranslate(mCustomEditText.getText().toString(),
+                                getActivity().getAssets(),
+                                mButtonSrcLang.getText().toString(),
+                                mButtonTrgLang.getText().toString(),
+                                mTranslatedResult);
                     } catch (IOException e){
                         e.printStackTrace();
                     }
@@ -365,6 +369,26 @@ public class TranslatorFragment extends Fragment implements
                 mTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode){
+            case 1:
+                if (resultCode == AppCompatActivity.RESULT_OK){
+                    String result = data.getStringExtra("result");
+                    mButtonSrcLang.setText(result);
+                }
+                break;
+            case 2:
+                if (resultCode == AppCompatActivity.RESULT_OK){
+                    String result = data.getStringExtra("result");
+                    mButtonTrgLang.setText(result);
+                }
+                break;
+            default:
+                break;
+        }
     }
 }
 

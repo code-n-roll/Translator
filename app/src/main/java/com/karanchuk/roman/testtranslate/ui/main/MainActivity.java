@@ -1,10 +1,10 @@
 package com.karanchuk.roman.testtranslate.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -13,12 +13,12 @@ import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
+import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.settings.SettingsFragment;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredFragment;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
-import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.List;
@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements
         }
 
     };
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

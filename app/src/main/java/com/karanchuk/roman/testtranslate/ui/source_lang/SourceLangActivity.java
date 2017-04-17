@@ -1,5 +1,6 @@
 package com.karanchuk.roman.testtranslate.ui.source_lang;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.R;
+import com.karanchuk.roman.testtranslate.data.Language;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +30,7 @@ public class SourceLangActivity extends AppCompatActivity {
     private RecyclerView mSrcLangRecycler;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.ItemDecoration mDividerItemDecoration;
-    private ArrayList<String> mItems;
+    private ArrayList<Language> mItems;
 
 
     @Override
@@ -52,8 +54,15 @@ public class SourceLangActivity extends AppCompatActivity {
         SourceLangRecyclerAdapter.OnItemClickListener itemClickListener = new
                 SourceLangRecyclerAdapter.OnItemClickListener() {
                     @Override
-                    public void onItemClick(String item) {
-                        Toast.makeText(getApplicationContext(),"clicked",Toast.LENGTH_SHORT).show();
+                    public void onItemClick(Language item) {
+                        item.setSelected(true);
+                        mItems.set(mItems.indexOf(item),item);
+                        mSrcLangRecycler.getAdapter().notifyDataSetChanged();
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("result",item.getName());
+                        setResult(AppCompatActivity.RESULT_OK,returnIntent);
+                        Toast.makeText(getApplicationContext(),"selected "+item,Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 };
 
@@ -70,7 +79,7 @@ public class SourceLangActivity extends AppCompatActivity {
             JsonObject jo = (JsonObject)new JsonParser().parse(s);
             for (Map.Entry<String,JsonElement> o : jo.entrySet()){
                 String lang = o.getKey();
-                mItems.add(lang.substring(0,1).toUpperCase().concat(lang.substring(1)));
+                mItems.add(new Language(lang.substring(0,1).toUpperCase().concat(lang.substring(1)),false));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,6 +98,7 @@ public class SourceLangActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
+
                 finish();
             default:
                 break;

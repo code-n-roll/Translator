@@ -21,6 +21,7 @@ import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.favorites.SearchListRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.ArrayList;
@@ -36,7 +37,8 @@ import static com.karanchuk.roman.testtranslate.ui.main.MainActivity.STORED_FRAG
 public class HistoryFragment extends Fragment implements
         TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver,
-        SearchView.OnQueryTextListener
+        SearchView.OnQueryTextListener,
+        ContentManager.TranslatedItemChanged
 {
     private RecyclerView mHistoryRecycler;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -46,16 +48,18 @@ public class HistoryFragment extends Fragment implements
                                 mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
-    private View mView;
+    private View mView, mEmptyView, mContentView;
     private TextView mTextViewEmptyHistory;
     private ImageView mImageViewEmptyHistory;
-
+    private ContentManager mContentManager;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mMainHandler = new Handler(getContext().getMainLooper());
 
+        mContentManager = ContentManager.getInstance();
+        mContentManager.addContentObserver(this);
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
@@ -65,19 +69,14 @@ public class HistoryFragment extends Fragment implements
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         Collections.reverse(mHistoryTranslatedItems);
 
-        if (!mHistoryTranslatedItems.isEmpty()) {
-            mView = inflater.inflate(R.layout.content_history, container, false);
-        } else {
-            mView = inflater.inflate(R.layout.content_empty_item_list, container, false);
-            mTextViewEmptyHistory = (TextView) mView.findViewById(R.id.textview_empty_item_list);
-            mTextViewEmptyHistory.setText(R.string.empty_history);
-            mImageViewEmptyHistory = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
-            mImageViewEmptyHistory.setImageResource(R.drawable.history_light512);
-            return mView;
-        }
+        mView = inflater.inflate(R.layout.content_history, container, false);
+        mEmptyView = mView.findViewById(R.id.include_content_history_empty_item_list);
+        mContentView = mView.findViewById(R.id.include_content_history_full_item_list);
 
-
-
+        mTextViewEmptyHistory = (TextView) mView.findViewById(R.id.textview_empty_item_list);
+        mTextViewEmptyHistory.setText(R.string.empty_history);
+        mImageViewEmptyHistory = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
+        mImageViewEmptyHistory.setImageResource(R.drawable.history_light512);
 
         mLayoutManager = new LinearLayoutManager(mView.getContext());
         mHistoryRecycler = (RecyclerView) mView.findViewById(R.id.history_items_list);
@@ -117,17 +116,27 @@ public class HistoryFragment extends Fragment implements
                             mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
                         }
                         mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-//                        mHistoryRecycler.getAdapter().notifyDataSetChanged();
-//                        UIUtils.updateUIRecyclerView(getParentFragment().getFragmentManager(), R.id.favorites_items_list);
-                        UIUtils.updateUIFragment(getActivity().getSupportFragmentManager(),STORED_FRAGMENT);
+                        mHistoryRecycler.getAdapter().notifyDataSetChanged();
+
                         Toast.makeText(getContext(),"isFavorite was clicked in history", Toast.LENGTH_SHORT).show();
                     }
                 };
         mHistoryRecycler.setAdapter(
                 new SearchListRecyclerAdapter(mHistoryTranslatedItems, itemClickListener, isFavoriteClickListener));
-        mHistoryRecycler.setHasFixedSize(true);
+
+        chooseCurView();
 
         return mView;
+    }
+
+    public void chooseCurView(){
+        if (!mHistoryTranslatedItems.isEmpty()){
+            mEmptyView.setVisibility(View.GONE);
+            mContentView.setVisibility(View.VISIBLE);
+        } else {
+            mEmptyView.setVisibility(View.VISIBLE);
+            mContentView.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -135,6 +144,7 @@ public class HistoryFragment extends Fragment implements
         super.onStop();
         mRepository.removeHistoryContentObserver(this);
         mRepository.removeFavoritesContentObserver(this);
+        mContentManager.removeContentObserver(this);
     }
 
     @Override
@@ -142,7 +152,8 @@ public class HistoryFragment extends Fragment implements
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+                mHistoryTranslatedItems.clear();
+                mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
             }
         });
     }
@@ -152,7 +163,8 @@ public class HistoryFragment extends Fragment implements
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+                mFavoritesTranslatedItems.clear();
+                mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
             }
         });
     }
@@ -178,5 +190,14 @@ public class HistoryFragment extends Fragment implements
         SearchListRecyclerAdapter adapter = (SearchListRecyclerAdapter)mHistoryRecycler.getAdapter();
         adapter.setFilter(newList);
         return true;
+    }
+
+
+    @Override
+    public void onTranslatedItemChanged() {
+        if (mHistoryRecycler != null) {
+            chooseCurView();
+            mHistoryRecycler.getAdapter().notifyDataSetChanged();
+        }
     }
 }

@@ -8,8 +8,10 @@ import java.util.UUID;
 
 public class TranslatedItem {
     private String mId;
-    private String mSrcLanguage;
-    private String mTrgLanguage;
+    private String mSrcLanguageForAPI;
+    private String mTrgLanguageForAPI;
+    private String mSrcLanguageForUser;
+    private String mTrgLanguageForUser;
     private String mSrcMeaning;
     private String mTrgMeaning;
     private String mIsFavorite;
@@ -17,23 +19,30 @@ public class TranslatedItem {
 
     public TranslatedItem(TranslatedItem translatedItem){
         mId = translatedItem.getId();
-        mSrcLanguage = translatedItem.getSrcLanguage();
-        mTrgLanguage = translatedItem.getTrgLanguage();
+        mSrcLanguageForAPI = translatedItem.getSrcLanguageForAPI();
+        mTrgLanguageForAPI = translatedItem.getTrgLanguageForAPI();
+        mSrcLanguageForUser = translatedItem.getSrcLanguageForAPI();
+        mTrgLanguageForUser = translatedItem.getTrgLanguageForAPI();
         mSrcMeaning = translatedItem.getSrcMeaning();
         mTrgMeaning = translatedItem.getTrgMeaning();
         mIsFavorite = translatedItem.getIsFavorite();
         mDictDefinition = translatedItem.getDictDefinition();
+
     }
 
-    public TranslatedItem(String id, String srcLanguage,
-                          String trgLanguage,
+    public TranslatedItem(String id, String srcLanguageForAPI,
+                          String trgLanguageForAPI,
+                          String srcLanguageForUser,
+                          String trgLanguageForUser,
                           String srcMeaning,
                           String trgMeaning,
                           String isFavorite,
                           String dictDefinition) {
         mId = id;
-        mSrcLanguage = srcLanguage;
-        mTrgLanguage = trgLanguage;
+        mSrcLanguageForAPI = srcLanguageForAPI;
+        mTrgLanguageForAPI = trgLanguageForAPI;
+        mSrcLanguageForUser = srcLanguageForUser;
+        mTrgLanguageForUser = trgLanguageForUser;
         mSrcMeaning = srcMeaning;
         mTrgMeaning = trgMeaning;
         mIsFavorite = isFavorite;
@@ -42,14 +51,19 @@ public class TranslatedItem {
 
 
 
-    public TranslatedItem(String srcLanguage,
-                          String trgLanguage,
+    public TranslatedItem(String srcLanguageForAPI,
+                          String trgLanguageForAPI,
+                          String srcLanguageForUser,
+                          String trgLanguageForUser,
                           String srcMeaning,
                           String trgMeaning,
                           String isFavorite,
                           String dictDefinition){
-        this(UUID.randomUUID().toString(), srcLanguage,
-                trgLanguage, srcMeaning, trgMeaning, isFavorite, dictDefinition);
+        this(UUID.randomUUID().toString(), srcLanguageForAPI,
+                trgLanguageForAPI, srcLanguageForUser,
+                trgLanguageForUser, srcMeaning,
+                trgMeaning, isFavorite,
+                dictDefinition);
     }
 
     public String getId() {
@@ -60,20 +74,36 @@ public class TranslatedItem {
         mId = id;
     }
 
-    public String getSrcLanguage() {
-        return mSrcLanguage;
+    public String getSrcLanguageForAPI() {
+        return mSrcLanguageForAPI;
     }
 
-    public void setSrcLanguage(String srcLanguage) {
-        mSrcLanguage = srcLanguage;
+    public void setSrcLanguageForAPI(String srcLanguageForAPI) {
+        mSrcLanguageForAPI = srcLanguageForAPI;
     }
 
-    public String getTrgLanguage() {
-        return mTrgLanguage;
+    public String getTrgLanguageForAPI() {
+        return mTrgLanguageForAPI;
     }
 
-    public void setTrgLanguage(String trgLanguage) {
-        mTrgLanguage = trgLanguage;
+    public void setTrgLanguageForAPI(String trgLanguageForAPI) {
+        mTrgLanguageForAPI = trgLanguageForAPI;
+    }
+
+    public String getSrcLanguageForUser() {
+        return mSrcLanguageForUser;
+    }
+
+    public void setSrcLanguageForUser(String srcLanguageForUser) {
+        mSrcLanguageForUser = srcLanguageForUser;
+    }
+
+    public String getTrgLanguageForUser() {
+        return mTrgLanguageForUser;
+    }
+
+    public void setTrgLanguageForUser(String trgLanguageForUser) {
+        mTrgLanguageForUser = trgLanguageForUser;
     }
 
     public String getSrcMeaning() {
@@ -130,8 +160,8 @@ public class TranslatedItem {
         TranslatedItem item = (TranslatedItem) obj;
         if (this.mSrcMeaning.equals(item.mSrcMeaning) &&
                 this.mTrgMeaning.equals(item.mTrgMeaning) &&
-                this.mSrcLanguage.equals(item.mSrcLanguage) &&
-                this.mTrgLanguage.equals(item.mTrgLanguage)){
+                this.mSrcLanguageForAPI.equals(item.mSrcLanguageForAPI) &&
+                this.mTrgLanguageForAPI.equals(item.mTrgLanguageForAPI)){
             return true;
         }
         return false;

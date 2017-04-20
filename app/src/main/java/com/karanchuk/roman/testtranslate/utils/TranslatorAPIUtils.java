@@ -3,13 +3,21 @@ package com.karanchuk.roman.testtranslate.utils;
 import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.karanchuk.roman.testtranslate.data.DictDefinition;
+import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
+import com.karanchuk.roman.testtranslate.data.Translation;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorRecyclerAdapter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -17,24 +25,30 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.karanchuk.roman.testtranslate.utils.DictionaryAPIUtils.lookup;
+
 /**
  * Created by roman on 11.4.17.
  */
 
 public class TranslatorAPIUtils {
 
-    public static void getTranslate(String translatedText,
-                                      AssetManager manager,
-                                      String srcLang,
-                                      String trgLang,
-                                      final TextView tvTranslateResult) throws IOException{
+    public static void getTranslate(final String translatedText,
+                                    AssetManager manager,
+                                    String srcLang,
+                                    String trgLang,
+                                    final TextView tvTranslateResult,
+                                    final RecyclerView rvTranslate,
+                                    final TranslatorFragment.TranslationSaver saver
+    )
+            throws IOException{
         OkHttpClient client = new OkHttpClient();
         final Handler mHandler = new Handler(Looper.getMainLooper());
 
         JsonObject langs = JsonUtils.getJsonObjectFromFile(manager, "langs.json");
 
 
-        String translDirection = langs.get(srcLang.toLowerCase()).getAsString().
+        final String translDirection = langs.get(srcLang.toLowerCase()).getAsString().
                 concat("-").
                 concat(langs.get(trgLang.toLowerCase()).getAsString());
 
@@ -57,9 +71,9 @@ public class TranslatorAPIUtils {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, final Response response) throws IOException {
                 String strResponse = response.body().string();
-                JsonObject jo = (JsonObject)new JsonParser().parse(strResponse);
+                final JsonObject jo = (JsonObject)new JsonParser().parse(strResponse);
                 final String result = jo.get("text").getAsString();
                 Log.d("api response", strResponse);
                 Log.d("http response", response.toString());
@@ -67,7 +81,11 @@ public class TranslatorAPIUtils {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        tvTranslateResult.setText(result);
+                        if (!result.isEmpty()) {
+                            tvTranslateResult.setText(result);
+                            DictionaryAPIUtils.lookup(mHandler, translatedText,translDirection,rvTranslate, saver);
+                        }
+
                     }
                 });
 

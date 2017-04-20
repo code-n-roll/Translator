@@ -112,10 +112,18 @@ public class JsonUtils {
             String namePOS = pOfsJSON.getAsJsonObject().get("pos").getAsString();
             dictDefinition.add(new PartOfSpeech(namePOS,translations));
         }
+        String text = "";
+        String ts = "";
+        if (dictDefJSON.getAsJsonArray().size() != 0) {
+            JsonElement textJSON = dictDefJSON.getAsJsonArray().get(0).getAsJsonObject().get("text");
+            if (textJSON != null)
+                text = textJSON.getAsString();
 
-        String text = dictDefJSON.getAsJsonArray().get(0).getAsJsonObject().get("text").getAsString();
-        String ts = "[".concat(dictDefJSON.getAsJsonArray().get(0).getAsJsonObject().get("ts").getAsString()).concat("]");
-        DictDefinition dictDef = new DictDefinition(text,ts,dictDefinition);
+            JsonElement tsJSON = dictDefJSON.getAsJsonArray().get(0).getAsJsonObject().get("ts");
+            if (tsJSON != null)
+                ts = "[".concat(tsJSON.getAsString()).concat("]");
+        }
+        DictDefinition dictDef = new DictDefinition(text,ts,dictDefinition,jsonObject.toString());
         Log.d("parse_json_response", dictDef.toString());
         return dictDef;
     }

@@ -22,8 +22,10 @@ public class TablesDbHelper extends SQLiteOpenHelper{
             "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME_HISTORY + " (" +
                     TranslatedItemEntry._ID + INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
-                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG + TEXT_TYPE + COMMA_SEP +
-                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_TRG_MEAN + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE + TEXT_TYPE + COMMA_SEP +
@@ -33,8 +35,10 @@ public class TablesDbHelper extends SQLiteOpenHelper{
             "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME_FAVORITES + " (" +
                     TranslatedItemEntry._ID + INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
-                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG + TEXT_TYPE + COMMA_SEP +
-                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER + TEXT_TYPE + COMMA_SEP +
+                    TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_TRG_MEAN + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE + TEXT_TYPE + COMMA_SEP +

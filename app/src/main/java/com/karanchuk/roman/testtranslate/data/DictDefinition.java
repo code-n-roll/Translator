@@ -1,5 +1,8 @@
 package com.karanchuk.roman.testtranslate.data;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.List;
 
 /**
@@ -10,11 +13,26 @@ public class DictDefinition {
     private String mText;
     private String mTranscription;
     private List<PartOfSpeech> mPartsOfSpeech;
+    private String mJsonToStringRepr;
 
-    public DictDefinition(String text, String transcription, List<PartOfSpeech> partsOfSpeech) {
+    public DictDefinition(String text,
+                          String transcription,
+                          List<PartOfSpeech> partsOfSpeech,
+                          String jsonToStringRepr) {
         mText = text;
         mTranscription = transcription;
         mPartsOfSpeech = partsOfSpeech;
+        mJsonToStringRepr = jsonToStringRepr;
+    }
+
+
+
+    public String getJsonToStringRepr() {
+        return mJsonToStringRepr;
+    }
+
+    public void setJsonToStringRepr(String jsonToStringRepr) {
+        mJsonToStringRepr = jsonToStringRepr;
     }
 
     public String getText() {

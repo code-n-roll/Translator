@@ -13,8 +13,10 @@ public final class TablesPersistenceContract {
         public static final String TABLE_NAME_HISTORY = "history_translated_items";
         public static final String TABLE_NAME_FAVORITES = "favorites_translated_items";
         public static final String COLUMN_NAME_ENTRY_ID = "translated_item_id";
-        public static final String COLUMN_NAME_SRC_LANG = "source_language";
-        public static final String COLUMN_NAME_TRG_LANG = "target_language";
+        public static final String COLUMN_NAME_SRC_LANG_API = "source_language_api";
+        public static final String COLUMN_NAME_TRG_LANG_API = "target_language_api";
+        public static final String COLUMN_NAME_SRC_LANG_USER = "source_language_user";
+        public static final String COLUMN_NAME_TRG_LANG_USER = "target_language_user";
         public static final String COLUMN_NAME_SRC_MEAN = "source_meaning";
         public static final String COLUMN_NAME_TRG_MEAN = "target_meaning";
         public static final String COLUMN_NAME_IS_FAVORITE = "is_favorite";

@@ -29,10 +29,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.DictDefinition;
 import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
-import com.karanchuk.roman.testtranslate.data.Synonym;
 import com.karanchuk.roman.testtranslate.data.Translation;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
@@ -87,8 +87,13 @@ public class TranslatorFragment extends Fragment implements
     public static final String PREFS_NAME = "MyPrefsFile",
                                EDITTEXT_DATA = "EdittextData",
                                 SRC_LANG = "ButtonSrcLangData",
-                                TRG_LANG = "ButtonTrgLangData";
+                                TRG_LANG = "ButtonTrgLangData",
+                                TRANSL_RESULT = "TextviewTranslResult",
+                                TRANSL_CONTENT = "RecyclerViewTranslContent";
     private SharedPreferences mSettings;
+    private TranslationSaver saver;
+    private DictDefinition curDictDefinition;
+
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -106,7 +111,7 @@ public class TranslatorFragment extends Fragment implements
 
 
         mMainHandler = new Handler(getContext().getMainLooper());
-
+        saver = new TranslationSaver();
 
 
         initToolbar();
@@ -116,9 +121,9 @@ public class TranslatorFragment extends Fragment implements
         mButtonSwitchLang = (ImageButton) mViewActionBar.findViewById(R.id.center_actionbar_button);
 
         mButtonSrcLang = (Button) mViewActionBar.findViewById(R.id.left_actionbar_button);
-        mButtonSrcLang.setText(mSettings.getString(SRC_LANG,"Select language"));
+        mButtonSrcLang.setText(mSettings.getString(SRC_LANG,"Choose language"));
         mButtonTrgLang = (Button) mViewActionBar.findViewById(R.id.right_actionbar_button);
-        mButtonTrgLang.setText(mSettings.getString(TRG_LANG,"Select language"));
+        mButtonTrgLang.setText(mSettings.getString(TRG_LANG,"Choose language"));
 
 
         mCustomEditText = (CustomEditText) mView.findViewById(R.id.edittext);
@@ -133,6 +138,7 @@ public class TranslatorFragment extends Fragment implements
         mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
 
         mTranslatedResult = (TextView) mView.findViewById(R.id.textview_translate_result);
+        mTranslatedResult.setText(mSettings.getString(TRANSL_RESULT,""));
 
         mButtonFullscreen = (ImageButton) mView.findViewById(R.id.fullscreen_translated_word);
 
@@ -149,16 +155,26 @@ public class TranslatorFragment extends Fragment implements
         mLayoutManager = new LinearLayoutManager(getActivity());
         mTranslateRecyclerView.setLayoutManager(mLayoutManager);
 
+        String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
+
+
         mTranslations = new ArrayList<>();
 
-        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
-                JsonUtils.getJsonObjectFromFile(
-                        getActivity().getAssets(),"translator_response.json"));
-        for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
-            for (Translation transl : POS.getTranslations()){
-                mTranslations.add(transl);
+        if (!dictDefString.isEmpty()) {
+            DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
+                    new JsonParser().parse(dictDefString).getAsJsonObject()
+            );
+            curDictDefinition = dictDefinition;
+    //        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
+    //                JsonUtils.getJsonObjectFromFile(
+    //                        getActivity().getAssets(),"translator_response.json"));
+            for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
+                for (Translation transl : POS.getTranslations()){
+                    mTranslations.add(transl);
+                }
             }
         }
+
 //        List<Synonym> synonyms = new ArrayList<>();
 //        synonyms.add(new Synonym("время","ср"));
 //        synonyms.add(new Synonym("раз","м"));
@@ -267,6 +283,12 @@ public class TranslatorFragment extends Fragment implements
         editor.putString(EDITTEXT_DATA,mCustomEditText.getText().toString());
         editor.putString(SRC_LANG,mButtonSrcLang.getText().toString());
         editor.putString(TRG_LANG,mButtonTrgLang.getText().toString());
+        editor.putString(TRANSL_RESULT, mTranslatedResult.getText().toString());
+        if (saver.getDictDefinition() != null) {
+            editor.putString(TRANSL_CONTENT, saver.getDictDefinition().getJsonToStringRepr());
+        } else if (curDictDefinition != null){
+            editor.putString(TRANSL_CONTENT, curDictDefinition.getJsonToStringRepr());
+        }
         editor.apply();
     }
 
@@ -309,7 +331,6 @@ public class TranslatorFragment extends Fragment implements
                                                 getResources(),
                                                 getResources().getLayout(R.layout.edittext_border)));
                                 mCustomEditText.setCursorVisible(false);
-                                addToHistory();
                             } catch (XmlPullParserException | IOException e) {
                                 e.printStackTrace();
                             }
@@ -343,7 +364,9 @@ public class TranslatorFragment extends Fragment implements
                                 getActivity().getAssets(),
                                 mButtonSrcLang.getText().toString(),
                                 mButtonTrgLang.getText().toString(),
-                                mTranslatedResult);
+                                mTranslatedResult,
+                                mTranslateRecyclerView,
+                                saver);
                     } catch (IOException e){
                         e.printStackTrace();
                     }
@@ -377,23 +400,34 @@ public class TranslatorFragment extends Fragment implements
     }
 
     public void addToHistory(){
-        if (mCustomEditText.getText().length() != 0){
-            TranslationSaver saver = new TranslationSaver();
-            new Thread(saver).start();
-        }
+//        if (mCustomEditText.getText().length() != 0){
+//        }
     }
 
-    private class TranslationSaver implements Runnable{
+    public class TranslationSaver implements Runnable{
+        private DictDefinition mDictDefinition;
+
+        public DictDefinition getDictDefinition() {
+            return mDictDefinition;
+        }
+
+        public void setDictDefinition(DictDefinition dictDefinition) {
+            mDictDefinition = dictDefinition;
+        }
+
         @Override
         public void run() {
 
             TranslatedItem item = new TranslatedItem(
                     mLanguagesMap.get(mButtonSrcLang.getText().toString().toLowerCase()).getAsString().toUpperCase(),
                     mLanguagesMap.get(mButtonTrgLang.getText().toString().toLowerCase()).getAsString().toUpperCase(),
+                    mButtonSrcLang.getText().toString(),
+                    mButtonTrgLang.getText().toString(),
                     mCustomEditText.getText().toString(),
                     mTranslatedResult.getText().toString(),
                     "false",
-                    mTranslations.toString());
+                    mDictDefinition.getJsonToStringRepr()
+                    );
             if (!mTranslatedItems.contains(item)) {
                 mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
             } else {

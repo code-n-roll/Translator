@@ -10,6 +10,7 @@ import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Translation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by roman on 11.4.17.
@@ -58,8 +59,23 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
         public void bind(Translation item){
             mNumberDictDefinItem.setText(item.getNumber());
             mTranslDictDefinItem.setText(item.getRepresentSynonyms());
-            mMeanDictDefinItem.setText(item.getMeanings());
-            mExprDictDefinItem.setText(item.getExpressions());
+            if (!item.getMeanings().isEmpty()) {
+                mMeanDictDefinItem.setText(item.getMeanings());
+                mMeanDictDefinItem.setVisibility(View.VISIBLE);
+            } else {
+                mMeanDictDefinItem.setVisibility(View.GONE);
+            }
+            if (!item.getExpressions().isEmpty()){
+                mExprDictDefinItem.setText(item.getExpressions());
+                mExprDictDefinItem.setVisibility(View.VISIBLE);
+            } else {
+                mExprDictDefinItem.setVisibility(View.GONE);
+            }
         }
+    }
+    public void updateData(List<Translation> translations){
+        mItems.clear();
+        mItems.addAll(translations);
+        notifyDataSetChanged();
     }
 }

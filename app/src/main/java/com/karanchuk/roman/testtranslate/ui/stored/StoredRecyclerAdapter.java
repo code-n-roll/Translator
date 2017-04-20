@@ -1,6 +1,7 @@
-package com.karanchuk.roman.testtranslate.ui.stored.favorites;
+package com.karanchuk.roman.testtranslate.ui.stored;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,24 +18,36 @@ import java.util.List;
  * Created by roman on 9.4.17.
  */
 
-public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRecyclerAdapter.ViewHolder>{
+public class StoredRecyclerAdapter extends
+        RecyclerView.Adapter<StoredRecyclerAdapter.ViewHolder>{
+    private List<TranslatedItem> mItems;
+    private final OnItemClickListener mItemClickListener, mIsFavoriteListener;
+    private int mPosition;
+    private int mUniqueFragmentId;
+
     public interface OnItemClickListener {
         void onItemClick(TranslatedItem item);
     }
 
-    private List<TranslatedItem> mItems;
-    private final OnItemClickListener mItemListener, mIsFavoriteListener;
+    public int getPosition() {
+        return mPosition;
+    }
 
-    public SearchListRecyclerAdapter(List<TranslatedItem> items,
-                                     OnItemClickListener itemListener,
-                                     OnItemClickListener isFavoriteListener){
+    public void setPosition(int position) {
+        this.mPosition = position;
+    }
+    public StoredRecyclerAdapter(List<TranslatedItem> items,
+                                 OnItemClickListener itemClickListener,
+                                 OnItemClickListener isFavoriteListener,
+                                 int uniqueFragmentId){
         mItems = items;
-        mItemListener = itemListener;
+        mItemClickListener = itemClickListener;
         mIsFavoriteListener = isFavoriteListener;
+        mUniqueFragmentId = uniqueFragmentId;
     }
 
     @Override
-    public SearchListRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+    public StoredRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View view = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.content_favorite_item, parent, false);
         return new ViewHolder(view);
@@ -42,8 +55,23 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
 
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(mItems.get(position), mItemListener, mIsFavoriteListener);
+    public void onViewRecycled(ViewHolder holder) {
+        holder.itemView.setOnLongClickListener(null);
+        super.onViewRecycled(holder);
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        holder.bind(mItems.get(position), mItemClickListener, mIsFavoriteListener);
+
+
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                setPosition(holder.getAdapterPosition());
+                return false;
+            }
+        });
     }
 
     @Override
@@ -51,7 +79,8 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
         return mItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnCreateContextMenuListener{
         private ImageButton mIsFavoriteView;
         private TextView mSrcTrgLanguage, mSrcMeaning, mTrgMeaning;
         private View mView;
@@ -59,6 +88,8 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
         public ViewHolder(View view){
             super(view);
             mView = view;
+            view.setOnCreateContextMenuListener(this);
+
             mIsFavoriteView = (ImageButton) view.findViewById(R.id.imagebutton_isfavorite_favorite_item);
             mSrcTrgLanguage = (TextView) view.findViewById(R.id.src_trg_languages);
             mSrcMeaning = (TextView) view.findViewById(R.id.src_meaning);
@@ -76,7 +107,7 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
             } else {
                 mIsFavoriteView.setImageResource(R.drawable.bookmark_black_shape_light512);
             }
-            mSrcTrgLanguage.setText(item.getSrcLanguage() +" - " + item.getTrgLanguage());
+            mSrcTrgLanguage.setText(item.getSrcLanguageForAPI() +" - " + item.getTrgLanguageForAPI());
             mSrcMeaning.setText(item.getSrcMeaning());
             mTrgMeaning.setText(item.getTrgMeaning());
 
@@ -93,6 +124,12 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
                 }
             });
 
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(mUniqueFragmentId, R.id.menu_item_delete,
+                    0, R.string.menu_item_delete_option);
         }
     }
     public void setFilter(ArrayList<TranslatedItem> items){

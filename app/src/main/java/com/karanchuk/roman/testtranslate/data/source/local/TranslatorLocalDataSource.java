@@ -58,8 +58,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
 
         ContentValues values = new ContentValues();
         values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, translatedItem.getId());
-        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG, translatedItem.getSrcLanguage());
-        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG, translatedItem.getTrgLanguage());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API, translatedItem.getSrcLanguageForAPI());
+        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API, translatedItem.getTrgLanguageForAPI());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER, translatedItem.getTrgLanguageForUser());
+        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER, translatedItem.getTrgLanguageForUser());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN, translatedItem.getSrcMeaning());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_MEAN, translatedItem.getTrgMeaning());
         values.put(TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE, translatedItem.isFavorite());
@@ -79,12 +81,12 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         String selection = TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + " LIKE ? AND " +
-                            TranslatedItemEntry.COLUMN_NAME_SRC_LANG + " LIKE ? AND " +
-                            TranslatedItemEntry.COLUMN_NAME_TRG_LANG + " LIKE ?";
+                            TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API + " LIKE ? AND " +
+                            TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API + " LIKE ?";
         String[] selectionArgs = {
                 translatedItem.getSrcMeaning(),
-                translatedItem.getSrcLanguage(),
-                translatedItem.getTrgLanguage()};
+                translatedItem.getSrcLanguageForAPI(),
+                translatedItem.getTrgLanguageForAPI()};
         db.delete(tableName, selection, selectionArgs);
         db.close();
 
@@ -117,8 +119,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
 
         ContentValues values = new ContentValues();
         values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, item.getId());
-        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG, item.getSrcLanguage());
-        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG, item.getTrgLanguage());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API, item.getSrcLanguageForAPI());
+        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API, item.getTrgLanguageForAPI());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER, item.getTrgLanguageForUser());
+        values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER, item.getTrgLanguageForUser());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN, item.getSrcMeaning());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_MEAN, item.getTrgMeaning());
         values.put(TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE, item.isFavorite());
@@ -140,8 +144,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         List<TranslatedItem> items = new ArrayList<>();
         String[] projection = {
                 TranslatedItemEntry.COLUMN_NAME_ENTRY_ID,
-                TranslatedItemEntry.COLUMN_NAME_SRC_LANG,
-                TranslatedItemEntry.COLUMN_NAME_TRG_LANG,
+                TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API,
+                TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API,
+                TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER,
+                TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER,
                 TranslatedItemEntry.COLUMN_NAME_SRC_MEAN,
                 TranslatedItemEntry.COLUMN_NAME_TRG_MEAN,
                 TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE,
@@ -153,10 +159,14 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
             while(c.moveToNext()){
                 String itemId =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID));
-                String itemSrcLang =
-                        c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_LANG));
-                String itemTrgLang =
-                        c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_TRG_LANG));
+                String itemSrcLangAPI =
+                        c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API));
+                String itemTrgLangAPI =
+                        c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API));
+                String itemSrcLangUser =
+                        c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER));
+                String itemTrgLangUser =
+                        c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER));
                 String itemSrcMean =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN));
                 String itemTrgMean =
@@ -166,8 +176,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
                 String itemDictDef =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION));
 
-                TranslatedItem translatedItem = new TranslatedItem(itemId, itemSrcLang, itemTrgLang,
-                        itemSrcMean, itemTrgMean, itemIsFavorite, itemDictDef);
+                TranslatedItem translatedItem = new TranslatedItem(
+                        itemId, itemSrcLangAPI, itemTrgLangAPI,
+                        itemSrcLangUser, itemTrgLangUser, itemSrcMean,
+                        itemTrgMean, itemIsFavorite, itemDictDef);
                 items.add(translatedItem);
             }
         }

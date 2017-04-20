@@ -1,17 +1,20 @@
 package com.karanchuk.roman.testtranslate.ui.stored.history;
 
-import android.graphics.drawable.Drawable;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,15 +25,19 @@ import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.ui.stored.favorites.SearchListRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.EDITTEXT_DATA;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.PREFS_NAME;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRANSL_CONTENT;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRANSL_RESULT;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRG_LANG;
 
 /**
  * Created by roman on 9.4.17.
@@ -54,11 +61,23 @@ public class HistoryFragment extends Fragment implements
     private TextView mTextViewEmptyHistory;
     private ImageView mImageViewEmptyHistory;
     private ContentManager mContentManager;
+    private SharedPreferences mSettings;
+    private ImageButton mClearStored;
+
+    public static int UNIQUE_HISTORY_FRAGMENT_ID = 1;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mMainHandler = new Handler(getContext().getMainLooper());
+
+        mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+
+
+        View parent = getParentFragment().getView();
+        if (parent != null)
+            mClearStored = (ImageButton) parent.findViewById(R.id.imagebutton_clear_stored);
+
 
         mContentManager = ContentManager.getInstance();
         mContentManager.addContentObserver(this);
@@ -73,6 +92,7 @@ public class HistoryFragment extends Fragment implements
         Collections.reverse(mHistoryTranslatedItems);
 
         mView = inflater.inflate(R.layout.content_history, container, false);
+
         mEmptyView = mView.findViewById(R.id.include_content_history_empty_item_list);
         mContentView = mView.findViewById(R.id.include_content_history_full_item_list);
 
@@ -119,6 +139,9 @@ public class HistoryFragment extends Fragment implements
 //            }
 //        });
 
+        final BottomNavigationView navigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
+        final View translatorNavigationItem = navigation.findViewById(R.id.navigation_translate);
+
         mDividerItemDecoration = new DividerItemDecoration(mHistoryRecycler.getContext(),
                 RecyclerView.VERTICAL);
         mHistoryRecycler.addItemDecoration(mDividerItemDecoration);
@@ -127,16 +150,23 @@ public class HistoryFragment extends Fragment implements
 //        for (int i = 0; i < 100; i++)
 //            mHistoryTranslatedItems.add(i, new TranslatedItem("RU","FR","привет", "bonjour", "false", null));
 
-        SearchListRecyclerAdapter.OnItemClickListener itemClickListener = new
-                SearchListRecyclerAdapter.OnItemClickListener() {
+        StoredRecyclerAdapter.OnItemClickListener itemClickListener = new
+                StoredRecyclerAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick (TranslatedItem item){
-
+                        SharedPreferences.Editor editor = mSettings.edit();
+                        editor.putString(EDITTEXT_DATA, item.getSrcMeaning());
+                        editor.putString(SRC_LANG, item.getSrcLanguageForUser());
+                        editor.putString(TRG_LANG, item.getTrgLanguageForUser());
+                        editor.putString(TRANSL_RESULT, item.getTrgMeaning());
+                        editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+                        editor.apply();
+                        translatorNavigationItem.performClick();
                         Toast.makeText(getContext(),"item was clicked in history", Toast.LENGTH_SHORT).show();
                     }
                 };
-        SearchListRecyclerAdapter.OnItemClickListener isFavoriteClickListener = new
-                SearchListRecyclerAdapter.OnItemClickListener() {
+        StoredRecyclerAdapter.OnItemClickListener isFavoriteClickListener = new
+                StoredRecyclerAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(TranslatedItem item) {
                         if (item.isFavorite()){
@@ -152,10 +182,16 @@ public class HistoryFragment extends Fragment implements
                         Toast.makeText(getContext(),"isFavorite was clicked in history", Toast.LENGTH_SHORT).show();
                     }
                 };
+
         mHistoryRecycler.setAdapter(
-                new SearchListRecyclerAdapter(mHistoryTranslatedItems, itemClickListener, isFavoriteClickListener));
+                new StoredRecyclerAdapter(mHistoryTranslatedItems,
+                        itemClickListener,
+                        isFavoriteClickListener,
+                        UNIQUE_HISTORY_FRAGMENT_ID));
+        registerForContextMenu(mHistoryRecycler);
 
         chooseCurView();
+
 
         return mView;
     }
@@ -175,6 +211,7 @@ public class HistoryFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
+        unregisterForContextMenu(mHistoryRecycler);
 //        remove observers here is bad idea!
     }
 
@@ -234,7 +271,7 @@ public class HistoryFragment extends Fragment implements
                 newList.add(item);
             }
         }
-        SearchListRecyclerAdapter adapter = (SearchListRecyclerAdapter)mHistoryRecycler.getAdapter();
+        StoredRecyclerAdapter adapter = (StoredRecyclerAdapter)mHistoryRecycler.getAdapter();
         adapter.setFilter(newList);
         return true;
     }
@@ -249,5 +286,43 @@ public class HistoryFragment extends Fragment implements
             chooseCurView();
             mHistoryRecycler.getAdapter().notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getGroupId() == UNIQUE_HISTORY_FRAGMENT_ID) {
+            switch (item.getItemId()) {
+                case R.id.menu_item_delete:
+                    performContextItemDeletion();
+                    chooseCurView();
+                    chooseClearStoredVisility();
+                    Toast.makeText(getContext(), "item was longclicked contextmenu in history", Toast.LENGTH_SHORT).show();
+                    return true;
+                default:
+                    return super.onContextItemSelected(item);
+            }
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    public void chooseClearStoredVisility(){
+        if (!mHistoryTranslatedItems.isEmpty()){
+            mClearStored.setVisibility(View.VISIBLE);
+        } else {
+            mClearStored.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void performContextItemDeletion(){
+        StoredRecyclerAdapter adapter = (StoredRecyclerAdapter) mHistoryRecycler.getAdapter();
+        int position = adapter.getPosition();
+        mHistoryTranslatedItems.remove(position);
+        mHistoryRecycler.getAdapter().notifyItemRemoved(position);
     }
 }

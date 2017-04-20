@@ -60,7 +60,7 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, translatedItem.getId());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API, translatedItem.getSrcLanguageForAPI());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API, translatedItem.getTrgLanguageForAPI());
-        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER, translatedItem.getTrgLanguageForUser());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER, translatedItem.getSrcLanguageForUser());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER, translatedItem.getTrgLanguageForUser());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN, translatedItem.getSrcMeaning());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_MEAN, translatedItem.getTrgMeaning());
@@ -121,7 +121,7 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, item.getId());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API, item.getSrcLanguageForAPI());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API, item.getTrgLanguageForAPI());
-        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER, item.getTrgLanguageForUser());
+        values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER, item.getSrcLanguageForUser());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER, item.getTrgLanguageForUser());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN, item.getSrcMeaning());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_MEAN, item.getTrgMeaning());

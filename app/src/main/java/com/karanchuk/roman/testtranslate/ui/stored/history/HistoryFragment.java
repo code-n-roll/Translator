@@ -1,5 +1,6 @@
 package com.karanchuk.roman.testtranslate.ui.stored.history;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,13 +24,13 @@ import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceCont
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.favorites.SearchListRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
-import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static com.karanchuk.roman.testtranslate.ui.main.MainActivity.STORED_FRAGMENT;
 
 /**
  * Created by roman on 9.4.17.
@@ -65,6 +67,7 @@ public class HistoryFragment extends Fragment implements
         mRepository = TranslatorRepository.getInstance(localDataSource);
         mRepository.addHistoryContentObserver(this);
         mRepository.addFavoritesContentObserver(this);
+
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         Collections.reverse(mHistoryTranslatedItems);
@@ -87,6 +90,34 @@ public class HistoryFragment extends Fragment implements
         mSearchViewHistory.setQueryHint("Search in History");
         mSearchViewHistory.setOnQueryTextListener(this);
 
+//        mSearchViewHistory.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                try{
+//                    if (hasFocus){
+//                        mSearchViewHistory.setBackground(Drawable.createFromXml(
+//                                getResources(),
+//                                getResources().getLayout(R.layout.searchview_border_active)));
+//                    } else {
+//
+//                    }
+//                } catch (XmlPullParserException | IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        mSearchViewHistory.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getContext(), "clicked on searchview in history",Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        mSearchViewHistory.setOnSearchClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getContext(), "clicked on searchview in history",Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         mDividerItemDecoration = new DividerItemDecoration(mHistoryRecycler.getContext(),
                 RecyclerView.VERTICAL);
@@ -116,7 +147,7 @@ public class HistoryFragment extends Fragment implements
                             mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
                         }
                         mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-                        mHistoryRecycler.getAdapter().notifyDataSetChanged();
+                        mHistoryRecycler.getAdapter().notifyItemChanged(mHistoryTranslatedItems.indexOf(item));
 
                         Toast.makeText(getContext(),"isFavorite was clicked in history", Toast.LENGTH_SHORT).show();
                     }
@@ -139,9 +170,23 @@ public class HistoryFragment extends Fragment implements
         }
     }
 
+
+
     @Override
     public void onStop() {
         super.onStop();
+//        remove observers here is bad idea!
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+//        remove observers here is bad idea!
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         mRepository.removeHistoryContentObserver(this);
         mRepository.removeFavoritesContentObserver(this);
         mContentManager.removeContentObserver(this);
@@ -154,6 +199,7 @@ public class HistoryFragment extends Fragment implements
             public void run() {
                 mHistoryTranslatedItems.clear();
                 mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+                Collections.reverse(mHistoryTranslatedItems);
             }
         });
     }
@@ -165,6 +211,7 @@ public class HistoryFragment extends Fragment implements
             public void run() {
                 mFavoritesTranslatedItems.clear();
                 mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
+                Collections.reverse(mFavoritesTranslatedItems);
             }
         });
     }
@@ -180,8 +227,8 @@ public class HistoryFragment extends Fragment implements
         newText = newText.toLowerCase();
         ArrayList<TranslatedItem> newList = new ArrayList<>();
         for (TranslatedItem item : mHistoryTranslatedItems){
-            String srcMeaning = item.getSrcMeaning(),
-                    trgMeaning = item.getTrgMeaning();
+            String srcMeaning = item.getSrcMeaning().toLowerCase(),
+                    trgMeaning = item.getTrgMeaning().toLowerCase();
             if (srcMeaning.contains(newText) ||
                     trgMeaning.contains(newText)){
                 newList.add(item);
@@ -196,6 +243,9 @@ public class HistoryFragment extends Fragment implements
     @Override
     public void onTranslatedItemChanged() {
         if (mHistoryRecycler != null) {
+            mHistoryTranslatedItems.clear();
+            mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+            Collections.reverse(mHistoryTranslatedItems);
             chooseCurView();
             mHistoryRecycler.getAdapter().notifyDataSetChanged();
         }

@@ -1,5 +1,6 @@
 package com.karanchuk.roman.testtranslate.ui.stored;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,11 +9,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
@@ -25,6 +28,9 @@ import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,11 +147,11 @@ public class StoredFragment extends Fragment implements
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        Log.d("viewpager log",
-                "onPageScrellod, position="+String.valueOf(position)+
-                        ",positionOffset="+String.valueOf(positionOffset)+
-                        ",positionOffsetPixels="+String.valueOf(positionOffsetPixels)
-        );
+//        Log.d("viewpager log",
+//                "onPageScrellod, position="+String.valueOf(position)+
+//                        ",positionOffset="+String.valueOf(positionOffset)+
+//                        ",positionOffsetPixels="+String.valueOf(positionOffsetPixels)
+//        );
     }
 
     @Override
@@ -163,12 +169,12 @@ public class StoredFragment extends Fragment implements
         curPosition = position;
 
 
-        Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
+//        Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        Log.d("viewpager log", "onPageScrollStateChanged, state="+String.valueOf(state));
+//        Log.d("viewpager log", "onPageScrollStateChanged, state="+String.valueOf(state));
     }
 
     @Override

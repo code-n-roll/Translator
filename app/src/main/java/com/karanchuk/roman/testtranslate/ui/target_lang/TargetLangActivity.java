@@ -12,12 +12,10 @@ import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.R;
+import com.karanchuk.roman.testtranslate.data.Language;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -30,7 +28,8 @@ public class TargetLangActivity extends AppCompatActivity {
     private RecyclerView mTrgLangRecycler;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.ItemDecoration mDividerItemDecoration;
-    private ArrayList<String> mItems;
+    private ArrayList<Language> mItems;
+    private JsonObject mLangs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +37,8 @@ public class TargetLangActivity extends AppCompatActivity {
         setContentView(R.layout.activity_target_lang);
 
         initToolbar();
+        mLangs = JsonUtils.getJsonObjectFromFile(getAssets(),"langs.json");
+
         mLayoutManager = new LinearLayoutManager(this);
         mTrgLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_trg_lang);
         mTrgLangRecycler.setLayoutManager(mLayoutManager);
@@ -53,9 +54,9 @@ public class TargetLangActivity extends AppCompatActivity {
         TargetLangRecyclerAdapter.OnItemClickListener itemClickListener = new
                 TargetLangRecyclerAdapter.OnItemClickListener() {
                     @Override
-                    public void onItemClick(String item) {
+                    public void onItemClick(Language item) {
                         Intent returnIntent = new Intent();
-                        returnIntent.putExtra("result",item);
+                        returnIntent.putExtra("result",item.getName());
                         setResult(AppCompatActivity.RESULT_OK,returnIntent);
                         Toast.makeText(getApplicationContext(),"selected "+item,Toast.LENGTH_SHORT).show();
                         finish();
@@ -67,19 +68,12 @@ public class TargetLangActivity extends AppCompatActivity {
     }
 
     public void getLangsFromJson() {
-//        try {
-//            InputStream is = getAssets().open("langs.json");
-//            byte[] buffer = new byte[is.available()];
-//            is.read(buffer);
-//            String s = new String(buffer);
-//            JsonObject jo = (JsonObject)new JsonParser().parse(s);
-            for (Map.Entry<String,JsonElement> o : JsonUtils.readJson(getAssets(),"langs.json").entrySet()){
-                String lang = o.getKey();
-                mItems.add(lang.substring(0,1).toUpperCase().concat(lang.substring(1)));
-            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        for (Map.Entry<String,JsonElement> o : mLangs.entrySet()){
+            String lang = o.getKey();
+            String abbr = o.getValue().getAsString();
+            String firstCapitalize = lang.substring(0,1).toUpperCase().concat(lang.substring(1));
+            mItems.add(new Language(firstCapitalize,abbr,false));
+        }
     }
 
     public void initToolbar(){

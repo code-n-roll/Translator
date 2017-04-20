@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
+import com.karanchuk.roman.testtranslate.data.Language;
 
 import java.util.ArrayList;
 
@@ -17,13 +18,13 @@ import java.util.ArrayList;
 
 public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRecyclerAdapter.ViewHolder>{
     public interface OnItemClickListener {
-        void onItemClick(String item);
+        void onItemClick(Language item);
     }
 
-    private final ArrayList<String> mItems;
+    private final ArrayList<Language> mItems;
     private final OnItemClickListener mListener;
 
-    public TargetLangRecyclerAdapter(ArrayList<String> items, OnItemClickListener listener){
+    public TargetLangRecyclerAdapter(ArrayList<Language> items, OnItemClickListener listener){
         mItems = items;
         mListener = listener;
     }
@@ -57,10 +58,10 @@ public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRe
         }
 
 
-        public void bind(final String item,
+        public void bind(final Language item,
                          final OnItemClickListener listener){
 
-            mLanguage.setText(item);
+            mLanguage.setText(item.getName());
             mIsSelected.setVisibility(View.GONE);
             mView.setOnClickListener(new View.OnClickListener(){
                 @Override public void onClick(View v){

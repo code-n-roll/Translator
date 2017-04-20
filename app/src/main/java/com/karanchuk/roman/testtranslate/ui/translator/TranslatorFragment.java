@@ -2,6 +2,7 @@ package com.karanchuk.roman.testtranslate.ui.translator;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +17,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -26,19 +28,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract;
-import com.karanchuk.roman.testtranslate.ui.view.CustomEditText;
-import com.karanchuk.roman.testtranslate.ui.fullscreen.FullscreenActivity;
+import com.google.gson.JsonObject;
 import com.karanchuk.roman.testtranslate.R;
-import com.karanchuk.roman.testtranslate.ui.target_lang.TargetLangActivity;
 import com.karanchuk.roman.testtranslate.data.DictDefinition;
+import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
+import com.karanchuk.roman.testtranslate.data.Synonym;
+import com.karanchuk.roman.testtranslate.data.Translation;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
-import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.ui.source_lang.SourceLangActivity;
-import com.karanchuk.roman.testtranslate.utils.TranslatorAPIUtils;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
+import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
+import com.karanchuk.roman.testtranslate.ui.fullscreen.FullscreenActivity;
+import com.karanchuk.roman.testtranslate.ui.source_lang.SourceLangActivity;
+import com.karanchuk.roman.testtranslate.ui.target_lang.TargetLangActivity;
+import com.karanchuk.roman.testtranslate.ui.view.CustomEditText;
+import com.karanchuk.roman.testtranslate.utils.JsonUtils;
+import com.karanchuk.roman.testtranslate.utils.TranslatorAPIUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
@@ -64,24 +70,33 @@ public class TranslatorFragment extends Fragment implements
             mButtonShare,
             mButtonFullscreen,
             mClearEditText;
-    private RelativeLayout mTranslateResultContainer;
     private ActionBar mActionBar;
     private Button mButtonSrcLang, mButtonTrgLang;
     private ImageButton mButtonSwitchLang;
     private TextView mTranslatedResult, mTvLink;
     private RecyclerView mTranslateRecyclerView;
-    private ArrayList<DictDefinition> mDictDefinitions;
+    private ArrayList<Translation> mTranslations;
     private RecyclerView.LayoutManager mLayoutManager;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
     private List<TranslatedItem> mTranslatedItems;
-    private RelativeLayout mContainerEdittext;
-
+    private RelativeLayout mContainerEdittext,
+            mGeneralContainer,
+            mTranslateResultContainer;
+    private JsonObject mLanguagesMap;
+    public static final String PREFS_NAME = "MyPrefsFile",
+                               EDITTEXT_DATA = "EdittextData",
+                                SRC_LANG = "ButtonSrcLangData",
+                                TRG_LANG = "ButtonTrgLangData";
+    private SharedPreferences mSettings;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_translator, container, false);
+
+        mLanguagesMap  = JsonUtils.getJsonObjectFromFile(getActivity().getAssets(),"langs.json");
+        mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
 
@@ -92,14 +107,19 @@ public class TranslatorFragment extends Fragment implements
 
         mMainHandler = new Handler(getContext().getMainLooper());
 
+
+
         initToolbar();
         handleKeyboardVisibility();
 
-        mLayoutManager = new LinearLayoutManager(mView.getContext());
         mViewActionBar = mActionBar.getCustomView();
-        mButtonSrcLang = (Button) mViewActionBar.findViewById(R.id.left_actionbar_button);
         mButtonSwitchLang = (ImageButton) mViewActionBar.findViewById(R.id.center_actionbar_button);
+
+        mButtonSrcLang = (Button) mViewActionBar.findViewById(R.id.left_actionbar_button);
+        mButtonSrcLang.setText(mSettings.getString(SRC_LANG,"Select language"));
         mButtonTrgLang = (Button) mViewActionBar.findViewById(R.id.right_actionbar_button);
+        mButtonTrgLang.setText(mSettings.getString(TRG_LANG,"Select language"));
+
 
         mCustomEditText = (CustomEditText) mView.findViewById(R.id.edittext);
         initCustomEditText();
@@ -117,6 +137,7 @@ public class TranslatorFragment extends Fragment implements
         mButtonFullscreen = (ImageButton) mView.findViewById(R.id.fullscreen_translated_word);
 
         mContainerEdittext = (RelativeLayout) mView.findViewById(R.id.container_edittext);
+        mGeneralContainer = (RelativeLayout) mView.findViewById(R.id.general_container);
 
         mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
         mButtonGetTargetVoice = (ImageButton) mView.findViewById(R.id.get_target_voice);
@@ -125,17 +146,35 @@ public class TranslatorFragment extends Fragment implements
 
 
         mTranslateRecyclerView = (RecyclerView) mView.findViewById(R.id.container_dict_defin);
+        mLayoutManager = new LinearLayoutManager(getActivity());
         mTranslateRecyclerView.setLayoutManager(mLayoutManager);
 
-        mDictDefinitions = new ArrayList<>();
-        for (int i = 1; i <= 10; i++){
-            mDictDefinitions.add(new DictDefinition(String.valueOf(i),
-                    "время ср, раз м, момент м, срок м, пора ж, период м",
-                    "(period, time, moment, pore)",
-                    "dayling saving time \u2014 летнее время\ntake some time \u2014 занять некоторое время"));
-        }
-        mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(mDictDefinitions));
+        mTranslations = new ArrayList<>();
 
+        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
+                JsonUtils.getJsonObjectFromFile(
+                        getActivity().getAssets(),"translator_response.json"));
+        for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
+            for (Translation transl : POS.getTranslations()){
+                mTranslations.add(transl);
+            }
+        }
+//        List<Synonym> synonyms = new ArrayList<>();
+//        synonyms.add(new Synonym("время","ср"));
+//        synonyms.add(new Synonym("раз","м"));
+//        synonyms.add(new Synonym("момент","м"));
+//        synonyms.add(new Synonym("срок","м"));
+//        synonyms.add(new Synonym("пора","ж"));
+//        synonyms.add(new Synonym("период","м"));
+//
+//        for (int i = 1; i <= 10; i++){
+//            mTranslations.add(new Translation(String.valueOf(i),
+//                    synonyms,"(period, time, moment, pore)",
+//                    "dayling saving time \u2014 летнее время\ntake some time \u2014 занять некоторое время",
+//                    synonyms.toString()));
+//        }
+
+        mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(mTranslations));
 
         mButtonFullscreen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,6 +242,15 @@ public class TranslatorFragment extends Fragment implements
             }
         });
 
+        mGeneralContainer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                hideKeyboard();
+                Toast.makeText(getContext(), "clicked outside keyboard, keyboard hided",Toast.LENGTH_SHORT).show();
+
+                return false;
+            }
+        });
 
 
 //        mTvLink = (TextView) mView.findViewById(R.id.tv_link);
@@ -215,6 +263,11 @@ public class TranslatorFragment extends Fragment implements
     public void onStop() {
         super.onStop();
         mRepository.removeHistoryContentObserver(this);
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putString(EDITTEXT_DATA,mCustomEditText.getText().toString());
+        editor.putString(SRC_LANG,mButtonSrcLang.getText().toString());
+        editor.putString(TRG_LANG,mButtonTrgLang.getText().toString());
+        editor.apply();
     }
 
 
@@ -276,6 +329,7 @@ public class TranslatorFragment extends Fragment implements
     }
 
     public void initCustomEditText(){
+        mCustomEditText.setText(mSettings.getString(EDITTEXT_DATA, ""));
         mCustomEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         mCustomEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
@@ -320,15 +374,6 @@ public class TranslatorFragment extends Fragment implements
             }
         });
 
-        mCustomEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard();
-                }
-            }
-        });
-//        showKeyboard();
     }
 
     public void addToHistory(){
@@ -341,13 +386,14 @@ public class TranslatorFragment extends Fragment implements
     private class TranslationSaver implements Runnable{
         @Override
         public void run() {
+
             TranslatedItem item = new TranslatedItem(
-                    mButtonSrcLang.getText().toString(),
-                    mButtonTrgLang.getText().toString(),
+                    mLanguagesMap.get(mButtonSrcLang.getText().toString().toLowerCase()).getAsString().toUpperCase(),
+                    mLanguagesMap.get(mButtonTrgLang.getText().toString().toLowerCase()).getAsString().toUpperCase(),
                     mCustomEditText.getText().toString(),
                     mTranslatedResult.getText().toString(),
                     "false",
-                    mDictDefinitions.toString());
+                    mTranslations.toString());
             if (!mTranslatedItems.contains(item)) {
                 mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
             } else {
@@ -372,7 +418,7 @@ public class TranslatorFragment extends Fragment implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         switch(requestCode){
             case 1:
                 if (resultCode == AppCompatActivity.RESULT_OK){

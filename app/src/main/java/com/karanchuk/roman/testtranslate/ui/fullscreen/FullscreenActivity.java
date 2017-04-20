@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by roman on 13.4.17.
  */

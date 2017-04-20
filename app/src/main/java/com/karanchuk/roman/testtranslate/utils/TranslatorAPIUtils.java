@@ -6,15 +6,10 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -36,7 +31,7 @@ public class TranslatorAPIUtils {
         OkHttpClient client = new OkHttpClient();
         final Handler mHandler = new Handler(Looper.getMainLooper());
 
-        JsonObject langs = JsonUtils.readJson(manager, "langs.json");
+        JsonObject langs = JsonUtils.getJsonObjectFromFile(manager, "langs.json");
 
 
         String translDirection = langs.get(srcLang.toLowerCase()).getAsString().

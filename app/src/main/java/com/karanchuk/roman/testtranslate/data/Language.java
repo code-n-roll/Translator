@@ -8,10 +8,12 @@ import android.support.annotation.NonNull;
 
 public class Language implements Comparable<Language>{
     private String mName;
+    private String mAbbr;
     private boolean mSelected;
 
-    public Language(String name, boolean selected) {
+    public Language(String name, String abbr, boolean selected) {
         mName = name;
+        mAbbr = abbr;
         mSelected = selected;
     }
 
@@ -39,5 +41,13 @@ public class Language implements Comparable<Language>{
     @Override
     public String toString() {
         return mName;
+    }
+
+    public String getAbbr() {
+        return mAbbr;
+    }
+
+    public void setAbbr(String abbr) {
+        mAbbr = abbr;
     }
 }

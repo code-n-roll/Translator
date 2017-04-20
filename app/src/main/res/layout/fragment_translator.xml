@@ -31,7 +31,6 @@
             android:paddingRight="55dp"
             android:paddingEnd="55dp"
             android:paddingTop="4dp"
-            android:paddingBottom="30dp"
             android:imeOptions="actionDone"
         />
         <ImageButton
@@ -102,8 +101,8 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/container_dict_defin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_below="@+id/textview_translate_result"
             android:layout_marginLeft="15dp"
             android:layout_marginStart="15dp"

@@ -44,7 +44,8 @@ public class FavoritesFragment extends Fragment implements
     private ImageButton mButtonIsFavorite;
     private TranslatorRepository mRepository;
     private List<TranslatedItem> mFavoritesTranslatedItems,
-                                    mHistoryTranslatedItems;
+                                    mHistoryTranslatedItems,
+                                    mCopyFavoritesTranslatedItems;
     private Handler mMainHandler;
     private View mView, mEmptyView, mContentView;
     private TextView mTextViewEmptyFavorites;
@@ -70,9 +71,14 @@ public class FavoritesFragment extends Fragment implements
         mRepository = TranslatorRepository.getInstance(localDataSource);
         mRepository.addFavoritesContentObserver(this);
         mRepository.addHistoryContentObserver(this);
+
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+        mCopyFavoritesTranslatedItems = new ArrayList<>(mFavoritesTranslatedItems);
+
         Collections.reverse(mFavoritesTranslatedItems);
+        Collections.reverse(mCopyFavoritesTranslatedItems);
+        Collections.reverse(mHistoryTranslatedItems);
 
         mView = inflater.inflate(R.layout.content_favorites, container, false);
         mEmptyView =  mView.findViewById(R.id.include_content_favorites_empty_item_list);
@@ -95,7 +101,8 @@ public class FavoritesFragment extends Fragment implements
         mSearchViewFavorites.setOnQueryTextListener(this);
 
 
-        mDividerItemDecoration = new DividerItemDecoration(mFavoritesRecycler.getContext(),
+        mDividerItemDecoration = new DividerItemDecoration(
+                mFavoritesRecycler.getContext(),
                 RecyclerView.VERTICAL);
         mFavoritesRecycler.addItemDecoration(mDividerItemDecoration);
 
@@ -116,12 +123,13 @@ public class FavoritesFragment extends Fragment implements
                 if (item.isFavorite()){
                     item.isFavoriteUp(false);
                     mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+                    mFavoritesRecycler.getAdapter().notifyItemChanged(mFavoritesTranslatedItems.indexOf(item));
                 } else {
                     item.isFavoriteUp(true);
                     mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+                    mFavoritesRecycler.getAdapter().notifyItemChanged(mFavoritesTranslatedItems.indexOf(item));
                 }
                 mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-                mFavoritesRecycler.getAdapter().notifyDataSetChanged();
 
                 Toast.makeText(getContext(),"isFavorite was clicked in favorites", Toast.LENGTH_SHORT).show();
             }
@@ -150,8 +158,20 @@ public class FavoritesFragment extends Fragment implements
     @Override
     public void onStop() {
         super.onStop();
-        mRepository.removeFavoritesContentObserver(this);
+//        remove observers here is bad idea!
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+//        remove observers here is bad idea!
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         mRepository.removeHistoryContentObserver(this);
+        mRepository.removeFavoritesContentObserver(this);
         mContentManager.removeContentObserver(this);
     }
 
@@ -162,6 +182,7 @@ public class FavoritesFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
+
         newText = newText.toLowerCase();
         ArrayList<TranslatedItem> newList = new ArrayList<>();
         for (TranslatedItem item : mFavoritesTranslatedItems){
@@ -182,8 +203,9 @@ public class FavoritesFragment extends Fragment implements
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                mFavoritesTranslatedItems.clear();
-                mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
+                mCopyFavoritesTranslatedItems.clear();
+                mCopyFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
+                Collections.reverse(mCopyFavoritesTranslatedItems);
             }
         });
     }
@@ -195,6 +217,8 @@ public class FavoritesFragment extends Fragment implements
             public void run() {
                 mHistoryTranslatedItems.clear();
                 mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+                Collections.reverse(mHistoryTranslatedItems);
+
             }
         });
     }
@@ -202,6 +226,8 @@ public class FavoritesFragment extends Fragment implements
     @Override
     public void onTranslatedItemChanged() {
         if (mFavoritesRecycler != null) {
+            mFavoritesTranslatedItems.clear();
+            mFavoritesTranslatedItems.addAll(mCopyFavoritesTranslatedItems);
             chooseCurView();
             mFavoritesRecycler.getAdapter().notifyDataSetChanged();
         }

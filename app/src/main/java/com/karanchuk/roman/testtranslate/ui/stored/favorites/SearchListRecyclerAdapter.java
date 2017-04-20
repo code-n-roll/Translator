@@ -68,6 +68,9 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
         public void bind(final TranslatedItem item,
                          final OnItemClickListener itemListener,
                          final OnItemClickListener isFavoriteListener){
+
+
+
             if (item.isFavorite()){
                 mIsFavoriteView.setImageResource(R.drawable.bookmark_black_shape_gold512);
             } else {
@@ -93,7 +96,7 @@ public class SearchListRecyclerAdapter extends RecyclerView.Adapter<SearchListRe
         }
     }
     public void setFilter(ArrayList<TranslatedItem> items){
-        mItems = new ArrayList<>();
+        mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
     }

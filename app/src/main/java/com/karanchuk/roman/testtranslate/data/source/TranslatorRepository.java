@@ -1,6 +1,7 @@
 package com.karanchuk.roman.testtranslate.data.source;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
@@ -44,9 +45,6 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
 
     private List<TranslatedItem> getHistoryCachedTranslatedItems(){
-        if (mHistoryCachedTranslatedItems == null){
-            mHistoryCachedTranslatedItems = new LinkedHashMap<>();
-        }
         if (mHistoryCachedTranslatedItems == null ) {
             return new ArrayList<>();
         } else {
@@ -189,8 +187,20 @@ public class TranslatorRepository  implements TranslatorDataSource{
         }
     }
 
+    @Override
+    public void updateIsFavoriteTranslatedItems(@NonNull String tableName, @NonNull boolean isFavorite){
+        mTranslatorLocalDataSource.updateIsFavoriteTranslatedItems(tableName, isFavorite);
+        if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)) {
+            notifyFavoritesTranslatedItemsChanged();
+        } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)){
+            notifyHistoryTranslatedItemsChanged();
+        }
+    }
 
-
+    @Override
+    public void printAllTranslatedItems(@NonNull String tableName) {
+        mTranslatorLocalDataSource.printAllTranslatedItems(tableName);
+    }
 
 
     public void addFavoritesContentObserver(FavoritesTranslatedItemsRepositoryObserver observer){

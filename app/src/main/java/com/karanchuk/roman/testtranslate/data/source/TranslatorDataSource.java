@@ -21,4 +21,8 @@ public interface TranslatorDataSource {
     void deleteTranslatedItems(@NonNull String tableName);
 
     void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
+
+    void updateIsFavoriteTranslatedItems(@NonNull String tableName, @NonNull boolean isFavorite);
+
+    void printAllTranslatedItems(@NonNull String tableName);
 }

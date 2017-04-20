@@ -1,57 +1,56 @@
 package com.karanchuk.roman.testtranslate.data;
 
+import java.util.List;
+
 /**
- * Created by roman on 11.4.17.
+ * Created by roman on 19.4.17.
  */
 
 public class DictDefinition {
-    private String mNumber;
-    private String mTranslation;
-    private String mMeaning;
-    private String mExpression;
+    private String mText;
+    private String mTranscription;
+    private List<PartOfSpeech> mPartsOfSpeech;
 
-
-    public DictDefinition(String number, String translation,
-                          String meaning, String expression){
-        mNumber = number;
-        mTranslation = translation;
-        mMeaning = meaning;
-        mExpression = expression;
+    public DictDefinition(String text, String transcription, List<PartOfSpeech> partsOfSpeech) {
+        mText = text;
+        mTranscription = transcription;
+        mPartsOfSpeech = partsOfSpeech;
     }
 
-    public String getNumber() {
-        return mNumber;
+    public String getText() {
+        return mText;
     }
 
-    public void setNumber(String number) {
-        mNumber = number;
+    public void setText(String text) {
+        mText = text;
     }
 
-    public String getTranslation() {
-        return mTranslation;
+    public String getTranscription() {
+        return mTranscription;
     }
 
-    public void setTranslation(String translation) {
-        mTranslation = translation;
+    public void setTranscription(String transcription) {
+        mTranscription = transcription;
     }
 
-    public String getMeaning() {
-        return mMeaning;
+    public List<PartOfSpeech> getPartsOfSpeech() {
+        return mPartsOfSpeech;
     }
 
-    public void setMeaning(String meaning) {
-        mMeaning = meaning;
-    }
-
-    public String getExpression() {
-        return mExpression;
-    }
-
-    public void setExpression(String expression) {
-        mExpression = expression;
+    public void setPartsOfSpeech(List<PartOfSpeech> partsOfSpeech) {
+        mPartsOfSpeech = partsOfSpeech;
     }
 
 
-
-
+    @Override
+    public String toString() {
+        String result = mText.
+                concat(" ").
+                concat(mTranscription).
+                concat("\n");
+        for (PartOfSpeech pOfs : mPartsOfSpeech){
+            result = result.concat(pOfs.toString()).concat("\n");
+        }
+        return result;
+    }
 }

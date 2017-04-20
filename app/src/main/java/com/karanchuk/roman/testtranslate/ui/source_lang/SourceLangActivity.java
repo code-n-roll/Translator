@@ -12,12 +12,10 @@ import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Language;
+import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -31,6 +29,7 @@ public class SourceLangActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.ItemDecoration mDividerItemDecoration;
     private ArrayList<Language> mItems;
+    private JsonObject mLangs;
 
 
     @Override
@@ -39,6 +38,8 @@ public class SourceLangActivity extends AppCompatActivity {
         setContentView(R.layout.activity_source_lang);
 
         initToolbar();
+        mLangs = JsonUtils.getJsonObjectFromFile(getAssets(),"langs.json");
+
         mLayoutManager = new LinearLayoutManager(this);
         mSrcLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_src_lang);
         mSrcLangRecycler.setLayoutManager(mLayoutManager);
@@ -71,18 +72,11 @@ public class SourceLangActivity extends AppCompatActivity {
     }
 
     public void getLangsFromJson() {
-        try {
-            InputStream is = getAssets().open("langs.json");
-            byte[] buffer = new byte[is.available()];
-            is.read(buffer);
-            String s = new String(buffer);
-            JsonObject jo = (JsonObject)new JsonParser().parse(s);
-            for (Map.Entry<String,JsonElement> o : jo.entrySet()){
-                String lang = o.getKey();
-                mItems.add(new Language(lang.substring(0,1).toUpperCase().concat(lang.substring(1)),false));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (Map.Entry<String,JsonElement> o : mLangs.entrySet()){
+            String lang = o.getKey();
+            String abbr = o.getValue().getAsString();
+            String firstCapitalize = lang.substring(0,1).toUpperCase().concat(lang.substring(1));
+            mItems.add(new Language(firstCapitalize,abbr,false));
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.TranslatorDataSource;
@@ -19,6 +20,7 @@ import java.util.List;
 
 public class TranslatorLocalDataSource implements TranslatorDataSource{
     private static TranslatorLocalDataSource INSTANCE;
+    private static String LOG_TAG = "MY_DB_LOG";
 
     private TablesDbHelper mDbHelper;
 
@@ -66,6 +68,9 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         db.insert(tableName,null, values);
         db.close();
 
+        Log.d(LOG_TAG, "save item DB "+tableName);
+        printAllTranslatedItems(tableName);
+
         return true;
     }
 
@@ -82,6 +87,9 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
                 translatedItem.getTrgLanguage()};
         db.delete(tableName, selection, selectionArgs);
         db.close();
+
+        Log.d(LOG_TAG, "delete item DB "+tableName);
+        printAllTranslatedItems(tableName);
     }
 
     public void deleteTranslatedItems(@NonNull String tableName){
@@ -89,7 +97,19 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
 
         String clearTable = "DELETE FROM " + tableName;
         db.execSQL(clearTable);
+
+        Log.d(LOG_TAG, "delete items DB " + tableName);
+        printAllTranslatedItems(tableName);
+
         db.close();
+    }
+
+    public void updateIsFavoriteTranslatedItems(@NonNull String tableName, @NonNull boolean isFavorite){
+        List<TranslatedItem> list = getTranslatedItems(tableName);
+        for (TranslatedItem item : list){
+            item.isFavoriteUp(isFavorite);
+            updateTranslatedItem(tableName, item);
+        }
     }
 
     public void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem item) {
@@ -108,6 +128,9 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         String[] whereArgs = {item.getId()};
         db.update(tableName, values, whereClause, whereArgs);
         db.close();
+
+        Log.d(LOG_TAG, "update item DB " + tableName);
+        printAllTranslatedItems(tableName);
     }
 
     @NonNull
@@ -153,8 +176,40 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         }
         db.close();
 
+        Log.d(LOG_TAG, "get items DB " + tableName);
+        printAllTranslatedItems(tableName);
         return items;
     }
 
+    @Override
+    public void printAllTranslatedItems(@NonNull String tableName) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
+        Cursor c = db.query(tableName, null, null, null, null, null, null);
+        logCursor(c);
+
+        if (c!= null){
+            c.close();
+        }
+        db.close();
+
+    }
+
+
+    private void logCursor(Cursor c){
+        if (c != null){
+            if (c.moveToFirst()){
+                String str;
+                do {
+                    str = "";
+                    for (String cn : c.getColumnNames()){
+                        str = str.concat(cn + " = " + c.getString(c.getColumnIndex(cn)) + "; ");
+                    }
+                    Log.d(LOG_TAG, str);
+                } while (c.moveToNext());
+            }
+        } else {
+            Log.d(LOG_TAG, "Cursor is null");
+        }
+    }
 }

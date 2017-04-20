@@ -1,6 +1,5 @@
 package com.karanchuk.roman.testtranslate.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -19,6 +18,8 @@ import com.karanchuk.roman.testtranslate.ui.settings.SettingsFragment;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredFragment;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
+import com.karanchuk.roman.testtranslate.utils.ContentManager;
+import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements
                                 mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
+    private ContentManager mContentManager;
 
     public void setCurFragment(String curFragment){
         this.mCurFragment = curFragment;
@@ -90,7 +92,12 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        JsonUtils.getDictDefinitionFromJson(
+                JsonUtils.getJsonObjectFromFile(
+                        getAssets(),"translator_response.json"));
+
         mMainHandler = new Handler(getMainLooper());
+        mContentManager = ContentManager.getInstance();
 
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -131,13 +138,14 @@ public class MainActivity extends AppCompatActivity implements
                 case " History":
                     if (!mHistoryTranslatedItems.isEmpty()) {
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
-                        UIUtils.updateUIFragment(getSupportFragmentManager(), STORED_FRAGMENT);
+
                     }
                     break;
                 case " Favorites":
                     if (!mFavoritesTranslatedItems.isEmpty()) {
+                        mRepository.updateIsFavoriteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY, false);
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
-                        UIUtils.updateUIFragment(getSupportFragmentManager(), STORED_FRAGMENT);
+
                     }
                     break;
                 default:
@@ -174,60 +182,3 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 }
-
-
-//    if (getSupportActionBar() != null) {
-//        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-//        getSupportActionBar().setDisplayShowCustomEnabled(true);
-//        getSupportActionBar().setCustomView(R.layout.actionbar_translator);
-//    }
-//    View actionbar = getSupportActionBar().getCustomView();
-//    Button leftLang = (Button) actionbar.findViewById(R.id.left_actionbar_button),
-//            rightLang = (Button) actionbar.findViewById(R.id.right_actionbar_button),
-//            centerSeparator = (Button) actionbar.findViewById(R.id.center_actionbar_button);
-//        leftLang.setOnClickListener(new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//
-//        }
-//    });
-//
-//        rightLang.setOnClickListener(new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//
-//        }
-//    });
-//
-//        centerSeparator.setOnClickListener(new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//
-//        }
-//    });
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu){
-//        getMenuInflater().inflate(R.menu.choose_from_to_lang, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.action_settings:
-//                 User chose the "Settings" item, show the app settings UI...
-//                return true;
-//
-//            case R.id.action_favorite:
-//                 User chose the "Favorite" action, mark the current item
-//                 as a favorite...
-//                return true;
-//
-//            default:
-//                 If we got here, the user's action was not recognized.
-//                 Invoke the superclass to handle it.
-//                return super.onOptionsItemSelected(item);
-//
-//        }
-//    }

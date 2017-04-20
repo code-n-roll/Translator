@@ -13,9 +13,25 @@
         android:scaleType="fitCenter"
         android:layout_centerVertical="true"
         />
+
+    <TextView
+        android:id="@+id/src_trg_languages"
+        android:text="ru - en"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        />
     <LinearLayout
         android:layout_toRightOf="@id/imagebutton_isfavorite_favorite_item"
         android:layout_toEndOf="@+id/imagebutton_isfavorite_favorite_item"
+        android:layout_toLeftOf="@id/src_trg_languages"
+        android:layout_toStartOf="@id/src_trg_languages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -25,25 +41,19 @@
             android:id="@+id/src_meaning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="text src lang"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="source sdlf jlsdj lsjdlf jsdj flsjdlf jlsdj lsdjfltext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdf"
             />
         <TextView
             android:id="@+id/trg_meaning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="text trg lang"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="synonyms sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdf"
             />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/src_trg_languages"
-        android:text="src lang - trg lang"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginEnd="10dp"
-        />
+
 </RelativeLayout>

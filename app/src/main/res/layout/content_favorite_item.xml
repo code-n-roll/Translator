@@ -5,8 +5,8 @@
     >
     <ImageButton
         android:id="@+id/imagebutton_isfavorite_favorite_item"
-        android:layout_height="54dp"
-        android:layout_width="54dp"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
         android:adjustViewBounds="true"
         android:padding="15dp"
         android:background="@android:color/transparent"

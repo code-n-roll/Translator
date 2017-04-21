@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
 
+
         getSupportFragmentManager().
                 beginTransaction().
                 replace(R.id.main_activity_container,

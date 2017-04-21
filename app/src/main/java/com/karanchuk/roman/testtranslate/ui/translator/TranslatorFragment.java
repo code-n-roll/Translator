@@ -3,9 +3,13 @@ package com.karanchuk.roman.testtranslate.ui.translator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,10 +24,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,9 +89,9 @@ public class TranslatorFragment extends Fragment implements
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
     private List<TranslatedItem> mTranslatedItems;
-    private RelativeLayout mContainerEdittext,
-            mGeneralContainer,
-            mTranslateResultContainer;
+    private RelativeLayout mContainerEdittext;
+    private LinearLayout mGeneralContainer;
+    private FrameLayout mMainActivityContainer;
     private JsonObject mLanguagesMap;
     public static final String PREFS_NAME = "MyPrefsFile",
                                EDITTEXT_DATA = "EdittextData",
@@ -93,7 +102,8 @@ public class TranslatorFragment extends Fragment implements
     private SharedPreferences mSettings;
     private TranslationSaver saver;
     private DictDefinition curDictDefinition;
-
+    private BottomNavigationView mNavigation;
+    private int bottomPadding;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -114,6 +124,14 @@ public class TranslatorFragment extends Fragment implements
         saver = new TranslationSaver();
 
 
+        mNavigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
+
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        } else {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED);
+        }
+
         initToolbar();
         handleKeyboardVisibility();
 
@@ -130,7 +148,6 @@ public class TranslatorFragment extends Fragment implements
         initCustomEditText();
 
         mClearEditText = (ImageButton) mView.findViewById(R.id.clearEditText);
-        mTranslateResultContainer = (RelativeLayout) mView.findViewById(R.id.translate_result_container);
 
         mClearEditText.setVisibility(View.INVISIBLE);
 
@@ -143,7 +160,8 @@ public class TranslatorFragment extends Fragment implements
         mButtonFullscreen = (ImageButton) mView.findViewById(R.id.fullscreen_translated_word);
 
         mContainerEdittext = (RelativeLayout) mView.findViewById(R.id.container_edittext);
-        mGeneralContainer = (RelativeLayout) mView.findViewById(R.id.general_container);
+        mGeneralContainer = (LinearLayout) mView.findViewById(R.id.general_container);
+        mMainActivityContainer = (FrameLayout) getActivity().findViewById(R.id.main_activity_container);
 
         mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
         mButtonGetTargetVoice = (ImageButton) mView.findViewById(R.id.get_target_voice);
@@ -307,6 +325,7 @@ public class TranslatorFragment extends Fragment implements
         }
     }
 
+
     public void handleKeyboardVisibility(){
         KeyboardVisibilityEvent.setEventListener(
                 getActivity(),
@@ -321,6 +340,16 @@ public class TranslatorFragment extends Fragment implements
                                                 getResources(),
                                                 getResources().getLayout(R.layout.edittext_border_active)));
                                 mCustomEditText.setCursorVisible(true);
+
+                                Animation anim = new TranslateAnimation(0,0,0,200);
+                                anim.setDuration(500);
+                                mNavigation.startAnimation(anim);
+                                mNavigation.setVisibility(View.INVISIBLE);
+                                if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    bottomPadding = mMainActivityContainer.getPaddingBottom();
+                                    mMainActivityContainer.setPadding(0,0,0,0);
+                                }
+
                             } catch (XmlPullParserException | IOException e) {
                                 e.printStackTrace();
                             }
@@ -331,6 +360,11 @@ public class TranslatorFragment extends Fragment implements
                                                 getResources(),
                                                 getResources().getLayout(R.layout.edittext_border)));
                                 mCustomEditText.setCursorVisible(false);
+
+                                mNavigation.setVisibility(View.VISIBLE);
+                                if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    mMainActivityContainer.setPadding(0,0,0,bottomPadding);
+                                }
                             } catch (XmlPullParserException | IOException e) {
                                 e.printStackTrace();
                             }
@@ -351,7 +385,6 @@ public class TranslatorFragment extends Fragment implements
 
     public void initCustomEditText(){
         mCustomEditText.setText(mSettings.getString(EDITTEXT_DATA, ""));
-        mCustomEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         mCustomEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         mCustomEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {

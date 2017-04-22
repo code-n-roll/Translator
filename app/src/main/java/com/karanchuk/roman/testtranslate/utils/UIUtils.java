@@ -29,7 +29,7 @@ public class UIUtils {
         if (curActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
             curActivity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         } else {
-            curActivity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED);
+            curActivity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
     }
 

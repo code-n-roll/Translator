@@ -1,9 +1,11 @@
 package com.karanchuk.roman.testtranslate.ui.stored;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -30,6 +32,9 @@ import com.karanchuk.roman.testtranslate.utils.UIUtils;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +53,7 @@ public class StoredFragment extends Fragment implements
     private List<Fragment> mFragments;
     private List<String> mTitles;
     private ImageButton mClearStored;
-    private View mView;
+    private View mView, mMainActivityContainer;
     private TranslatorRepository mRepository;
     private ClearStoredDialogFragment mClearHistoryDialog;
     private static String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG",
@@ -57,7 +62,8 @@ public class StoredFragment extends Fragment implements
     private int curPosition = 0;
     private Handler mMainHandler;
     private List<TranslatedItem> mFavoritesItems, mHistoryItems;
-
+    private int mBottomPadding;
+    private BottomNavigationView mNavigation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +72,10 @@ public class StoredFragment extends Fragment implements
 
 
         mMainHandler = new Handler(Looper.getMainLooper());
+
+        mMainActivityContainer = getActivity().findViewById(R.id.main_activity_container);
+        mNavigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
+
 
         mContentManager = ContentManager.getInstance();
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
@@ -110,7 +120,7 @@ public class StoredFragment extends Fragment implements
         initViewPager(mView);
         initTabLayout(mView);
         initToolbar();
-
+        handleKeyboardVisibility();
 
         return mView;
     }
@@ -200,5 +210,21 @@ public class StoredFragment extends Fragment implements
                 mHistoryItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY));
             }
         });
+    }
+
+    public void handleKeyboardVisibility(){
+        KeyboardVisibilityEvent.setEventListener(
+                getActivity(),
+                new KeyboardVisibilityEventListener() {
+                    @Override
+                    public void onVisibilityChanged(boolean isOpen) {
+                        // some code depending on keyboard visiblity status
+                        if (isOpen && isAdded()){
+                                mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(getActivity(),mMainActivityContainer,mNavigation);
+                        } else if (!isOpen && isAdded()){
+                                UIUtils.showBottomNavViewSetBottomPadding(getActivity(),mMainActivityContainer,mNavigation,mBottomPadding);
+                        }
+                    }
+                });
     }
 }

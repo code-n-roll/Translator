@@ -107,7 +107,8 @@ public class StoredRecyclerAdapter extends
             } else {
                 mIsFavoriteView.setImageResource(R.drawable.bookmark_black_shape_light512);
             }
-            mSrcTrgLanguage.setText(item.getSrcLanguageForAPI() +" - " + item.getTrgLanguageForAPI());
+            mSrcTrgLanguage.setText(item.getSrcLanguageForAPI().toUpperCase() +
+                    " - " + item.getTrgLanguageForAPI().toUpperCase());
             mSrcMeaning.setText(item.getSrcMeaning());
             mTrgMeaning.setText(item.getTrgMeaning());
 

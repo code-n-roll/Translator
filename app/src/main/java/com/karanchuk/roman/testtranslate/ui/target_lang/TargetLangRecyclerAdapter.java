@@ -1,5 +1,6 @@
 package com.karanchuk.roman.testtranslate.ui.target_lang;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Language;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by roman on 17.4.17.
@@ -21,10 +23,10 @@ public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRe
         void onItemClick(Language item);
     }
 
-    private final ArrayList<Language> mItems;
+    private final List<Language> mItems;
     private final OnItemClickListener mListener;
 
-    public TargetLangRecyclerAdapter(ArrayList<Language> items, OnItemClickListener listener){
+    public TargetLangRecyclerAdapter(List<Language> items, OnItemClickListener listener){
         mItems = items;
         mListener = listener;
     }
@@ -62,7 +64,13 @@ public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRe
                          final OnItemClickListener listener){
 
             mLanguage.setText(item.getName());
-            mIsSelected.setVisibility(View.GONE);
+            if (item.isSelected()){
+                mIsSelected.setVisibility(View.VISIBLE);
+                mView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.colorSelectedItem));
+            } else {
+                mIsSelected.setVisibility(View.INVISIBLE);
+                mView.setBackgroundColor(ContextCompat.getColor(mView.getContext(), R.color.white));
+            }
             mView.setOnClickListener(new View.OnClickListener(){
                 @Override public void onClick(View v){
                     listener.onItemClick(item);

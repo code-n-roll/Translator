@@ -13,7 +13,7 @@
     <string name="favorites_search_hint">Search in Favorites</string>
     <string name="menu_item_delete_option">Delete</string>
     <string name="connection_error">Connection error</string>
-    <string name="connection_error_content">Please check your internet connection and try again. To use the app when you have no internet access, download data for your language pair in settings.</string>
+    <string name="connection_error_content">Unable to connect to server. Please check your internet connection and try again.</string>
     <string name="retry_button">RETRY</string>
     <string name="empty_search">No matches were found</string>
 </resources>

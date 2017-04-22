@@ -7,4 +7,6 @@
     <color name="colorMean">#795548</color>
     <color name="colorExpr">#607d8b</color>
     <color name="colorCustomDark">#666666</color>
+    <color name="white">#ffffff</color>
+    <color name="colorSelectedItem">#82dcdcdc</color>
 </resources>

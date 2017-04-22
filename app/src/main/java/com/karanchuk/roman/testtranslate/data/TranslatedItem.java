@@ -164,8 +164,8 @@ public class TranslatedItem {
         if (obj instanceof TranslatedItem) {
             TranslatedItem item = (TranslatedItem) obj;
             if (mSrcMeaning.equals(item.mSrcMeaning) &&
-                    mSrcLanguageForAPI.toLowerCase().equals(item.mSrcLanguageForAPI.toLowerCase()) &&
-                    mTrgLanguageForAPI.toLowerCase().equals(item.mTrgLanguageForAPI.toLowerCase())) {
+                    mSrcLanguageForAPI.equals(item.mSrcLanguageForAPI) &&
+                    mTrgLanguageForAPI.equals(item.mTrgLanguageForAPI)) {
                 return true;
             }
         }

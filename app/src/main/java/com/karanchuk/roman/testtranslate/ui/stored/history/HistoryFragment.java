@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.karanchuk.roman.testtranslate.ui.source_lang.SourceLangActivity.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.ui.target_lang.TargetLangActivity.CUR_SELECTED_ITEM_TRG_LANG;
 import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.EDITTEXT_DATA;
 import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.PREFS_NAME;
 import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.SRC_LANG;
@@ -119,34 +121,7 @@ public class HistoryFragment extends Fragment implements
         mSearchViewHistory.setQueryHint("Search in History");
         mSearchViewHistory.setOnQueryTextListener(this);
 
-//        mSearchViewHistory.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View v, boolean hasFocus) {
-//                try{
-//                    if (hasFocus){
-//                        mSearchViewHistory.setBackground(Drawable.createFromXml(
-//                                getResources(),
-//                                getResources().getLayout(R.layout.searchview_border_active)));
-//                    } else {
-//
-//                    }
-//                } catch (XmlPullParserException | IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        mSearchViewHistory.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getContext(), "clicked on searchview in history",Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        mSearchViewHistory.setOnSearchClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getContext(), "clicked on searchview in history",Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
 
         final BottomNavigationView navigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
         final View translatorNavigationItem = navigation.findViewById(R.id.navigation_translate);
@@ -169,6 +144,8 @@ public class HistoryFragment extends Fragment implements
                         editor.putString(TRG_LANG, item.getTrgLanguageForUser());
                         editor.putString(TRANSL_RESULT, item.getTrgMeaning());
                         editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+                        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, item.getSrcLanguageForAPI());
+                        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
                         editor.apply();
                         translatorNavigationItem.performClick();
                         Toast.makeText(getContext(),"item was clicked in history", Toast.LENGTH_SHORT).show();
@@ -323,7 +300,7 @@ public class HistoryFragment extends Fragment implements
                 case R.id.menu_item_delete:
                     performContextItemDeletion();
                     chooseCurView();
-                    chooseClearStoredVisility();
+                    chooseClearStoredVisibility();
                     Toast.makeText(getContext(), "item was longclicked contextmenu in history", Toast.LENGTH_SHORT).show();
                     return true;
                 default:
@@ -333,7 +310,7 @@ public class HistoryFragment extends Fragment implements
         return super.onContextItemSelected(item);
     }
 
-    public void chooseClearStoredVisility(){
+    public void chooseClearStoredVisibility(){
         if (!mHistoryTranslatedItems.isEmpty()){
             mClearStored.setVisibility(View.VISIBLE);
         } else {
@@ -344,7 +321,39 @@ public class HistoryFragment extends Fragment implements
     public void performContextItemDeletion(){
         StoredRecyclerAdapter adapter = (StoredRecyclerAdapter) mHistoryRecycler.getAdapter();
         int position = adapter.getPosition();
+        TranslatedItem item = mHistoryTranslatedItems.get(position);
+        mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY,item);
         mHistoryTranslatedItems.remove(position);
         mHistoryRecycler.getAdapter().notifyItemRemoved(position);
     }
 }
+
+
+//        mSearchViewHistory.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                try{
+//                    if (hasFocus){
+//                        mSearchViewHistory.setBackground(Drawable.createFromXml(
+//                                getResources(),
+//                                getResources().getLayout(R.layout.searchview_border_active)));
+//                    } else {
+//
+//                    }
+//                } catch (XmlPullParserException | IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        mSearchViewHistory.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getContext(), "clicked on searchview in history",Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        mSearchViewHistory.setOnSearchClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getContext(), "clicked on searchview in history",Toast.LENGTH_SHORT).show();
+//            }
+//        });

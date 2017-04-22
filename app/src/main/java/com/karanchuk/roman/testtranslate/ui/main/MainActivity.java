@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements
                         mCurFragment, mCurFragmentTag).
                 commit();
     }
+
     @Override
     protected void onStart() {
         super.onStart();

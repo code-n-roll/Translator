@@ -50,4 +50,15 @@ public class Language implements Comparable<Language>{
     public void setAbbr(String abbr) {
         mAbbr = abbr;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Language) {
+            Language item = (Language) obj;
+            if (mAbbr.equals(item.mAbbr)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

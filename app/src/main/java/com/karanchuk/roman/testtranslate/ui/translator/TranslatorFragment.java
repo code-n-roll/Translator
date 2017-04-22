@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -28,6 +29,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +61,9 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.karanchuk.roman.testtranslate.ui.source_lang.SourceLangActivity.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.ui.target_lang.TargetLangActivity.CUR_SELECTED_ITEM_TRG_LANG;
 
 /**
  * Created by roman on 8.4.17.
@@ -100,13 +105,16 @@ public class TranslatorFragment extends Fragment implements
                                 TRANSL_RESULT = "TextviewTranslResult",
                                 TRANSL_CONTENT = "RecyclerViewTranslContent",
                                 CONT_SUCCESS_VISIBILITY = "CONT_SUCCESS_VISIBILITY",
-                                CONT_ERROR_VISIBILITY = "CONT_ERROR_VISIBILITY";
+                                CONT_ERROR_VISIBILITY = "CONT_ERROR_VISIBILITY",
+                                PROGRESS_BAR_VISIBILITY = "PROGRESS_BAR_VISIBILITY",
+                                IS_FAVORITE ="SetFavorite";
     private SharedPreferences mSettings;
     private TranslationSaver saver;
     private DictDefinition curDictDefinition;
     private BottomNavigationView mNavigation;
     private int mBottomPadding;
     private TranslatorAPIHolder mTranslatorAPIHolder;
+    private ProgressBar mProgressBar;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -114,8 +122,9 @@ public class TranslatorFragment extends Fragment implements
         mView = inflater.inflate(R.layout.fragment_translator, container, false);
 
         mTranslatorAPIHolder = TranslatorAPIHolder.getInstance();
-        mTranslatorAPIHolder.addOnTranslatorAPIResultObserver(this);
 
+        mProgressBar = (ProgressBar) mView.findViewById(R.id.fragment_translator_progressbar);
+        mProgressBar.setVisibility(View.INVISIBLE);
 
         mLanguagesMap  = JsonUtils.getJsonObjectFromFile(getActivity().getAssets(),"langs.json");
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
@@ -123,11 +132,12 @@ public class TranslatorFragment extends Fragment implements
         mContainerSuccesful = (RelativeLayout) mView.findViewById(R.id.connection_succesful_content);
         mContainerError = (RelativeLayout) mView.findViewById(R.id.connection_error_content);
         mContainerError.setVisibility(View.INVISIBLE);
+        mContainerSuccesful.setVisibility(View.INVISIBLE);
+
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
 
         mRepository = TranslatorRepository.getInstance(localDataSource);
-        mRepository.addHistoryContentObserver(this);
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
 
 
@@ -176,6 +186,11 @@ public class TranslatorFragment extends Fragment implements
         mButtonSetFavorite = (ImageButton) mView.findViewById(R.id.set_favorite);
         mButtonShare = (ImageButton) mView.findViewById(R.id.share_translated_word);
 
+        if (Boolean.parseBoolean(mSettings.getString(IS_FAVORITE,""))) {
+            mButtonSetFavorite.setImageResource(R.drawable.bookmark_black_shape_gold512);
+        } else {
+            mButtonSetFavorite.setImageResource(R.drawable.bookmark_black_shape_dark512);
+        }
 
         mTranslateRecyclerView = (RecyclerView) mView.findViewById(R.id.container_dict_defin);
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -249,6 +264,13 @@ public class TranslatorFragment extends Fragment implements
                         trgText = mButtonTrgLang.getText().toString();
                 mButtonSrcLang.setText(trgText);
                 mButtonTrgLang.setText(srcText);
+
+                String srcLangAPI = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG,"");
+                String trgLangAPI = mSettings.getString(CUR_SELECTED_ITEM_TRG_LANG,"");
+                SharedPreferences.Editor editor = mSettings.edit();
+                editor.putString(CUR_SELECTED_ITEM_SRC_LANG, trgLangAPI);
+                editor.putString(CUR_SELECTED_ITEM_TRG_LANG, srcLangAPI);
+                editor.apply();
             }
         });
         mButtonTrgLang.setOnClickListener(new View.OnClickListener() {
@@ -281,6 +303,19 @@ public class TranslatorFragment extends Fragment implements
         mButtonSetFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                TranslatedItem item = saver.getCurTranslatedItem();
+                if (!item.isFavorite()) {
+                    item.isFavoriteUp(true);
+                    saver.setCurTranslatedItem(item);
+                    mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
+                    ((ImageButton)v).setImageResource(R.drawable.bookmark_black_shape_gold512);
+                } else {
+                    item.isFavoriteUp(false);
+                    saver.setCurTranslatedItem(item);
+                    mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
+                    ((ImageButton)v).setImageResource(R.drawable.bookmark_black_shape_dark512);
+                }
+                mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY,item);
                 Toast.makeText(getContext(), "set favorite was clicked", Toast.LENGTH_SHORT).show();
             }
         });
@@ -317,7 +352,17 @@ public class TranslatorFragment extends Fragment implements
         if (savedInstanceState != null){
             restoreVisibility(savedInstanceState,mContainerError,CONT_ERROR_VISIBILITY);
             restoreVisibility(savedInstanceState,mContainerSuccesful,CONT_SUCCESS_VISIBILITY);
+            restoreVisibility(savedInstanceState,mProgressBar,PROGRESS_BAR_VISIBILITY);
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mTranslatorAPIHolder.addOnTranslatorAPIResultObserver(this);
+        mRepository.addHistoryContentObserver(this);
+
     }
 
     public void restoreVisibility(Bundle savedInstanceState, View view, String key){
@@ -336,6 +381,8 @@ public class TranslatorFragment extends Fragment implements
         }
     }
 
+
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -343,6 +390,7 @@ public class TranslatorFragment extends Fragment implements
 
         outState.putString(CONT_ERROR_VISIBILITY, String.valueOf(mContainerError.getVisibility()));
         outState.putString(CONT_SUCCESS_VISIBILITY, String.valueOf(mContainerSuccesful.getVisibility()));
+        outState.putString(PROGRESS_BAR_VISIBILITY, String.valueOf(mProgressBar));
     }
 
     @Override
@@ -361,13 +409,21 @@ public class TranslatorFragment extends Fragment implements
         editor.putString(TRG_LANG,mButtonTrgLang.getText().toString());
         editor.putString(TRANSL_RESULT, mTranslatedResult.getText().toString());
 
+        if (saver.getCurTranslatedItem()!= null && saver.getCurTranslatedItem().getIsFavorite()!=null) {
+            editor.putString(IS_FAVORITE, saver.getCurTranslatedItem().getIsFavorite());
+        } else {
+            editor.putString(IS_FAVORITE, String.valueOf(false));
+        }
         if (saver.getDictDefinition() != null) {
             editor.putString(TRANSL_CONTENT, saver.getDictDefinition().getJsonToStringRepr());
         } else if (curDictDefinition != null){
             editor.putString(TRANSL_CONTENT, curDictDefinition.getJsonToStringRepr());
         }
+
         editor.apply();
     }
+
+
 
 
     public void initToolbar(){
@@ -442,10 +498,12 @@ public class TranslatorFragment extends Fragment implements
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE && mCustomEditText.getText().length() != 0) {
                     try {
+                        mContainerSuccesful.setVisibility(View.INVISIBLE);
+                        mProgressBar.setVisibility(View.VISIBLE);
                         TranslatorAPIUtils.getTranslate(mCustomEditText.getText().toString(),
                                 getActivity().getAssets(),
-                                mButtonSrcLang.getText().toString(),
-                                mButtonTrgLang.getText().toString(),
+                                mButtonSrcLang.getText().toString().toLowerCase(),
+                                mButtonTrgLang.getText().toString().toLowerCase(),
                                 mTranslatedResult,
                                 mTranslateRecyclerView,
                                 saver,
@@ -496,6 +554,7 @@ public class TranslatorFragment extends Fragment implements
 
     @Override
     public void onTranslatorAPIResult(boolean success) {
+        mProgressBar.setVisibility(View.INVISIBLE);
         if (success){
             mContainerSuccesful.setVisibility(View.VISIBLE);
             mContainerError.setVisibility(View.INVISIBLE);
@@ -508,6 +567,15 @@ public class TranslatorFragment extends Fragment implements
 
     public class TranslationSaver implements Runnable{
         private DictDefinition mDictDefinition;
+        private TranslatedItem mCurTranslatedItem;
+
+        public TranslatedItem getCurTranslatedItem() {
+            return mCurTranslatedItem;
+        }
+
+        public void setCurTranslatedItem(TranslatedItem curTranslatedItem) {
+            mCurTranslatedItem = curTranslatedItem;
+        }
 
         public DictDefinition getDictDefinition() {
             return mDictDefinition;
@@ -520,9 +588,9 @@ public class TranslatorFragment extends Fragment implements
         @Override
         public void run() {
 
-            TranslatedItem item = new TranslatedItem(
-                    mLanguagesMap.get(mButtonSrcLang.getText().toString().toLowerCase()).getAsString().toUpperCase(),
-                    mLanguagesMap.get(mButtonTrgLang.getText().toString().toLowerCase()).getAsString().toUpperCase(),
+            mCurTranslatedItem = new TranslatedItem(
+                    mLanguagesMap.get(mButtonSrcLang.getText().toString().toLowerCase()).getAsString(),
+                    mLanguagesMap.get(mButtonTrgLang.getText().toString().toLowerCase()).getAsString(),
                     mButtonSrcLang.getText().toString(),
                     mButtonTrgLang.getText().toString(),
                     mCustomEditText.getText().toString(),
@@ -530,12 +598,12 @@ public class TranslatorFragment extends Fragment implements
                     "false",
                     mDictDefinition.getJsonToStringRepr()
                     );
-            if (!mHistoryTranslatedItems.contains(item)) {
-                mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+            if (!mHistoryTranslatedItems.contains(mCurTranslatedItem)) {
+                mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
             } else {
-                int index = mHistoryTranslatedItems.indexOf(item);
-                item.setIsFavorite(mHistoryTranslatedItems.get(index).getIsFavorite());
-                mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+                int index = mHistoryTranslatedItems.indexOf(mCurTranslatedItem);
+                mCurTranslatedItem.setIsFavorite(mHistoryTranslatedItems.get(index).getIsFavorite());
+                mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
             }
         }
     }

@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.karanchuk.roman.testtranslate.ui.source_lang.SourceLangActivity.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.ui.target_lang.TargetLangActivity.CUR_SELECTED_ITEM_TRG_LANG;
 import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.EDITTEXT_DATA;
 import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.PREFS_NAME;
 import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.SRC_LANG;
@@ -158,6 +160,8 @@ public class FavoritesFragment extends Fragment implements
                 editor.putString(TRG_LANG, item.getTrgLanguageForUser());
                 editor.putString(TRANSL_RESULT, item.getTrgMeaning());
                 editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+                editor.putString(CUR_SELECTED_ITEM_SRC_LANG, item.getSrcLanguageForAPI());
+                editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
                 editor.apply();
                 translatorNavigationItem.performClick();
                 Toast.makeText(getContext(),"item was clicked in favorites", Toast.LENGTH_SHORT).show();
@@ -310,7 +314,7 @@ public class FavoritesFragment extends Fragment implements
                 case R.id.menu_item_delete:
                     performContextItemDeletion();
                     chooseCurView();
-                    chooseClearStoredVisility();
+                    chooseClearStoredVisibility();
                     Toast.makeText(getContext(), "item was longclicked contextmenu in favorites", Toast.LENGTH_SHORT).show();
                     return true;
                 default:
@@ -320,7 +324,7 @@ public class FavoritesFragment extends Fragment implements
         return super.onContextItemSelected(item);
     }
 
-    public void chooseClearStoredVisility(){
+    public void chooseClearStoredVisibility(){
         if (!mFavoritesTranslatedItems.isEmpty()){
             mClearStored.setVisibility(View.VISIBLE);
         } else {
@@ -331,6 +335,10 @@ public class FavoritesFragment extends Fragment implements
     public void performContextItemDeletion(){
         StoredRecyclerAdapter adapter = (StoredRecyclerAdapter) mFavoritesRecycler.getAdapter();
         int position = adapter.getPosition();
+        TranslatedItem item = mFavoritesTranslatedItems.get(position);
+        mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+        item.isFavoriteUp(false);
+        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
         mFavoritesTranslatedItems.remove(position);
         mFavoritesRecycler.getAdapter().notifyItemRemoved(position);
     }

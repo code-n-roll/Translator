@@ -43,78 +43,79 @@ public class JsonUtils {
     public static DictDefinition getDictDefinitionFromJson(JsonObject jsonObject){
         JsonElement dictDefJSON = jsonObject.get("def");
         List<PartOfSpeech> dictDefinition = new ArrayList<>();
-        for (JsonElement pOfsJSON : dictDefJSON.getAsJsonArray()){
-            JsonElement translationsJSON = pOfsJSON.getAsJsonObject().get("tr");
-            int i = 1;
-            ArrayList<Translation> translations = new ArrayList<>();
-            for (JsonElement translationJSON : translationsJSON.getAsJsonArray()) {
-                JsonElement synonymsJSON = translationJSON.getAsJsonObject().get("syn");
-                String firstText = "";
-                if (translationJSON.getAsJsonObject().get("text") != null)
-                    firstText = translationJSON.getAsJsonObject().get("text").getAsString();
+        if (dictDefJSON != null) {
+            for (JsonElement pOfsJSON : dictDefJSON.getAsJsonArray()) {
+                JsonElement translationsJSON = pOfsJSON.getAsJsonObject().get("tr");
+                int i = 1;
+                ArrayList<Translation> translations = new ArrayList<>();
+                for (JsonElement translationJSON : translationsJSON.getAsJsonArray()) {
+                    JsonElement synonymsJSON = translationJSON.getAsJsonObject().get("syn");
+                    String firstText = "";
+                    if (translationJSON.getAsJsonObject().get("text") != null)
+                        firstText = translationJSON.getAsJsonObject().get("text").getAsString();
 
-                String firstGen = "";
-                if (translationJSON.getAsJsonObject().get("gen") != null)
-                    firstGen = translationJSON.getAsJsonObject().get("gen").getAsString();
-                Synonym firstSynonym = new Synonym(firstText, firstGen);
-                List<Synonym> synonyms = new ArrayList<>();
-                synonyms.add(firstSynonym);
-                if (synonymsJSON != null) {
-                    for (JsonElement synonymJSON : synonymsJSON.getAsJsonArray()) {
-                        JsonObject synObjJSON = synonymJSON.getAsJsonObject();
-                        String text = "", gen = "";
-                        if (synObjJSON.get("text") != null)
-                            text = synObjJSON.get("text").getAsString();
-                        if (synObjJSON.get("gen") != null)
-                            gen = synObjJSON.get("gen").getAsString();
-                        Synonym synonym = new Synonym(text, gen);
-                        synonyms.add(synonym);
+                    String firstGen = "";
+                    if (translationJSON.getAsJsonObject().get("gen") != null)
+                        firstGen = translationJSON.getAsJsonObject().get("gen").getAsString();
+                    Synonym firstSynonym = new Synonym(firstText, firstGen);
+                    List<Synonym> synonyms = new ArrayList<>();
+                    synonyms.add(firstSynonym);
+                    if (synonymsJSON != null) {
+                        for (JsonElement synonymJSON : synonymsJSON.getAsJsonArray()) {
+                            JsonObject synObjJSON = synonymJSON.getAsJsonObject();
+                            String text = "", gen = "";
+                            if (synObjJSON.get("text") != null)
+                                text = synObjJSON.get("text").getAsString();
+                            if (synObjJSON.get("gen") != null)
+                                gen = synObjJSON.get("gen").getAsString();
+                            Synonym synonym = new Synonym(text, gen);
+                            synonyms.add(synonym);
+                        }
                     }
-                }
 
-                JsonElement meaningsJSON = translationJSON.getAsJsonObject().get("mean");
-                String meanings = "(";
-                if (meaningsJSON != null) {
-                    for (JsonElement meaningJSON : meaningsJSON.getAsJsonArray()) {
-                        JsonObject meanObjJSON = meaningJSON.getAsJsonObject();
-                        meanings = meanings.concat(meanObjJSON.get("text").getAsString()).concat(", ");
+                    JsonElement meaningsJSON = translationJSON.getAsJsonObject().get("mean");
+                    String meanings = "(";
+                    if (meaningsJSON != null) {
+                        for (JsonElement meaningJSON : meaningsJSON.getAsJsonArray()) {
+                            JsonObject meanObjJSON = meaningJSON.getAsJsonObject();
+                            meanings = meanings.concat(meanObjJSON.get("text").getAsString()).concat(", ");
+                        }
                     }
-                }
-                if (meanings.length()>=2){
-                    meanings = meanings.substring(0, meanings.length()-2).concat(")");
-                } else {
-                    meanings = "";
-                }
-
-                JsonElement exprsJSON = translationJSON.getAsJsonObject().get("ex");
-                String exprs = "";
-                if (exprsJSON != null) {
-                    for (JsonElement exprJSON : exprsJSON.getAsJsonArray()) {
-                        JsonObject exprObjJSON = exprJSON.getAsJsonObject();
-                        exprs = exprs.concat(exprObjJSON.get("text").getAsString()).
-                                concat(" \u2014 ").
-                                concat(exprObjJSON.get("tr").
-                                        getAsJsonArray().get(0).getAsJsonObject().
-                                        get("text").getAsString()).
-                                concat("\n");
+                    if (meanings.length() >= 2) {
+                        meanings = meanings.substring(0, meanings.length() - 2).concat(")");
+                    } else {
+                        meanings = "";
                     }
+
+                    JsonElement exprsJSON = translationJSON.getAsJsonObject().get("ex");
+                    String exprs = "";
+                    if (exprsJSON != null) {
+                        for (JsonElement exprJSON : exprsJSON.getAsJsonArray()) {
+                            JsonObject exprObjJSON = exprJSON.getAsJsonObject();
+                            exprs = exprs.concat(exprObjJSON.get("text").getAsString()).
+                                    concat(" \u2014 ").
+                                    concat(exprObjJSON.get("tr").
+                                            getAsJsonArray().get(0).getAsJsonObject().
+                                            get("text").getAsString()).
+                                    concat("\n");
+                        }
+                    }
+                    if (!exprs.isEmpty()) {
+                        exprs = exprs.substring(0, exprs.length() - 1);
+                    }
+
+
+                    translations.add(new Translation(String.valueOf(i), synonyms, meanings, exprs,
+                            JsonUtils.getRepresentSynonyms(synonyms)));
+                    ++i;
                 }
-                if (!exprs.isEmpty()){
-                    exprs = exprs.substring(0, exprs.length()-1);
-                }
-
-
-
-                translations.add(new Translation(String.valueOf(i),synonyms,meanings,exprs,
-                        JsonUtils.getRepresentSynonyms(synonyms)));
-                ++i;
+                String namePOS = pOfsJSON.getAsJsonObject().get("pos").getAsString();
+                dictDefinition.add(new PartOfSpeech(namePOS, translations));
             }
-            String namePOS = pOfsJSON.getAsJsonObject().get("pos").getAsString();
-            dictDefinition.add(new PartOfSpeech(namePOS,translations));
         }
         String text = "";
         String ts = "";
-        if (dictDefJSON.getAsJsonArray().size() != 0) {
+        if (dictDefJSON != null && dictDefJSON.getAsJsonArray().size() != 0) {
             JsonElement textJSON = dictDefJSON.getAsJsonArray().get(0).getAsJsonObject().get("text");
             if (textJSON != null)
                 text = textJSON.getAsString();

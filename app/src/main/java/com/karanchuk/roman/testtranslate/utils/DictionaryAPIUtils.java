@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.data.DictDefinition;
 import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.data.Translation;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorAPIHolder;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorRecyclerAdapter;
 
@@ -75,6 +76,8 @@ public class DictionaryAPIUtils {
 
                         saver.setDictDefinition(dictDefinition);
                         new Thread(saver).start();
+
+                        TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(true);
                     }
                 });
             }

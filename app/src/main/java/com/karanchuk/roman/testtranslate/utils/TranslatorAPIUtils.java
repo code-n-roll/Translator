@@ -63,8 +63,8 @@ public class TranslatorAPIUtils {
         JsonObject langs = JsonUtils.getJsonObjectFromFile(manager, "langs.json");
 
 
-        final String srcLangAPI = langs.get(srcLang.toLowerCase()).getAsString();
-        final String trgLangAPI = langs.get(trgLang.toLowerCase()).getAsString();
+        final String srcLangAPI = langs.get(srcLang).getAsString();
+        final String trgLangAPI = langs.get(trgLang).getAsString();
         final String translDirection = srcLangAPI.
                 concat("-").
                 concat(trgLangAPI);
@@ -126,13 +126,13 @@ public class TranslatorAPIUtils {
                 Log.d("api response", strResponse);
                 Log.d("http response", response.toString());
 
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         if (!result.isEmpty()) {
                             tvTranslateResult.setText(result);
                             DictionaryAPIUtils.lookup(mHandler, translatedText,translDirection,rvTranslate, saver);
-                            TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(true);
                         }
                     }
                 });

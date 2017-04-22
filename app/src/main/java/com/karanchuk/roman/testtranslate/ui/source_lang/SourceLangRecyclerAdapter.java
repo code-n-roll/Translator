@@ -1,6 +1,10 @@
 package com.karanchuk.roman.testtranslate.ui.source_lang;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +15,7 @@ import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Language;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by roman on 11.4.17.
@@ -21,12 +26,15 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
         void onItemClick(Language item);
     }
 
-    private final ArrayList<Language> mItems;
+    private final List<Language> mItems;
     private final OnItemClickListener mListener;
+    private Context mContext;
 
-    public SourceLangRecyclerAdapter(ArrayList<Language> items, OnItemClickListener listener){
+    public SourceLangRecyclerAdapter(List<Language> items, OnItemClickListener listener, Context context){
         mItems = items;
         mListener = listener;
+        mContext = context;
+
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -62,10 +70,12 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
                          final SourceLangRecyclerAdapter.OnItemClickListener listener){
 
             mLanguage.setText(item.getName());
-            if (mLanguage.isSelected()){
+            if (item.isSelected()){
                 mIsSelected.setVisibility(View.VISIBLE);
+                mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorSelectedItem));
             } else {
-                mIsSelected.setVisibility(View.GONE);
+                mIsSelected.setVisibility(View.INVISIBLE);
+                mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
             }
             mView.setOnClickListener(new View.OnClickListener(){
                 @Override public void onClick(View v){

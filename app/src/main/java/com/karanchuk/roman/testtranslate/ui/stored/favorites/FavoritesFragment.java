@@ -59,11 +59,13 @@ public class FavoritesFragment extends Fragment implements
                                     mHistoryTranslatedItems,
                                     mCopyFavoritesTranslatedItems;
     private Handler mMainHandler;
-    private View mView, mEmptyView, mContentView;
-    private TextView mTextViewEmptyFavorites;
-    private ImageView mImageViewEmptyFavorites;
+    private View mView, mEmptyView, mContentView, mEmptySearchView;
+    private TextView mTextViewEmptyFavorites, mTextViewEmptySearch;
+    private ImageView mImageViewEmptyFavorites, mImageViewEmptySearch;
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
+
+
 
     public static int UNIQUE_FAVORITES_FRAGMENT_ID = 2;
 
@@ -73,6 +75,7 @@ public class FavoritesFragment extends Fragment implements
                              Bundle savedInstanceState) {
 
         mMainHandler = new Handler(getContext().getMainLooper());
+
 
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 
@@ -106,13 +109,23 @@ public class FavoritesFragment extends Fragment implements
 
         mEmptyView =  mView.findViewById(R.id.include_content_favorites_empty_item_list);
         mContentView = mView.findViewById(R.id.include_content_favorites_full_item_list);
+        mEmptySearchView = mView.findViewById(R.id.include_content_favorites_empty_search);
+        mEmptySearchView.setVisibility(View.INVISIBLE);
+
 
         mTextViewEmptyFavorites = (TextView) mView.findViewById(R.id.textview_empty_item_list);
         mTextViewEmptyFavorites.setText(R.string.empty_favorites);
         mImageViewEmptyFavorites = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
         mImageViewEmptyFavorites.setImageResource(R.drawable.bookmark_black_shape_light512);
 
+        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
+        mTextViewEmptySearch.setText(R.string.empty_search);
+        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
+        mImageViewEmptySearch.setImageResource(R.drawable.bookmark_black_shape_light512);
+
+
         mButtonIsFavorite = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+
 
         mLayoutManager = new LinearLayoutManager(mView.getContext());
         mFavoritesRecycler = (RecyclerView) mView.findViewById(R.id.favorites_items_list);
@@ -234,7 +247,19 @@ public class FavoritesFragment extends Fragment implements
         }
         StoredRecyclerAdapter adapter = (StoredRecyclerAdapter)mFavoritesRecycler.getAdapter();
         adapter.setFilter(newList);
+
+        chooseCurSearchView(newList);
         return true;
+    }
+
+    public void chooseCurSearchView(List<TranslatedItem> list){
+        if (list.isEmpty()){
+            mEmptySearchView.setVisibility(View.VISIBLE);
+            mFavoritesRecycler.setVisibility(View.INVISIBLE);
+        } else {
+            mEmptySearchView.setVisibility(View.INVISIBLE);
+            mFavoritesRecycler.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

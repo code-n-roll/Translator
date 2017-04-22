@@ -18,9 +18,6 @@
             android:id="@+id/edittext"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignEnd="@+id/get_source_voice"
-            android:layout_alignRight="@+id/get_source_voice"
-            android:layout_above="@+id/clearEditText"
             android:ems="10"
             android:inputType="textMultiLine"
             android:hint="@string/translate_hint"
@@ -28,20 +25,21 @@
             android:background="@android:color/transparent"
             android:paddingStart="10dp"
             android:paddingLeft="10dp"
-            android:paddingRight="55dp"
-            android:paddingEnd="55dp"
-            android:paddingTop="4dp"
+            android:paddingRight="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:gravity="top|start"
             android:imeOptions="actionDone"
         />
         <ImageButton
             android:id="@+id/clearEditText"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:padding="8dp"
+            android:padding="10dp"
             android:scaleType="fitCenter"
             android:src="@drawable/cancel_dark512"
             android:background="@android:color/transparent"
@@ -75,98 +73,18 @@
             />
     </RelativeLayout>
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/translate_result_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/translate_result_container"
         android:layout_weight="3"
         >
-        <TextView
-            android:id="@+id/textview_translate_result"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dp"
-            android:layout_toLeftOf="@+id/get_target_voice"
-            android:layout_toStartOf="@+id/get_target_voice"
-            android:text="время"
-            android:textSize="20sp"
-            android:textColor="@android:color/black"
-           />
+        <include
+            android:id="@+id/connection_succesful_content"
+            layout="@layout/content_connection_succesful"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/container_dict_defin"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/textview_translate_result"
-            android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="20dp"
-            android:layout_toLeftOf="@+id/set_favorite"
-            android:layout_toStartOf="@+id/set_favorite"
-            android:scrollbars="vertical"
-            />
-
-        <ImageButton
-            android:id="@+id/get_target_voice"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/volume_up_indicator_dark512"
-            android:padding="10dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="10dp"
-            android:scaleType="fitCenter"
-            android:background="@android:color/transparent"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp"
-            />
-        <ImageButton
-            android:id="@+id/set_favorite"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/bookmark_black_shape_dark512"
-            android:padding="8dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/get_target_voice"
-            android:layout_marginTop="10dp"
-            android:scaleType="fitCenter"
-            android:background="@android:color/transparent"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp"
-            />
-        <ImageButton
-            android:id="@+id/share_translated_word"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/share_arrow_dark512"
-            android:padding="8dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/set_favorite"
-            android:layout_marginTop="10dp"
-            android:scaleType="fitCenter"
-            android:background="@android:color/transparent"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp"
-            />
-        <ImageButton
-            android:id="@+id/fullscreen_translated_word"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/fullscreen_dark512"
-            android:padding="8dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/share_translated_word"
-            android:layout_marginTop="10dp"
-            android:scaleType="fitCenter"
-            android:background="@android:color/transparent"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp"
-            />
-    </RelativeLayout>
+        <include
+            android:id="@+id/connection_error_content"
+            layout="@layout/content_connection_error"/>
+    </FrameLayout>
 </LinearLayout>

@@ -57,9 +57,11 @@ public class HistoryFragment extends Fragment implements
                                 mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
-    private View mView, mEmptyView, mContentView;
-    private TextView mTextViewEmptyHistory;
-    private ImageView mImageViewEmptyHistory;
+    private View mView, mEmptyView, mContentView, mEmptySearchView;
+    private TextView mTextViewEmptyContent,
+            mTextViewEmptySearch;
+    private ImageView mImageViewEmptyContent,
+            mImageViewEmptySearch;
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
     private ImageButton mClearStored;
@@ -95,11 +97,18 @@ public class HistoryFragment extends Fragment implements
 
         mEmptyView = mView.findViewById(R.id.include_content_history_empty_item_list);
         mContentView = mView.findViewById(R.id.include_content_history_full_item_list);
+        mEmptySearchView = mView.findViewById(R.id.include_content_history_empty_search);
+        mEmptySearchView.setVisibility(View.INVISIBLE);
 
-        mTextViewEmptyHistory = (TextView) mView.findViewById(R.id.textview_empty_item_list);
-        mTextViewEmptyHistory.setText(R.string.empty_history);
-        mImageViewEmptyHistory = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
-        mImageViewEmptyHistory.setImageResource(R.drawable.history_light512);
+        mTextViewEmptyContent = (TextView) mView.findViewById(R.id.textview_empty_item_list);
+        mTextViewEmptyContent.setText(R.string.empty_history);
+        mImageViewEmptyContent = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
+        mImageViewEmptyContent.setImageResource(R.drawable.history_light512);
+
+        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
+        mTextViewEmptySearch.setText(R.string.empty_search);
+        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
+        mImageViewEmptySearch.setImageResource(R.drawable.history_light512);
 
         mLayoutManager = new LinearLayoutManager(mView.getContext());
         mHistoryRecycler = (RecyclerView) mView.findViewById(R.id.history_items_list);
@@ -190,6 +199,7 @@ public class HistoryFragment extends Fragment implements
                         UNIQUE_HISTORY_FRAGMENT_ID));
         registerForContextMenu(mHistoryRecycler);
 
+
         chooseCurView();
 
 
@@ -273,7 +283,19 @@ public class HistoryFragment extends Fragment implements
         }
         StoredRecyclerAdapter adapter = (StoredRecyclerAdapter)mHistoryRecycler.getAdapter();
         adapter.setFilter(newList);
+
+        chooseCurSearchView(newList);
         return true;
+    }
+
+    public void chooseCurSearchView(List<TranslatedItem> list){
+        if (list.isEmpty()){
+            mEmptySearchView.setVisibility(View.VISIBLE);
+            mHistoryRecycler.setVisibility(View.INVISIBLE);
+        } else {
+            mEmptySearchView.setVisibility(View.INVISIBLE);
+            mHistoryRecycler.setVisibility(View.VISIBLE);
+        }
     }
 
 

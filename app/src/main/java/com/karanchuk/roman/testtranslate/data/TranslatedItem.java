@@ -1,5 +1,9 @@
 package com.karanchuk.roman.testtranslate.data;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.karanchuk.roman.testtranslate.utils.JsonUtils;
+
 import java.util.UUID;
 
 /**
@@ -157,13 +161,19 @@ public class TranslatedItem {
 
     @Override
     public boolean equals(Object obj) {
-        TranslatedItem item = (TranslatedItem) obj;
-        if (this.mSrcMeaning.equals(item.mSrcMeaning) &&
-                this.mTrgMeaning.equals(item.mTrgMeaning) &&
-                this.mSrcLanguageForAPI.equals(item.mSrcLanguageForAPI) &&
-                this.mTrgLanguageForAPI.equals(item.mTrgLanguageForAPI)){
-            return true;
+        if (obj instanceof TranslatedItem) {
+            TranslatedItem item = (TranslatedItem) obj;
+            if (mSrcMeaning.equals(item.mSrcMeaning) &&
+                    mSrcLanguageForAPI.toLowerCase().equals(item.mSrcLanguageForAPI.toLowerCase()) &&
+                    mTrgLanguageForAPI.toLowerCase().equals(item.mTrgLanguageForAPI.toLowerCase())) {
+                return true;
+            }
         }
         return false;
+    }
+
+    public DictDefinition getDictDefinitionFromStringRepr(String dictDefinition){
+        JsonObject jo = new JsonParser().parse(dictDefinition).getAsJsonObject();
+        return JsonUtils.getDictDefinitionFromJson(jo);
     }
 }

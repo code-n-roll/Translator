@@ -3,6 +3,7 @@ package com.karanchuk.roman.testtranslate.data;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,5 +71,13 @@ public class DictDefinition {
             result = result.concat(pOfs.toString()).concat("\n");
         }
         return result;
+    }
+
+    public List<Translation> getTranslations(){
+        List<Translation> translations = new ArrayList<>();
+        for (PartOfSpeech POS : mPartsOfSpeech){
+            translations.addAll(POS.getTranslations());
+        }
+        return translations;
     }
 }

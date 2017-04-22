@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,7 +21,6 @@ import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
-import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.List;
 
@@ -29,18 +29,20 @@ public class MainActivity extends AppCompatActivity implements
         TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver{
 
-    private String mCurFragment = "TRANSLATOR_FRAGMENT";
+    private String mCurFragmentTag = "TRANSLATOR_FRAGMENT";
     public static String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT",
                         STORED_FRAGMENT = "STORED_FRAGMENT",
-                        SETTINGS_FRAGMENT = "SETTINGS_FRAGMENT";
+                        SETTINGS_FRAGMENT = "SETTINGS_FRAGMENT",
+                        CUR_FRAGMENT_TAG = "CUR_FRAGMENT_TAG";
     private List<TranslatedItem> mHistoryTranslatedItems,
                                 mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
     private ContentManager mContentManager;
+    private Fragment mCurFragment;
 
-    public void setCurFragment(String curFragment){
-        this.mCurFragment = curFragment;
+    public void setCurFragmentTag(String curFragmentTag){
+        this.mCurFragmentTag = curFragmentTag;
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -50,8 +52,8 @@ public class MainActivity extends AppCompatActivity implements
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_translate:
-                    if (!mCurFragment.equals(TRANSLATOR_FRAGMENT)) {
-                        setCurFragment(TRANSLATOR_FRAGMENT);
+                    if (!mCurFragmentTag.equals(TRANSLATOR_FRAGMENT)) {
+                        setCurFragmentTag(TRANSLATOR_FRAGMENT);
                         getSupportFragmentManager().
                                 beginTransaction().
                                 replace(R.id.main_activity_container,
@@ -60,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     return true;
                 case R.id.navigation_favorites:
-                    if (!mCurFragment.equals(STORED_FRAGMENT)){
-                        setCurFragment(STORED_FRAGMENT);
+                    if (!mCurFragmentTag.equals(STORED_FRAGMENT)){
+                        setCurFragmentTag(STORED_FRAGMENT);
                         getSupportFragmentManager().
                                 beginTransaction().
                                 replace(R.id.main_activity_container,
@@ -70,8 +72,8 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     return true;
                 case R.id.navigation_settings:
-                    if (!mCurFragment.equals(SETTINGS_FRAGMENT)) {
-                        setCurFragment(SETTINGS_FRAGMENT);
+                    if (!mCurFragmentTag.equals(SETTINGS_FRAGMENT)) {
+                        setCurFragmentTag(SETTINGS_FRAGMENT);
                         getSupportFragmentManager().
                                 beginTransaction().
                                 replace(R.id.main_activity_container,
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements
 
         JsonUtils.getDictDefinitionFromJson(
                 JsonUtils.getJsonObjectFromFile(
-                        getAssets(),"translator_response.json"));
+                        getAssets(), "translator_response.json"));
 
         mMainHandler = new Handler(getMainLooper());
         mContentManager = ContentManager.getInstance();
@@ -103,14 +105,19 @@ public class MainActivity extends AppCompatActivity implements
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
 
-
+        if (savedInstanceState != null) {
+            mCurFragmentTag = savedInstanceState.getString(CUR_FRAGMENT_TAG);
+            mCurFragment = getSupportFragmentManager().getFragment(savedInstanceState,mCurFragmentTag);
+        } else {
+            mCurFragment = new TranslatorFragment();
+            mCurFragmentTag = TRANSLATOR_FRAGMENT;
+        }
         getSupportFragmentManager().
                 beginTransaction().
                 replace(R.id.main_activity_container,
-                        new TranslatorFragment(), TRANSLATOR_FRAGMENT).
+                        mCurFragment, mCurFragmentTag).
                 commit();
     }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -127,6 +134,13 @@ public class MainActivity extends AppCompatActivity implements
         super.onStop();
         mRepository.removeHistoryContentObserver(this);
         mRepository.removeFavoritesContentObserver(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, mCurFragmentTag,getSupportFragmentManager().findFragmentByTag(mCurFragmentTag));
+        outState.putString(CUR_FRAGMENT_TAG, mCurFragmentTag);
     }
 
 

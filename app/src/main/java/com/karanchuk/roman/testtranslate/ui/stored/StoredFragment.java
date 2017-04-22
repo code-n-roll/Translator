@@ -1,21 +1,19 @@
 package com.karanchuk.roman.testtranslate.ui.stored;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
@@ -27,10 +25,11 @@ import com.karanchuk.roman.testtranslate.ui.stored.favorites.FavoritesFragment;
 import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
+import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
-import org.xmlpull.v1.XmlPullParserException;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +58,12 @@ public class StoredFragment extends Fragment implements
     private Handler mMainHandler;
     private List<TranslatedItem> mFavoritesItems, mHistoryItems;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_stored, container, false);
+
 
         mMainHandler = new Handler(Looper.getMainLooper());
 
@@ -105,9 +106,11 @@ public class StoredFragment extends Fragment implements
             }
         });
 
+        UIUtils.changeSoftInputModeWithOrientation(getActivity());
         initViewPager(mView);
         initTabLayout(mView);
         initToolbar();
+
 
         return mView;
     }

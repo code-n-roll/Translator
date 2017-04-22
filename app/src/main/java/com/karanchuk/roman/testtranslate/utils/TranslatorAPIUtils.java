@@ -1,5 +1,6 @@
 package com.karanchuk.roman.testtranslate.utils;
 
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,7 +12,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.data.DictDefinition;
 import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
+import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.Translation;
+import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorAPIHolder;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorRecyclerAdapter;
 
@@ -25,6 +29,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.EDITTEXT_DATA;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.PREFS_NAME;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRANSL_CONTENT;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRANSL_RESULT;
+import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRG_LANG;
 import static com.karanchuk.roman.testtranslate.utils.DictionaryAPIUtils.lookup;
 
 /**
@@ -35,22 +45,29 @@ public class TranslatorAPIUtils {
 
     public static void getTranslate(final String translatedText,
                                     AssetManager manager,
-                                    String srcLang,
+                                    final String srcLang,
                                     String trgLang,
                                     final TextView tvTranslateResult,
                                     final RecyclerView rvTranslate,
-                                    final TranslatorFragment.TranslationSaver saver
-    )
+                                    final TranslatorFragment.TranslationSaver saver,
+                                    final List<TranslatedItem> historyTranslatedItems,
+                                    final SharedPreferences settings
+                                    )
             throws IOException{
+
+
         OkHttpClient client = new OkHttpClient();
         final Handler mHandler = new Handler(Looper.getMainLooper());
+
 
         JsonObject langs = JsonUtils.getJsonObjectFromFile(manager, "langs.json");
 
 
-        final String translDirection = langs.get(srcLang.toLowerCase()).getAsString().
+        final String srcLangAPI = langs.get(srcLang.toLowerCase()).getAsString();
+        final String trgLangAPI = langs.get(trgLang.toLowerCase()).getAsString();
+        final String translDirection = srcLangAPI.
                 concat("-").
-                concat(langs.get(trgLang.toLowerCase()).getAsString());
+                concat(trgLangAPI);
 
         String url = "https://translate.yandex.net/api/v1.5/tr.json/translate?"+
                 "key=trnsl.1.1.20170410T011338Z.07c9f77e0dd5777b.400bcbcacf7bdafcdaa1a38cfa576dbc9fae4010"+
@@ -67,8 +84,39 @@ public class TranslatorAPIUtils {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+//                        TranslatedItem item = new TranslatedItem("srcLangAPI","trgLangAPI",
+//                        srcLangUser,trgLangUser,"srcMean","trgMean","isFavor","dictDef");
+//                        TranslatedItem item = new TranslatedItem(srcLangAPI,trgLangAPI,
+//                                null,null,translatedText,null,null,null);
+//                        if (!historyTranslatedItems.contains(item)) {
+                        TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(false);
+//                        } else {
+//                            TranslatedItem newItem = historyTranslatedItems.get(historyTranslatedItems.indexOf(item));
+//                            tvTranslateResult.setText(newItem.getTrgMeaning());
 
+//                            List<Translation> newData = newItem.getDictDefinitionFromStringRepr(newItem.getDictDefinition()).getTranslations();
+//                            ((TranslatorRecyclerAdapter)rvTranslate.getAdapter()).updateData(newData);
+
+
+//                            saveToSharedPreferences(newItem);
+//                            TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(true);
+//                        }
+                    }
+                });
             }
+
+//            private void saveToSharedPreferences(TranslatedItem item){
+//                SharedPreferences.Editor editor = settings.edit();
+//                editor.putString(EDITTEXT_DATA, item.getSrcMeaning());
+//                editor.putString(SRC_LANG, item.getSrcLanguageForUser());
+//                editor.putString(TRG_LANG, item.getTrgLanguageForUser());
+//                editor.putString(TRANSL_RESULT, item.getTrgMeaning());
+//                editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+//                editor.apply();
+//            }
 
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
@@ -84,8 +132,8 @@ public class TranslatorAPIUtils {
                         if (!result.isEmpty()) {
                             tvTranslateResult.setText(result);
                             DictionaryAPIUtils.lookup(mHandler, translatedText,translDirection,rvTranslate, saver);
+                            TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(true);
                         }
-
                     }
                 });
 

@@ -14,13 +14,24 @@
         android:layout_centerHorizontal="true"
         />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/favorites_items_list"
-        android:layout_width="500dp"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
         android:layout_below="@id/search_view_favorites"
-        android:layout_centerHorizontal="true"
         >
-    </android.support.v7.widget.RecyclerView>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/favorites_items_list"
+            android:layout_width="500dp"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:layout_gravity="center_horizontal"
+            >
+        </android.support.v7.widget.RecyclerView>
+
+        <include android:id="@+id/include_content_favorites_empty_search"
+                 layout="@layout/content_empty_search"/>
+
+    </FrameLayout>
+
 </RelativeLayout>

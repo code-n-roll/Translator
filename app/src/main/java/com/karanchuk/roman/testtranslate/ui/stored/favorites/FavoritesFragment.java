@@ -86,7 +86,6 @@ public class FavoritesFragment extends Fragment implements
             mClearStored = (ImageButton) parent.findViewById(R.id.imagebutton_clear_stored);
 
         mContentManager = ContentManager.getInstance();
-        mContentManager.addContentObserver(this);
 
 //        mFavoritesTranslatedItems = new ArrayList<>();
 //        for (int i = 0; i < 10; i++) {
@@ -96,8 +95,7 @@ public class FavoritesFragment extends Fragment implements
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
-        mRepository.addFavoritesContentObserver(this);
-        mRepository.addHistoryContentObserver(this);
+
 
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
@@ -200,6 +198,15 @@ public class FavoritesFragment extends Fragment implements
         return mView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mContentManager.addContentObserver(this);
+        mRepository.addFavoritesContentObserver(this);
+        mRepository.addHistoryContentObserver(this);
+    }
+
     public void chooseCurView(){
         if (!mFavoritesTranslatedItems.isEmpty()){
             mEmptyView.setVisibility(View.GONE);
@@ -214,22 +221,12 @@ public class FavoritesFragment extends Fragment implements
     public void onStop() {
         super.onStop();
         unregisterForContextMenu(mFavoritesRecycler);
-//        remove observers here is bad idea!
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-//        remove observers here is bad idea!
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         mRepository.removeHistoryContentObserver(this);
         mRepository.removeFavoritesContentObserver(this);
         mContentManager.removeContentObserver(this);
     }
+
 
     @Override
     public boolean onQueryTextSubmit(String query) {

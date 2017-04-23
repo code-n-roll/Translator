@@ -107,12 +107,11 @@ public class SourceLangActivity extends AppCompatActivity {
         }
         mCurSelectedItem = new Language(langName, abbr, true);
         int id = mItems.indexOf(mCurSelectedItem);
-        if (id == -1) {
-            id = 0;
+        if (id != -1) {
+            mCurSelectedItem = mItems.get(id);
+            mCurSelectedItem.setSelected(true);
+            mSrcLangRecycler.getAdapter().notifyItemChanged(id);
         }
-        mCurSelectedItem = mItems.get(id);
-        mCurSelectedItem.setSelected(true);
-        mSrcLangRecycler.getAdapter().notifyItemChanged(id);
     }
     @Override
     protected void onStop() {
@@ -123,7 +122,8 @@ public class SourceLangActivity extends AppCompatActivity {
 
     public void saveToSharedPreferences(){
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, mCurSelectedItem.getAbbr());
+        if (mCurSelectedItem != null)
+            editor.putString(CUR_SELECTED_ITEM_SRC_LANG, mCurSelectedItem.getAbbr());
         editor.apply();
     }
 

@@ -109,12 +109,11 @@ public class TargetLangActivity extends AppCompatActivity {
         mCurSelectedItem = new Language(langName, abbr, true);
 
         int id = mItems.indexOf(mCurSelectedItem);
-        if (id == -1) {
-            id = 0;
+        if (id != -1) {
+            mCurSelectedItem = mItems.get(id);
+            mCurSelectedItem.setSelected(true);
+            mTrgLangRecycler.getAdapter().notifyItemChanged(id);
         }
-        mCurSelectedItem = mItems.get(id);
-        mCurSelectedItem.setSelected(true);
-        mTrgLangRecycler.getAdapter().notifyItemChanged(id);
     }
 
     @Override
@@ -126,7 +125,8 @@ public class TargetLangActivity extends AppCompatActivity {
 
     public void saveToSharedPreferences(){
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, mCurSelectedItem.getAbbr());
+        if (mCurSelectedItem != null)
+            editor.putString(CUR_SELECTED_ITEM_TRG_LANG, mCurSelectedItem.getAbbr());
         editor.apply();
     }
 

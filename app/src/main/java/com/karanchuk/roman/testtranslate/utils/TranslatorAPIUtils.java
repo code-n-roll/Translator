@@ -10,17 +10,11 @@ import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.karanchuk.roman.testtranslate.data.DictDefinition;
-import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
-import com.karanchuk.roman.testtranslate.data.Translation;
-import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorAPIHolder;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorRecyclerAdapter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -28,14 +22,6 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
-import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.EDITTEXT_DATA;
-import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.PREFS_NAME;
-import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.SRC_LANG;
-import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRANSL_CONTENT;
-import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRANSL_RESULT;
-import static com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment.TRG_LANG;
-import static com.karanchuk.roman.testtranslate.utils.DictionaryAPIUtils.lookup;
 
 /**
  * Created by roman on 11.4.17.
@@ -92,7 +78,7 @@ public class TranslatorAPIUtils {
 //                        TranslatedItem item = new TranslatedItem(srcLangAPI,trgLangAPI,
 //                                null,null,translatedText,null,null,null);
 //                        if (!historyTranslatedItems.contains(item)) {
-                        TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(false);
+                        TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(false);
 //                        } else {
 //                            TranslatedItem newItem = historyTranslatedItems.get(historyTranslatedItems.indexOf(item));
 //                            tvTranslateResult.setText(newItem.getTrgMeaning());
@@ -102,7 +88,7 @@ public class TranslatorAPIUtils {
 
 
 //                            saveToSharedPreferences(newItem);
-//                            TranslatorAPIHolder.getInstance().notifyTranslatorAPIResult(true);
+//                            TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
 //                        }
                     }
                 });

@@ -26,6 +26,7 @@ import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 
 import java.util.ArrayList;
@@ -84,12 +85,10 @@ public class HistoryFragment extends Fragment implements
 
 
         mContentManager = ContentManager.getInstance();
-        mContentManager.addContentObserver(this);
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
-        mRepository.addHistoryContentObserver(this);
-        mRepository.addFavoritesContentObserver(this);
+
 
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
@@ -148,6 +147,7 @@ public class HistoryFragment extends Fragment implements
                         editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
                         editor.apply();
                         translatorNavigationItem.performClick();
+//                        TranslatorStateHolder.getInstance().notifyShowSelectedItem();
                         Toast.makeText(getContext(),"item was clicked in history", Toast.LENGTH_SHORT).show();
                     }
                 };
@@ -183,6 +183,16 @@ public class HistoryFragment extends Fragment implements
         return mView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        mRepository.addHistoryContentObserver(this);
+        mRepository.addFavoritesContentObserver(this);
+        mContentManager.addContentObserver(this);
+
+    }
+
     public void chooseCurView(){
         if (!mHistoryTranslatedItems.isEmpty()){
             mEmptyView.setVisibility(View.GONE);
@@ -199,22 +209,12 @@ public class HistoryFragment extends Fragment implements
     public void onStop() {
         super.onStop();
         unregisterForContextMenu(mHistoryRecycler);
-//        remove observers here is bad idea!
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-//        remove observers here is bad idea!
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
         mRepository.removeHistoryContentObserver(this);
         mRepository.removeFavoritesContentObserver(this);
         mContentManager.removeContentObserver(this);
     }
+
 
     @Override
     public void onHistoryTranslatedItemsChanged() {

@@ -28,6 +28,8 @@ public class ContentManager {
         }
     }
 
+
+
     public void addContentObserver(TranslatedItemChanged observer){
         if (!mObservers.contains(observer)){
             mObservers.add(observer);

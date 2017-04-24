@@ -27,6 +27,7 @@ import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceCont
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
+import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,23 +56,25 @@ public class FavoritesFragment extends Fragment implements
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.ItemDecoration mDividerItemDecoration;
     private SearchView mSearchViewFavorites;
-    private ImageButton mButtonIsFavorite,mClearStored;
+    private ImageButton mButtonIsFavorite;
+    private ImageButton mClearStored;
     private TranslatorRepository mRepository;
     private List<TranslatedItem> mFavoritesTranslatedItems,
                                     mHistoryTranslatedItems,
                                     mCopyFavoritesTranslatedItems;
     private Handler mMainHandler;
-    private View mView, mEmptyView, mContentView, mEmptySearchView;
-    private TextView mTextViewEmptyFavorites, mTextViewEmptySearch;
-    private ImageView mImageViewEmptyFavorites, mImageViewEmptySearch;
+    private View mView;
+    private View mEmptyView;
+    private View mContentView;
+    private View mEmptySearchView;
+    private TextView mTextViewEmptyFavorites;
+    private TextView mTextViewEmptySearch;
+    private ImageView mImageViewEmptyFavorites;
+    private ImageView mImageViewEmptySearch;
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
 
-
-
     public static int UNIQUE_FAVORITES_FRAGMENT_ID = 2;
-
-
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,9 +84,9 @@ public class FavoritesFragment extends Fragment implements
 
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 
-        View parent = getParentFragment().getView();
-        if (parent != null)
-            mClearStored = (ImageButton) parent.findViewById(R.id.imagebutton_clear_stored);
+        View parentView = getParentFragment().getView();
+        if (parentView != null)
+            mClearStored = (ImageButton) parentView.findViewById(R.id.imagebutton_clear_stored);
 
         mContentManager = ContentManager.getInstance();
 
@@ -95,8 +98,6 @@ public class FavoritesFragment extends Fragment implements
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
-
-
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
         mCopyFavoritesTranslatedItems = new ArrayList<>(mFavoritesTranslatedItems);
@@ -106,96 +107,85 @@ public class FavoritesFragment extends Fragment implements
         Collections.reverse(mHistoryTranslatedItems);
 
         mView = inflater.inflate(R.layout.content_favorites, container, false);
+        findViewsOnFragment();
 
-        mEmptyView =  mView.findViewById(R.id.include_content_favorites_empty_item_list);
-        mContentView = mView.findViewById(R.id.include_content_favorites_full_item_list);
-        mEmptySearchView = mView.findViewById(R.id.include_content_favorites_empty_search);
         mEmptySearchView.setVisibility(View.INVISIBLE);
 
-
-        mTextViewEmptyFavorites = (TextView) mView.findViewById(R.id.textview_empty_item_list);
         mTextViewEmptyFavorites.setText(R.string.empty_favorites);
-        mImageViewEmptyFavorites = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
         mImageViewEmptyFavorites.setImageResource(R.drawable.bookmark_black_shape_light512);
 
-        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
         mTextViewEmptySearch.setText(R.string.empty_search);
-        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
         mImageViewEmptySearch.setImageResource(R.drawable.bookmark_black_shape_light512);
 
-
-        mButtonIsFavorite = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
-
-
         mLayoutManager = new LinearLayoutManager(mView.getContext());
-        mFavoritesRecycler = (RecyclerView) mView.findViewById(R.id.favorites_items_list);
         mFavoritesRecycler.setLayoutManager(mLayoutManager);
 
-        mSearchViewFavorites = (SearchView) mView.findViewById(R.id.search_view_favorites);
         mSearchViewFavorites.setIconifiedByDefault(false);
         mSearchViewFavorites.setQueryHint("Search in Favorites");
         mSearchViewFavorites.setOnQueryTextListener(this);
 
 
-        mDividerItemDecoration = new DividerItemDecoration(
-                mFavoritesRecycler.getContext(),
-                RecyclerView.VERTICAL);
+        mDividerItemDecoration =
+                new DividerItemDecoration(mFavoritesRecycler.getContext(), RecyclerView.VERTICAL);
         mFavoritesRecycler.addItemDecoration(mDividerItemDecoration);
-
 
         final BottomNavigationView navigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
         final View translatorNavigationItem = navigation.findViewById(R.id.navigation_translate);
 
-
-
-        StoredRecyclerAdapter.OnItemClickListener itemClickListener = new
-            StoredRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick (TranslatedItem item){
-                SharedPreferences.Editor editor = mSettings.edit();
-                editor.putString(EDITTEXT_DATA, item.getSrcMeaning());
-                editor.putString(SRC_LANG, item.getSrcLanguageForUser());
-                editor.putString(TRG_LANG, item.getTrgLanguageForUser());
-                editor.putString(TRANSL_RESULT, item.getTrgMeaning());
-                editor.putString(TRANSL_CONTENT, item.getDictDefinition());
-                editor.putString(CUR_SELECTED_ITEM_SRC_LANG, item.getSrcLanguageForAPI());
-                editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
-                editor.apply();
-                translatorNavigationItem.performClick();
-                Toast.makeText(getContext(),"item was clicked in favorites", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        StoredRecyclerAdapter.OnItemClickListener isFavoriteClickListener = new
-            StoredRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(TranslatedItem item) {
-                if (item.isFavorite()){
-                    item.isFavoriteUp(false);
-                    mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
-                    mFavoritesRecycler.getAdapter().notifyItemChanged(mFavoritesTranslatedItems.indexOf(item));
-                } else {
-                    item.isFavoriteUp(true);
-                    mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
-                    mFavoritesRecycler.getAdapter().notifyItemChanged(mFavoritesTranslatedItems.indexOf(item));
-                }
-                mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-
-                Toast.makeText(getContext(),"isFavorite was clicked in favorites", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-
-        mFavoritesRecycler.setAdapter(
-                new StoredRecyclerAdapter(mFavoritesTranslatedItems, itemClickListener,
-                        isFavoriteClickListener, UNIQUE_FAVORITES_FRAGMENT_ID));
+        mFavoritesRecycler.setAdapter(new StoredRecyclerAdapter(
+                mFavoritesTranslatedItems,
+                (item)->clickOnItemStoredRecycler(item,translatorNavigationItem),
+                (item)->clickOnSetFavoriteItem(item),
+                UNIQUE_FAVORITES_FRAGMENT_ID));
 
         registerForContextMenu(mFavoritesRecycler);
 
         chooseCurView();
 
-
         return mView;
+    }
+
+    private void clickOnSetFavoriteItem(TranslatedItem item){
+        if (item.isFavorite()){
+            item.isFavoriteUp(false);
+            mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+            mFavoritesRecycler.getAdapter().notifyItemChanged(mFavoritesTranslatedItems.indexOf(item));
+        } else {
+            item.isFavoriteUp(true);
+            mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+            mFavoritesRecycler.getAdapter().notifyItemChanged(mFavoritesTranslatedItems.indexOf(item));
+        }
+        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+
+        Toast.makeText(getContext(),"isFavorite was clicked in favorites", Toast.LENGTH_SHORT).show();
+    }
+
+    private void clickOnItemStoredRecycler(final TranslatedItem item, final View view){
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putString(EDITTEXT_DATA, item.getSrcMeaning());
+        editor.putString(SRC_LANG, item.getSrcLanguageForUser());
+        editor.putString(TRG_LANG, item.getTrgLanguageForUser());
+        editor.putString(TRANSL_RESULT, item.getTrgMeaning());
+        editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, item.getSrcLanguageForAPI());
+        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
+        editor.apply();
+        view.performClick();
+        Toast.makeText(getContext(),"item was clicked in favorites", Toast.LENGTH_SHORT).show();
+    }
+
+    private void findViewsOnFragment(){
+        ViewSearcher viewSearcher = new ViewSearcher(mView);
+        mEmptyView =  viewSearcher.findViewById(R.id.include_content_favorites_empty_item_list);
+        mContentView = viewSearcher.findViewById(R.id.include_content_favorites_full_item_list);
+        mEmptySearchView = viewSearcher.findViewById(R.id.include_content_favorites_empty_search);
+        mTextViewEmptyFavorites = viewSearcher.findViewById(R.id.textview_empty_item_list);
+        mImageViewEmptyFavorites = viewSearcher.findViewById(R.id.imageview_empty_item_list);
+        mTextViewEmptySearch = viewSearcher.findViewById(R.id.textview_empty_search);
+        mImageViewEmptySearch = viewSearcher.findViewById(R.id.imageview_empty_search);
+        mButtonIsFavorite = viewSearcher.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+        mFavoritesRecycler = viewSearcher.findViewById(R.id.favorites_items_list);
+        mSearchViewFavorites = viewSearcher.findViewById(R.id.search_view_favorites);
     }
 
     @Override
@@ -207,7 +197,7 @@ public class FavoritesFragment extends Fragment implements
         mRepository.addHistoryContentObserver(this);
     }
 
-    public void chooseCurView(){
+    private void chooseCurView(){
         if (!mFavoritesTranslatedItems.isEmpty()){
             mEmptyView.setVisibility(View.GONE);
             mContentView.setVisibility(View.VISIBLE);
@@ -235,7 +225,6 @@ public class FavoritesFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-
         newText = newText.toLowerCase();
         ArrayList<TranslatedItem> newList = new ArrayList<>();
         for (TranslatedItem item : mFavoritesTranslatedItems){
@@ -253,7 +242,7 @@ public class FavoritesFragment extends Fragment implements
         return true;
     }
 
-    public void chooseCurSearchView(List<TranslatedItem> list){
+    private void chooseCurSearchView(List<TranslatedItem> list){
         if (list.isEmpty()){
             mEmptySearchView.setVisibility(View.VISIBLE);
             mFavoritesRecycler.setVisibility(View.INVISIBLE);
@@ -265,26 +254,20 @@ public class FavoritesFragment extends Fragment implements
 
     @Override
     public void onFavoritesTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mCopyFavoritesTranslatedItems.clear();
-                mCopyFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
-                Collections.reverse(mCopyFavoritesTranslatedItems);
-            }
+        mMainHandler.post(() -> {
+            mCopyFavoritesTranslatedItems.clear();
+            mCopyFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
+            Collections.reverse(mCopyFavoritesTranslatedItems);
         });
     }
 
     @Override
     public void onHistoryTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mHistoryTranslatedItems.clear();
-                mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
-                Collections.reverse(mHistoryTranslatedItems);
+        mMainHandler.post(() -> {
+            mHistoryTranslatedItems.clear();
+            mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+            Collections.reverse(mHistoryTranslatedItems);
 
-            }
         });
     }
 
@@ -321,7 +304,7 @@ public class FavoritesFragment extends Fragment implements
         return super.onContextItemSelected(item);
     }
 
-    public void chooseClearStoredVisibility(){
+    private void chooseClearStoredVisibility(){
         if (!mFavoritesTranslatedItems.isEmpty()){
             mClearStored.setVisibility(View.VISIBLE);
         } else {
@@ -329,7 +312,7 @@ public class FavoritesFragment extends Fragment implements
         }
     }
 
-    public void performContextItemDeletion(){
+    private void performContextItemDeletion(){
         StoredRecyclerAdapter adapter = (StoredRecyclerAdapter) mFavoritesRecycler.getAdapter();
         int position = adapter.getPosition();
         TranslatedItem item = mFavoritesTranslatedItems.get(position);

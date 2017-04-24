@@ -62,32 +62,31 @@ public class TargetLangActivity extends AppCompatActivity {
         mItems = getLangsFromJson();
         Collections.sort(mItems);
 
-        TargetLangRecyclerAdapter.OnItemClickListener itemClickListener = new
-                TargetLangRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Language item) {
-                        if (mCurSelectedItem == null){
-                            mCurSelectedItem = item;
-                        }
-                        if (!mCurSelectedItem.equals(item)){
-                            mCurSelectedItem.setSelected(false);
-                            mTrgLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(mCurSelectedItem));
-                            mCurSelectedItem = item;
-                        }
-                        if (!item.isSelected()) {
-                            item.setSelected(true);
-                            mTrgLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(item));
-                            Intent returnIntent = new Intent();
-                            returnIntent.putExtra("result",item.getName());
-                            setResult(AppCompatActivity.RESULT_OK,returnIntent);
-                            Toast.makeText(getApplicationContext(),"selected "+item,Toast.LENGTH_SHORT).show();
-                        }
-                        finish();
-                    }
-                };
 
-        mTrgLangRecycler.setAdapter(new TargetLangRecyclerAdapter(mItems, itemClickListener));
+        mTrgLangRecycler.setAdapter(new TargetLangRecyclerAdapter(
+                mItems,
+                (language)->clickOnTargetLangRecyclerItem(language)
+        ));
+    }
 
+    private void clickOnTargetLangRecyclerItem(Language language){
+        if (mCurSelectedItem == null){
+            mCurSelectedItem = language;
+        }
+        if (!mCurSelectedItem.equals(language)){
+            mCurSelectedItem.setSelected(false);
+            mTrgLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(mCurSelectedItem));
+            mCurSelectedItem = language;
+        }
+        if (!language.isSelected()) {
+            language.setSelected(true);
+            mTrgLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(language));
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("result",language.getName());
+            setResult(AppCompatActivity.RESULT_OK,returnIntent);
+            Toast.makeText(getApplicationContext(),"selected "+language,Toast.LENGTH_SHORT).show();
+        }
+        finish();
     }
 
     @Override

@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
@@ -26,8 +25,9 @@ import com.karanchuk.roman.testtranslate.data.source.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
+import com.karanchuk.roman.testtranslate.utils.UIUtils;
+import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,24 +52,28 @@ public class HistoryFragment extends Fragment implements
         SearchView.OnQueryTextListener,
         ContentManager.TranslatedItemChanged
 {
+    private View mEmptyView;
+    private View mContentView;
+    private View mEmptySearchView;
+    private View mView;
+    private TextView mTextViewEmptyContent;
+    private TextView mTextViewEmptySearch;
+    private ImageView mImageViewEmptyContent;
+    private ImageView mImageViewEmptySearch;
     private RecyclerView mHistoryRecycler;
+    private SearchView mSearchViewHistory;
+    private ImageButton mClearStored;
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.ItemDecoration mDividerItemDecoration;
-    private SearchView mSearchViewHistory;
+
     private List<TranslatedItem> mHistoryTranslatedItems,
-                                mFavoritesTranslatedItems;
+                                 mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
-    private View mView, mEmptyView, mContentView, mEmptySearchView;
-    private TextView mTextViewEmptyContent,
-            mTextViewEmptySearch;
-    private ImageView mImageViewEmptyContent,
-            mImageViewEmptySearch;
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
-    private ImageButton mClearStored;
 
-    public static int UNIQUE_HISTORY_FRAGMENT_ID = 1;
+    public final static int UNIQUE_HISTORY_FRAGMENT_ID = 1;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,109 +82,106 @@ public class HistoryFragment extends Fragment implements
 
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 
-
-        View parent = getParentFragment().getView();
-        if (parent != null)
-            mClearStored = (ImageButton) parent.findViewById(R.id.imagebutton_clear_stored);
+        View parentView = getParentFragment().getView();
+        if (parentView != null)
+            mClearStored = new ViewSearcher(parentView).findViewById(R.id.imagebutton_clear_stored);
 
 
         mContentManager = ContentManager.getInstance();
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
-
-
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         Collections.reverse(mHistoryTranslatedItems);
 
         mView = inflater.inflate(R.layout.content_history, container, false);
 
-        mEmptyView = mView.findViewById(R.id.include_content_history_empty_item_list);
-        mContentView = mView.findViewById(R.id.include_content_history_full_item_list);
-        mEmptySearchView = mView.findViewById(R.id.include_content_history_empty_search);
+        findViewsOnFragment();
+
+
         mEmptySearchView.setVisibility(View.INVISIBLE);
-
-        mTextViewEmptyContent = (TextView) mView.findViewById(R.id.textview_empty_item_list);
         mTextViewEmptyContent.setText(R.string.empty_history);
-        mImageViewEmptyContent = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
-        mImageViewEmptyContent.setImageResource(R.drawable.history_light512);
-
-        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
         mTextViewEmptySearch.setText(R.string.empty_search);
-        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
+        mImageViewEmptyContent.setImageResource(R.drawable.history_light512);
         mImageViewEmptySearch.setImageResource(R.drawable.history_light512);
 
         mLayoutManager = new LinearLayoutManager(mView.getContext());
-        mHistoryRecycler = (RecyclerView) mView.findViewById(R.id.history_items_list);
         mHistoryRecycler.setLayoutManager(mLayoutManager);
-
-        mSearchViewHistory = (SearchView) mView.findViewById(R.id.search_view_history);
         mSearchViewHistory.setIconifiedByDefault(false);
         mSearchViewHistory.setQueryHint("Search in History");
         mSearchViewHistory.setOnQueryTextListener(this);
 
 
+        final BottomNavigationView navigation = (BottomNavigationView)
+                getActivity().findViewById(R.id.navigation);
+        final View translatorNavView = navigation.findViewById(R.id.navigation_translate);
 
-        final BottomNavigationView navigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
-        final View translatorNavigationItem = navigation.findViewById(R.id.navigation_translate);
-
-        mDividerItemDecoration = new DividerItemDecoration(mHistoryRecycler.getContext(),
-                RecyclerView.VERTICAL);
+        mDividerItemDecoration =
+                new DividerItemDecoration(mHistoryRecycler.getContext(), RecyclerView.VERTICAL);
         mHistoryRecycler.addItemDecoration(mDividerItemDecoration);
 
 //        mHistoryTranslatedItems = new ArrayList<>();
 //        for (int i = 0; i < 100; i++)
 //            mHistoryTranslatedItems.add(i, new TranslatedItem("RU","FR","привет", "bonjour", "false", null));
 
-        StoredRecyclerAdapter.OnItemClickListener itemClickListener = new
-                StoredRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick (TranslatedItem item){
-                        SharedPreferences.Editor editor = mSettings.edit();
-                        editor.putString(EDITTEXT_DATA, item.getSrcMeaning());
-                        editor.putString(SRC_LANG, item.getSrcLanguageForUser());
-                        editor.putString(TRG_LANG, item.getTrgLanguageForUser());
-                        editor.putString(TRANSL_RESULT, item.getTrgMeaning());
-                        editor.putString(TRANSL_CONTENT, item.getDictDefinition());
-                        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, item.getSrcLanguageForAPI());
-                        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
-                        editor.apply();
-                        translatorNavigationItem.performClick();
-//                        TranslatorStateHolder.getInstance().notifyShowSelectedItem();
-                        Toast.makeText(getContext(),"item was clicked in history", Toast.LENGTH_SHORT).show();
-                    }
-                };
-        StoredRecyclerAdapter.OnItemClickListener isFavoriteClickListener = new
-                StoredRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(TranslatedItem item) {
-                        if (item.isFavorite()){
-                            item.isFavoriteUp(false);
-                            mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
-                        } else {
-                            item.isFavoriteUp(true);
-                            mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
-                        }
-                        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-                        mHistoryRecycler.getAdapter().notifyItemChanged(mHistoryTranslatedItems.indexOf(item));
 
-                        Toast.makeText(getContext(),"isFavorite was clicked in history", Toast.LENGTH_SHORT).show();
-                    }
-                };
-
-        mHistoryRecycler.setAdapter(
-                new StoredRecyclerAdapter(mHistoryTranslatedItems,
-                        itemClickListener,
-                        isFavoriteClickListener,
+        mHistoryRecycler.setAdapter(new StoredRecyclerAdapter(
+                        mHistoryTranslatedItems,
+                        (item)->clickOnItemStoredRecycler(item,translatorNavView),
+                        (item)->clickOnSetFavoriteItem(item),
                         UNIQUE_HISTORY_FRAGMENT_ID));
         registerForContextMenu(mHistoryRecycler);
 
-
         chooseCurView();
 
-
         return mView;
+    }
+
+    private void clickOnItemStoredRecycler(final TranslatedItem item, final View view){
+        final SharedPreferences.Editor editor = mSettings.edit();
+        editor.putString(EDITTEXT_DATA, item.getSrcMeaning());
+        editor.putString(SRC_LANG, item.getSrcLanguageForUser());
+        editor.putString(TRG_LANG, item.getTrgLanguageForUser());
+        editor.putString(TRANSL_RESULT, item.getTrgMeaning());
+        editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, item.getSrcLanguageForAPI());
+        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
+        editor.apply();
+        view.performClick();
+//                        TranslatorStateHolder.getInstance().notifyShowSelectedItem();
+        UIUtils.showToast(getContext(), "item was clicked in history");
+    }
+
+    private void clickOnSetFavoriteItem(final TranslatedItem item){
+        if (item.isFavorite()){
+            item.isFavoriteUp(false);
+            mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
+        } else {
+            item.isFavoriteUp(true);
+            mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES,item);
+        }
+        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+        mHistoryRecycler.getAdapter().notifyItemChanged(mHistoryTranslatedItems.indexOf(item));
+
+        UIUtils.showToast(getContext(), "isFavorite was clicked in history");
+    }
+
+    private void findViewsOnFragment(){
+        final ViewSearcher viewSearcher = new ViewSearcher(mView);
+
+        mEmptyView = viewSearcher.findViewById(R.id.include_content_history_empty_item_list);
+        mContentView = viewSearcher.findViewById(R.id.include_content_history_full_item_list);
+        mEmptySearchView = viewSearcher.findViewById(R.id.include_content_history_empty_search);
+
+        mTextViewEmptyContent = viewSearcher.findViewById(R.id.textview_empty_item_list);
+        mImageViewEmptyContent = viewSearcher.findViewById(R.id.imageview_empty_item_list);
+
+        mTextViewEmptySearch = viewSearcher.findViewById(R.id.textview_empty_search);
+        mImageViewEmptySearch = viewSearcher.findViewById(R.id.imageview_empty_search);
+
+        mHistoryRecycler = viewSearcher.findViewById(R.id.history_items_list);
+        mSearchViewHistory = viewSearcher.findViewById(R.id.search_view_history);
     }
 
     @Override
@@ -193,7 +194,7 @@ public class HistoryFragment extends Fragment implements
 
     }
 
-    public void chooseCurView(){
+    private void chooseCurView(){
         if (!mHistoryTranslatedItems.isEmpty()){
             mEmptyView.setVisibility(View.GONE);
             mContentView.setVisibility(View.VISIBLE);
@@ -218,25 +219,19 @@ public class HistoryFragment extends Fragment implements
 
     @Override
     public void onHistoryTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mHistoryTranslatedItems.clear();
-                mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
-                Collections.reverse(mHistoryTranslatedItems);
-            }
+        mMainHandler.post(() -> {
+            mHistoryTranslatedItems.clear();
+            mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+            Collections.reverse(mHistoryTranslatedItems);
         });
     }
 
     @Override
     public void onFavoritesTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mFavoritesTranslatedItems.clear();
-                mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
-                Collections.reverse(mFavoritesTranslatedItems);
-            }
+        mMainHandler.post(() -> {
+            mFavoritesTranslatedItems.clear();
+            mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
+            Collections.reverse(mFavoritesTranslatedItems);
         });
     }
 
@@ -249,12 +244,11 @@ public class HistoryFragment extends Fragment implements
     public boolean onQueryTextChange(String newText) {
 
         newText = newText.toLowerCase();
-        ArrayList<TranslatedItem> newList = new ArrayList<>();
+        final ArrayList<TranslatedItem> newList = new ArrayList<>();
         for (TranslatedItem item : mHistoryTranslatedItems){
-            String srcMeaning = item.getSrcMeaning().toLowerCase(),
-                    trgMeaning = item.getTrgMeaning().toLowerCase();
-            if (srcMeaning.contains(newText) ||
-                    trgMeaning.contains(newText)){
+            final String srcMeaning = item.getSrcMeaning().toLowerCase();
+            final String trgMeaning = item.getTrgMeaning().toLowerCase();
+            if (srcMeaning.contains(newText) || trgMeaning.contains(newText)){
                 newList.add(item);
             }
         }
@@ -265,7 +259,7 @@ public class HistoryFragment extends Fragment implements
         return true;
     }
 
-    public void chooseCurSearchView(List<TranslatedItem> list){
+    private void chooseCurSearchView(final List<TranslatedItem> list){
         if (list.isEmpty()){
             mEmptySearchView.setVisibility(View.VISIBLE);
             mHistoryRecycler.setVisibility(View.INVISIBLE);
@@ -301,7 +295,7 @@ public class HistoryFragment extends Fragment implements
                     performContextItemDeletion();
                     chooseCurView();
                     chooseClearStoredVisibility();
-                    Toast.makeText(getContext(), "item was longclicked contextmenu in history", Toast.LENGTH_SHORT).show();
+                    UIUtils.showToast(getContext(), "item was longclicked contextmenu in history");
                     return true;
                 default:
                     return super.onContextItemSelected(item);
@@ -310,7 +304,7 @@ public class HistoryFragment extends Fragment implements
         return super.onContextItemSelected(item);
     }
 
-    public void chooseClearStoredVisibility(){
+    private void chooseClearStoredVisibility(){
         if (!mHistoryTranslatedItems.isEmpty()){
             mClearStored.setVisibility(View.VISIBLE);
         } else {
@@ -318,10 +312,10 @@ public class HistoryFragment extends Fragment implements
         }
     }
 
-    public void performContextItemDeletion(){
-        StoredRecyclerAdapter adapter = (StoredRecyclerAdapter) mHistoryRecycler.getAdapter();
-        int position = adapter.getPosition();
-        TranslatedItem item = mHistoryTranslatedItems.get(position);
+    private void performContextItemDeletion(){
+        final StoredRecyclerAdapter adapter = (StoredRecyclerAdapter) mHistoryRecycler.getAdapter();
+        final int position = adapter.getPosition();
+        final TranslatedItem item = mHistoryTranslatedItems.get(position);
         mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY,item);
         mHistoryTranslatedItems.remove(position);
         mHistoryRecycler.getAdapter().notifyItemRemoved(position);

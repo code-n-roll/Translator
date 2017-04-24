@@ -10,7 +10,7 @@ import java.util.List;
 public class TranslatorStateHolder {
     private static TranslatorStateHolder INSTANCE = null;
 
-    private List<OnTranslatorStateObserver> mObservers = new ArrayList<>();
+    private final List<OnTranslatorStateObserver> mObservers = new ArrayList<>();
 
 
     public static TranslatorStateHolder getInstance(){
@@ -20,19 +20,19 @@ public class TranslatorStateHolder {
         return INSTANCE;
     }
 
-    public void removeOnTranslatorAPIResultObserver(OnTranslatorStateObserver observer){
+    public void removeOnTranslatorAPIResultObserver(final OnTranslatorStateObserver observer){
         if (mObservers.contains(observer)){
             mObservers.remove(observer);
         }
     }
 
-    public void addOnTranslatorAPIResultObserver(OnTranslatorStateObserver observer){
+    public void addOnTranslatorAPIResultObserver(final OnTranslatorStateObserver observer){
         if (!mObservers.contains(observer)){
             mObservers.add(observer);
         }
     }
 
-    public void notifyTranslatorAPIResult(boolean success){
+    public void notifyTranslatorAPIResult(final boolean success){
         for (OnTranslatorStateObserver observer : mObservers){
             observer.onTranslatorAPIResult(success);
         }
@@ -45,7 +45,7 @@ public class TranslatorStateHolder {
     }
 
     public interface OnTranslatorStateObserver {
-        void onTranslatorAPIResult(boolean success);
+        void onTranslatorAPIResult(final boolean success);
 
         void onShowSelectedItem();
     }

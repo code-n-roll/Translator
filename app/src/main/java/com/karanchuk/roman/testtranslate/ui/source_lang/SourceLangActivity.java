@@ -36,7 +36,7 @@ public class SourceLangActivity extends AppCompatActivity {
     private JsonObject mLangs;
     private Language mCurSelectedItem;
     private SharedPreferences mSettings;
-    public static String CUR_SELECTED_ITEM_SRC_LANG = "CUR_SELECTED_ITEM_SRC_LANG";
+    public static final String CUR_SELECTED_ITEM_SRC_LANG = "CUR_SELECTED_ITEM_SRC_LANG";
 
 
     @Override
@@ -61,42 +61,40 @@ public class SourceLangActivity extends AppCompatActivity {
         mItems = getLangsFromJson();
         Collections.sort(mItems);
 
-        SourceLangRecyclerAdapter.OnItemClickListener itemClickListener = new
-                SourceLangRecyclerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(Language item) {
-                        if (mCurSelectedItem == null){
-                            mCurSelectedItem = item;
-                        }
-                        if (!mCurSelectedItem.equals(item)){
-                            mCurSelectedItem.setSelected(false);
-                            mSrcLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(mCurSelectedItem));
-                            mCurSelectedItem = item;
-                        }
-                        if (!item.isSelected()) {
-                            item.setSelected(true);
-                            mSrcLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(item));
-                            Intent returnIntent = new Intent();
-                            returnIntent.putExtra("result",item.getName());
-                            setResult(AppCompatActivity.RESULT_OK,returnIntent);
-                            Toast.makeText(getApplicationContext(),"selected "+item,Toast.LENGTH_SHORT).show();
-                        }
-                        finish();
-                    }
-                };
+        mSrcLangRecycler.setAdapter(new SourceLangRecyclerAdapter(
+                mItems,
+                (language) -> clickOnSourceLangItemRecycler(language),
+                getApplicationContext()));
 
-        mSrcLangRecycler.setAdapter(new SourceLangRecyclerAdapter(mItems, itemClickListener, getApplicationContext()));
+    }
 
+    private void clickOnSourceLangItemRecycler(final Language language){
+        if (mCurSelectedItem == null){
+            mCurSelectedItem = language;
+        }
+        if (!mCurSelectedItem.equals(language)){
+            mCurSelectedItem.setSelected(false);
+            mSrcLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(mCurSelectedItem));
+            mCurSelectedItem = language;
+        }
+        if (!language.isSelected()) {
+            language.setSelected(true);
+            mSrcLangRecycler.getAdapter().notifyItemChanged(mItems.indexOf(language));
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("result",language.getName());
+            setResult(AppCompatActivity.RESULT_OK,returnIntent);
+            Toast.makeText(getApplicationContext(),"selected "+language,Toast.LENGTH_SHORT).show();
+        }
+        finish();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
         restoreFromSharedPreferences();
     }
 
-    public void restoreFromSharedPreferences() {
+    private void restoreFromSharedPreferences() {
         String abbr = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG, "");
         String langName = null;
         for (Map.Entry<String, JsonElement> pair : mLangs.entrySet()) {
@@ -116,18 +114,17 @@ public class SourceLangActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
         saveToSharedPreferences();
     }
 
-    public void saveToSharedPreferences(){
+    private void saveToSharedPreferences(){
         SharedPreferences.Editor editor = mSettings.edit();
         if (mCurSelectedItem != null)
             editor.putString(CUR_SELECTED_ITEM_SRC_LANG, mCurSelectedItem.getAbbr());
         editor.apply();
     }
 
-    public List<Language> getLangsFromJson() {
+    private List<Language> getLangsFromJson() {
         List<Language> items = new ArrayList<>();
         for (Map.Entry<String,JsonElement> o : mLangs.entrySet()){
             String lang = o.getKey();
@@ -138,7 +135,7 @@ public class SourceLangActivity extends AppCompatActivity {
         return items;
     }
 
-    public void initToolbar(){
+    private void initToolbar(){
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle("Source Language");
@@ -150,7 +147,6 @@ public class SourceLangActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
-
                 finish();
             default:
                 break;

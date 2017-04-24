@@ -21,7 +21,7 @@ public class TranslatedItem {
     private String mIsFavorite;
     private String mDictDefinition;
 
-    public TranslatedItem(TranslatedItem translatedItem){
+    public TranslatedItem(final TranslatedItem translatedItem){
         mId = translatedItem.getId();
         mSrcLanguageForAPI = translatedItem.getSrcLanguageForAPI();
         mTrgLanguageForAPI = translatedItem.getTrgLanguageForAPI();
@@ -34,14 +34,14 @@ public class TranslatedItem {
 
     }
 
-    public TranslatedItem(String id, String srcLanguageForAPI,
-                          String trgLanguageForAPI,
-                          String srcLanguageForUser,
-                          String trgLanguageForUser,
-                          String srcMeaning,
-                          String trgMeaning,
-                          String isFavorite,
-                          String dictDefinition) {
+    public TranslatedItem(final String id, String srcLanguageForAPI,
+                          final String trgLanguageForAPI,
+                          final String srcLanguageForUser,
+                          final String trgLanguageForUser,
+                          final String srcMeaning,
+                          final String trgMeaning,
+                          final String isFavorite,
+                          final String dictDefinition) {
         mId = id;
         mSrcLanguageForAPI = srcLanguageForAPI;
         mTrgLanguageForAPI = trgLanguageForAPI;
@@ -55,14 +55,14 @@ public class TranslatedItem {
 
 
 
-    public TranslatedItem(String srcLanguageForAPI,
-                          String trgLanguageForAPI,
-                          String srcLanguageForUser,
-                          String trgLanguageForUser,
-                          String srcMeaning,
-                          String trgMeaning,
-                          String isFavorite,
-                          String dictDefinition){
+    public TranslatedItem(final String srcLanguageForAPI,
+                          final String trgLanguageForAPI,
+                          final String srcLanguageForUser,
+                          final String trgLanguageForUser,
+                          final String srcMeaning,
+                          final String trgMeaning,
+                          final String isFavorite,
+                          final String dictDefinition){
         this(UUID.randomUUID().toString(), srcLanguageForAPI,
                 trgLanguageForAPI, srcLanguageForUser,
                 trgLanguageForUser, srcMeaning,
@@ -74,7 +74,7 @@ public class TranslatedItem {
         return mId;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         mId = id;
     }
 
@@ -82,7 +82,7 @@ public class TranslatedItem {
         return mSrcLanguageForAPI;
     }
 
-    public void setSrcLanguageForAPI(String srcLanguageForAPI) {
+    public void setSrcLanguageForAPI(final String srcLanguageForAPI) {
         mSrcLanguageForAPI = srcLanguageForAPI;
     }
 
@@ -90,7 +90,7 @@ public class TranslatedItem {
         return mTrgLanguageForAPI;
     }
 
-    public void setTrgLanguageForAPI(String trgLanguageForAPI) {
+    public void setTrgLanguageForAPI(final String trgLanguageForAPI) {
         mTrgLanguageForAPI = trgLanguageForAPI;
     }
 
@@ -98,7 +98,7 @@ public class TranslatedItem {
         return mSrcLanguageForUser;
     }
 
-    public void setSrcLanguageForUser(String srcLanguageForUser) {
+    public void setSrcLanguageForUser(final String srcLanguageForUser) {
         mSrcLanguageForUser = srcLanguageForUser;
     }
 
@@ -106,7 +106,7 @@ public class TranslatedItem {
         return mTrgLanguageForUser;
     }
 
-    public void setTrgLanguageForUser(String trgLanguageForUser) {
+    public void setTrgLanguageForUser(final String trgLanguageForUser) {
         mTrgLanguageForUser = trgLanguageForUser;
     }
 
@@ -114,7 +114,7 @@ public class TranslatedItem {
         return mSrcMeaning;
     }
 
-    public void setSrcMeaning(String srcMeaning) {
+    public void setSrcMeaning(final String srcMeaning) {
         mSrcMeaning = srcMeaning;
     }
 
@@ -122,7 +122,7 @@ public class TranslatedItem {
         return mTrgMeaning;
     }
 
-    public void setTrgMeaning(String trgMeaning) {
+    public void setTrgMeaning(final String trgMeaning) {
         mTrgMeaning = trgMeaning;
     }
 
@@ -131,14 +131,10 @@ public class TranslatedItem {
     }
 
     public boolean isFavorite() {
-        if (mIsFavorite.equals("1")){
-            return true;
-        } else {
-            return false;
-        }
+        return mIsFavorite.equals("1");
     }
 
-    public void isFavoriteUp(boolean isFavoriteUp){
+    public void isFavoriteUp(final boolean isFavoriteUp){
         if (isFavoriteUp){
             mIsFavorite = "1";
         } else {
@@ -146,7 +142,7 @@ public class TranslatedItem {
         }
     }
 
-    public void setIsFavorite(String isFavorite) {
+    public void setIsFavorite(final String isFavorite) {
         mIsFavorite = isFavorite;
     }
 
@@ -155,14 +151,14 @@ public class TranslatedItem {
         return mDictDefinition;
     }
 
-    public void setDictDefinition(String dictDefinition) {
+    public void setDictDefinition(final String dictDefinition) {
         mDictDefinition = dictDefinition;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof TranslatedItem) {
-            TranslatedItem item = (TranslatedItem) obj;
+            final TranslatedItem item = (TranslatedItem) obj;
             if (mSrcMeaning.equals(item.mSrcMeaning) &&
                     mSrcLanguageForAPI.equals(item.mSrcLanguageForAPI) &&
                     mTrgLanguageForAPI.equals(item.mTrgLanguageForAPI)) {
@@ -172,8 +168,8 @@ public class TranslatedItem {
         return false;
     }
 
-    public DictDefinition getDictDefinitionFromStringRepr(String dictDefinition){
-        JsonObject jo = new JsonParser().parse(dictDefinition).getAsJsonObject();
+    public DictDefinition getDictDefinitionFromStringRepr(final String dictDefinition){
+        final JsonObject jo = new JsonParser().parse(dictDefinition).getAsJsonObject();
         return JsonUtils.getDictDefinitionFromJson(jo);
     }
 }

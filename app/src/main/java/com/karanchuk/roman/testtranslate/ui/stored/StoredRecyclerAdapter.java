@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
+import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +65,9 @@ public class StoredRecyclerAdapter extends
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.bind(mItems.get(position), mItemClickListener, mIsFavoriteListener);
 
-
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                setPosition(holder.getAdapterPosition());
-                return false;
-            }
+        holder.itemView.setOnLongClickListener(v -> {
+            setPosition(holder.getAdapterPosition());
+            return false;
         });
     }
 
@@ -90,18 +87,16 @@ public class StoredRecyclerAdapter extends
             mView = view;
             view.setOnCreateContextMenuListener(this);
 
-            mIsFavoriteView = (ImageButton) view.findViewById(R.id.imagebutton_isfavorite_favorite_item);
-            mSrcTrgLanguage = (TextView) view.findViewById(R.id.src_trg_languages);
-            mSrcMeaning = (TextView) view.findViewById(R.id.src_meaning);
-            mTrgMeaning = (TextView) view.findViewById(R.id.trg_meaning);
+            ViewSearcher viewSearcher = new ViewSearcher(mView);
+            mIsFavoriteView = viewSearcher.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+            mSrcTrgLanguage = viewSearcher.findViewById(R.id.src_trg_languages);
+            mSrcMeaning = viewSearcher.findViewById(R.id.src_meaning);
+            mTrgMeaning = viewSearcher.findViewById(R.id.trg_meaning);
         }
 
         public void bind(final TranslatedItem item,
                          final OnItemClickListener itemListener,
                          final OnItemClickListener isFavoriteListener){
-
-
-
             if (item.isFavorite()){
                 mIsFavoriteView.setImageResource(R.drawable.bookmark_black_shape_gold512);
             } else {
@@ -112,25 +107,16 @@ public class StoredRecyclerAdapter extends
             mSrcMeaning.setText(item.getSrcMeaning());
             mTrgMeaning.setText(item.getTrgMeaning());
 
-            mView.setOnClickListener(new View.OnClickListener(){
-               @Override public void onClick(View v){
-                   itemListener.onItemClick(item);
-               }
-            });
-
-            mIsFavoriteView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    isFavoriteListener.onItemClick(item);
-                }
-            });
-
+            mView.setOnClickListener(v -> itemListener.onItemClick(item));
+            mIsFavoriteView.setOnClickListener(v -> isFavoriteListener.onItemClick(item));
         }
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(mUniqueFragmentId, R.id.menu_item_delete,
-                    0, R.string.menu_item_delete_option);
+            menu.add(mUniqueFragmentId,
+                    R.id.menu_item_delete,
+                    0,
+                    R.string.menu_item_delete_option);
         }
     }
     public void setFilter(ArrayList<TranslatedItem> items){

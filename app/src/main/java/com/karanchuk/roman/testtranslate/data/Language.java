@@ -11,7 +11,9 @@ public class Language implements Comparable<Language>{
     private String mAbbr;
     private boolean mSelected;
 
-    public Language(String name, String abbr, boolean selected) {
+    public Language(final String name,
+                    final String abbr,
+                    final boolean selected) {
         mName = name;
         mAbbr = abbr;
         mSelected = selected;
@@ -21,7 +23,7 @@ public class Language implements Comparable<Language>{
         return mName;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         mName = name;
     }
 
@@ -29,12 +31,12 @@ public class Language implements Comparable<Language>{
         return mSelected;
     }
 
-    public void setSelected(boolean selected) {
+    public void setSelected(final boolean selected) {
         mSelected = selected;
     }
 
     @Override
-    public int compareTo(@NonNull Language o) {
+    public int compareTo(@NonNull final Language o) {
         return mName.compareTo(o.mName);
     }
 
@@ -47,12 +49,12 @@ public class Language implements Comparable<Language>{
         return mAbbr;
     }
 
-    public void setAbbr(String abbr) {
+    public void setAbbr(final String abbr) {
         mAbbr = abbr;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof Language) {
             Language item = (Language) obj;
             if (mAbbr.equals(item.mAbbr)) {

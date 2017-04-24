@@ -29,63 +29,58 @@ public class MainActivity extends AppCompatActivity implements
         TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver{
 
+    public static String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT";
+    public static String STORED_FRAGMENT = "STORED_FRAGMENT";
+    public static String SETTINGS_FRAGMENT = "SETTINGS_FRAGMENT";
+    public static String CUR_FRAGMENT_TAG = "CUR_FRAGMENT_TAG";
     private String mCurFragmentTag = "TRANSLATOR_FRAGMENT";
-    public static String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT",
-                        STORED_FRAGMENT = "STORED_FRAGMENT",
-                        SETTINGS_FRAGMENT = "SETTINGS_FRAGMENT",
-                        CUR_FRAGMENT_TAG = "CUR_FRAGMENT_TAG";
-    private List<TranslatedItem> mHistoryTranslatedItems,
-                                mFavoritesTranslatedItems;
+    private List<TranslatedItem> mHistoryTranslatedItems;
+    private List<TranslatedItem> mFavoritesTranslatedItems;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
     private ContentManager mContentManager;
     private Fragment mCurFragment;
 
-    public void setCurFragmentTag(String curFragmentTag){
+    public void setCurFragmentTag(final String curFragmentTag){
         this.mCurFragmentTag = curFragmentTag;
     }
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_translate:
-                    if (!mCurFragmentTag.equals(TRANSLATOR_FRAGMENT)) {
-                        setCurFragmentTag(TRANSLATOR_FRAGMENT);
-                        getSupportFragmentManager().
-                                beginTransaction().
-                                replace(R.id.main_activity_container,
-                                        new TranslatorFragment(), TRANSLATOR_FRAGMENT).
-                                commit();
-                    }
-                    return true;
-                case R.id.navigation_favorites:
-                    if (!mCurFragmentTag.equals(STORED_FRAGMENT)){
-                        setCurFragmentTag(STORED_FRAGMENT);
-                        getSupportFragmentManager().
-                                beginTransaction().
-                                replace(R.id.main_activity_container,
-                                        new StoredFragment(), STORED_FRAGMENT).
-                                commit();
-                    }
-                    return true;
-                case R.id.navigation_settings:
-                    if (!mCurFragmentTag.equals(SETTINGS_FRAGMENT)) {
-                        setCurFragmentTag(SETTINGS_FRAGMENT);
-                        getSupportFragmentManager().
-                                beginTransaction().
-                                replace(R.id.main_activity_container,
-                                        new SettingsFragment(), SETTINGS_FRAGMENT).
-                                commit();
-                    }
-                    return true;
-            }
-            return false;
+    private boolean clickOnItemNavigation(@NonNull final MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.navigation_translate:
+                if (!mCurFragmentTag.equals(TRANSLATOR_FRAGMENT)) {
+                    setCurFragmentTag(TRANSLATOR_FRAGMENT);
+                    getSupportFragmentManager().
+                            beginTransaction().
+                            replace(R.id.main_activity_container,
+                                    new TranslatorFragment(), TRANSLATOR_FRAGMENT).
+                            commit();
+                }
+                return true;
+            case R.id.navigation_favorites:
+                if (!mCurFragmentTag.equals(STORED_FRAGMENT)){
+                    setCurFragmentTag(STORED_FRAGMENT);
+                    getSupportFragmentManager().
+                            beginTransaction().
+                            replace(R.id.main_activity_container,
+                                    new StoredFragment(), STORED_FRAGMENT).
+                            commit();
+                }
+                return true;
+            case R.id.navigation_settings:
+                if (!mCurFragmentTag.equals(SETTINGS_FRAGMENT)) {
+                    setCurFragmentTag(SETTINGS_FRAGMENT);
+                    getSupportFragmentManager().
+                            beginTransaction().
+                            replace(R.id.main_activity_container,
+                                    new SettingsFragment(), SETTINGS_FRAGMENT).
+                            commit();
+                }
+                return true;
         }
-
-    };
+        return false;
+    }
 
 
 
@@ -94,15 +89,15 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        JsonUtils.getDictDefinitionFromJson(
-                JsonUtils.getJsonObjectFromFile(
-                        getAssets(), "translator_response.json"));
+        JsonUtils.getDictDefinitionFromJson(JsonUtils.getJsonObjectFromFile(
+                getAssets(),
+                "translator_response.json"));
 
         mMainHandler = new Handler(getMainLooper());
         mContentManager = ContentManager.getInstance();
 
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setOnNavigationItemSelectedListener((item)->clickOnItemNavigation(item));
 
 
         if (savedInstanceState != null) {
@@ -140,7 +135,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, mCurFragmentTag,getSupportFragmentManager().findFragmentByTag(mCurFragmentTag));
+        getSupportFragmentManager().putFragment(
+                outState,
+                mCurFragmentTag,
+                getSupportFragmentManager().findFragmentByTag(mCurFragmentTag));
         outState.putString(CUR_FRAGMENT_TAG, mCurFragmentTag);
     }
 
@@ -154,14 +152,12 @@ public class MainActivity extends AppCompatActivity implements
                 case " History":
                     if (!mHistoryTranslatedItems.isEmpty()) {
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
-
                     }
                     break;
                 case " Favorites":
                     if (!mFavoritesTranslatedItems.isEmpty()) {
                         mRepository.updateIsFavoriteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY, false);
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
-
                     }
                     break;
                 default:
@@ -180,21 +176,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onHistoryTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
-            }
-        });
+        mMainHandler.post(() -> mHistoryTranslatedItems =
+                mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
     }
 
     @Override
     public void onFavoritesTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
-            }
-        });
+        mMainHandler.post(() -> mFavoritesTranslatedItems =
+                mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
     }
 }

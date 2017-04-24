@@ -30,13 +30,13 @@ public class ContentManager {
 
 
 
-    public void addContentObserver(TranslatedItemChanged observer){
+    public void addContentObserver(final TranslatedItemChanged observer){
         if (!mObservers.contains(observer)){
             mObservers.add(observer);
         }
     }
 
-    public void removeContentObserver(TranslatedItemChanged observer){
+    public void removeContentObserver(final TranslatedItemChanged observer){
         if (mObservers.contains(observer)){
             mObservers.remove(observer);
         }

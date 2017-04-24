@@ -1,8 +1,5 @@
 package com.karanchuk.roman.testtranslate.data;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +13,10 @@ public class DictDefinition {
     private List<PartOfSpeech> mPartsOfSpeech;
     private String mJsonToStringRepr;
 
-    public DictDefinition(String text,
-                          String transcription,
-                          List<PartOfSpeech> partsOfSpeech,
-                          String jsonToStringRepr) {
+    public DictDefinition(final String text,
+                          final String transcription,
+                          final List<PartOfSpeech> partsOfSpeech,
+                          final String jsonToStringRepr) {
         mText = text;
         mTranscription = transcription;
         mPartsOfSpeech = partsOfSpeech;
@@ -32,7 +29,7 @@ public class DictDefinition {
         return mJsonToStringRepr;
     }
 
-    public void setJsonToStringRepr(String jsonToStringRepr) {
+    public void setJsonToStringRepr(final String jsonToStringRepr) {
         mJsonToStringRepr = jsonToStringRepr;
     }
 
@@ -40,7 +37,7 @@ public class DictDefinition {
         return mText;
     }
 
-    public void setText(String text) {
+    public void setText(final String text) {
         mText = text;
     }
 
@@ -48,7 +45,7 @@ public class DictDefinition {
         return mTranscription;
     }
 
-    public void setTranscription(String transcription) {
+    public void setTranscription(final String transcription) {
         mTranscription = transcription;
     }
 
@@ -56,7 +53,7 @@ public class DictDefinition {
         return mPartsOfSpeech;
     }
 
-    public void setPartsOfSpeech(List<PartOfSpeech> partsOfSpeech) {
+    public void setPartsOfSpeech(final List<PartOfSpeech> partsOfSpeech) {
         mPartsOfSpeech = partsOfSpeech;
     }
 
@@ -74,7 +71,7 @@ public class DictDefinition {
     }
 
     public List<Translation> getTranslations(){
-        List<Translation> translations = new ArrayList<>();
+        final List<Translation> translations = new ArrayList<>();
         for (PartOfSpeech POS : mPartsOfSpeech){
             translations.addAll(POS.getTranslations());
         }

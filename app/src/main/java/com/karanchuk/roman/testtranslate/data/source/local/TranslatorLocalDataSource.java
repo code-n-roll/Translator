@@ -20,25 +20,28 @@ import java.util.List;
 
 public class TranslatorLocalDataSource implements TranslatorDataSource{
     private static TranslatorLocalDataSource INSTANCE;
-    private static String LOG_TAG = "MY_DB_LOG";
+    private static final String LOG_TAG = "MY_DB_LOG";
 
-    private TablesDbHelper mDbHelper;
+    private final TablesDbHelper mDbHelper;
 
-    private TranslatorLocalDataSource(@NonNull Context context){
+    private TranslatorLocalDataSource(@NonNull final Context context){
         mDbHelper = new TablesDbHelper(context);
     }
 
-    public static TranslatorLocalDataSource getInstance(@NonNull Context context){
+    public static TranslatorLocalDataSource getInstance(@NonNull final Context context){
         if (INSTANCE == null){
             INSTANCE = new TranslatorLocalDataSource(context);
         }
         return INSTANCE;
     }
 
-    private boolean isEntryExist(SQLiteDatabase db, String tableName, String fieldName, String entryId){
+    private boolean isEntryExist(final SQLiteDatabase db,
+                                 final String tableName,
+                                 final String fieldName,
+                                 final String entryId){
         Cursor c = null;
         try{
-            String query = "SELECT COUNT(*) FROM " + tableName + " WHERE " + fieldName + " = ?";
+            final String query = "SELECT COUNT(*) FROM " + tableName + " WHERE " + fieldName + " = ?";
             c = db.rawQuery(query, new String[] {entryId});
             return c.moveToFirst() && c.getInt(0) != 0;
         } finally {
@@ -49,14 +52,15 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
     }
 
     @Override
-    public boolean saveTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    public boolean saveTranslatedItem(@NonNull final String tableName,
+                                      @NonNull final TranslatedItem translatedItem) {
+        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
         if (isEntryExist(db, tableName, TranslatedItemEntry.COLUMN_NAME_ENTRY_ID,
                 translatedItem.getId())){
             return false;
         }
 
-        ContentValues values = new ContentValues();
+        final ContentValues values = new ContentValues();
         values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, translatedItem.getId());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API, translatedItem.getSrcLanguageForAPI());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API, translatedItem.getTrgLanguageForAPI());
@@ -77,13 +81,14 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
     }
 
 
-    public void deleteTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+    public void deleteTranslatedItem(@NonNull final String tableName,
+                                     @NonNull final TranslatedItem translatedItem) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        String selection = TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + " LIKE ? AND " +
+        final String selection = TranslatedItemEntry.COLUMN_NAME_SRC_MEAN + " LIKE ? AND " +
                             TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API + " LIKE ? AND " +
                             TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API + " LIKE ?";
-        String[] selectionArgs = {
+        final String[] selectionArgs = {
                 translatedItem.getSrcMeaning(),
                 translatedItem.getSrcLanguageForAPI(),
                 translatedItem.getTrgLanguageForAPI()};
@@ -94,10 +99,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         printAllTranslatedItems(tableName);
     }
 
-    public void deleteTranslatedItems(@NonNull String tableName){
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    public void deleteTranslatedItems(@NonNull final String tableName){
+        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        String clearTable = "DELETE FROM " + tableName;
+        final String clearTable = "DELETE FROM " + tableName;
         db.execSQL(clearTable);
 
         Log.d(LOG_TAG, "delete items DB " + tableName);
@@ -106,18 +111,20 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         db.close();
     }
 
-    public void updateIsFavoriteTranslatedItems(@NonNull String tableName, @NonNull boolean isFavorite){
-        List<TranslatedItem> list = getTranslatedItems(tableName);
+    public void updateIsFavoriteTranslatedItems(@NonNull final String tableName,
+                                                @NonNull final boolean isFavorite){
+        final List<TranslatedItem> list = getTranslatedItems(tableName);
         for (TranslatedItem item : list){
             item.isFavoriteUp(isFavorite);
             updateTranslatedItem(tableName, item);
         }
     }
 
-    public void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem item) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    public void updateTranslatedItem(@NonNull final String tableName,
+                                     @NonNull final TranslatedItem item) {
+        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
+        final ContentValues values = new ContentValues();
         values.put(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID, item.getId());
         values.put(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API, item.getSrcLanguageForAPI());
         values.put(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API, item.getTrgLanguageForAPI());
@@ -128,8 +135,8 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         values.put(TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE, item.isFavorite());
         values.put(TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION, item.getDictDefinition());
 
-        String whereClause = TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + " = ? ";
-        String[] whereArgs = {item.getId()};
+        final String whereClause = TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + " = ? ";
+        final String[] whereArgs = {item.getId()};
         db.update(tableName, values, whereClause, whereArgs);
         db.close();
 
@@ -139,10 +146,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
 
     @NonNull
     @Override
-    public List<TranslatedItem> getTranslatedItems(@NonNull String tableName) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        List<TranslatedItem> items = new ArrayList<>();
-        String[] projection = {
+    public List<TranslatedItem> getTranslatedItems(@NonNull final String tableName) {
+        final SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        final List<TranslatedItem> items = new ArrayList<>();
+        final String[] projection = {
                 TranslatedItemEntry.COLUMN_NAME_ENTRY_ID,
                 TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API,
                 TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API,
@@ -154,32 +161,38 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
                 TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION
         };
 
-        Cursor c = db.query(tableName, projection, null, null, null, null, null);
+        final Cursor c = db.query(tableName, projection, null, null, null, null, null);
         if (c != null && c.getCount() > 0){
             while(c.moveToNext()){
-                String itemId =
+                final String itemId =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_ENTRY_ID));
-                String itemSrcLangAPI =
+                final String itemSrcLangAPI =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API));
-                String itemTrgLangAPI =
+                final String itemTrgLangAPI =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API));
-                String itemSrcLangUser =
+                final String itemSrcLangUser =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_LANG_USER));
-                String itemTrgLangUser =
+                final String itemTrgLangUser =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_TRG_LANG_USER));
-                String itemSrcMean =
+                final String itemSrcMean =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_SRC_MEAN));
-                String itemTrgMean =
+                final String itemTrgMean =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_TRG_MEAN));
-                String itemIsFavorite =
+                final String itemIsFavorite =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_IS_FAVORITE));
-                String itemDictDef =
+                final String itemDictDef =
                         c.getString(c.getColumnIndexOrThrow(TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION));
 
                 TranslatedItem translatedItem = new TranslatedItem(
-                        itemId, itemSrcLangAPI, itemTrgLangAPI,
-                        itemSrcLangUser, itemTrgLangUser, itemSrcMean,
-                        itemTrgMean, itemIsFavorite, itemDictDef);
+                        itemId,
+                        itemSrcLangAPI,
+                        itemTrgLangAPI,
+                        itemSrcLangUser,
+                        itemTrgLangUser,
+                        itemSrcMean,
+                        itemTrgMean,
+                        itemIsFavorite,
+                        itemDictDef);
                 items.add(translatedItem);
             }
         }
@@ -194,10 +207,10 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
     }
 
     @Override
-    public void printAllTranslatedItems(@NonNull String tableName) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+    public void printAllTranslatedItems(@NonNull final String tableName) {
+        final SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        Cursor c = db.query(tableName, null, null, null, null, null, null);
+        final Cursor c = db.query(tableName, null, null, null, null, null, null);
         logCursor(c);
 
         if (c!= null){
@@ -208,13 +221,13 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
     }
 
 
-    private void logCursor(Cursor c){
+    private void logCursor(final Cursor c){
         if (c != null){
             if (c.moveToFirst()){
                 String str;
                 do {
                     str = "";
-                    for (String cn : c.getColumnNames()){
+                    for (final String cn : c.getColumnNames()){
                         str = str.concat(cn + " = " + c.getString(c.getColumnIndex(cn)) + "; ");
                     }
                     Log.d(LOG_TAG, str);

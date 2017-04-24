@@ -20,7 +20,8 @@ public class TablesDbHelper extends SQLiteOpenHelper{
 
     private static final String SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS =
             "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME_HISTORY + " (" +
-                    TranslatedItemEntry._ID + INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
+                    TranslatedItemEntry._ID + INTEGER_TYPE +
+                    " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API + TEXT_TYPE + COMMA_SEP +
@@ -33,7 +34,8 @@ public class TablesDbHelper extends SQLiteOpenHelper{
             " );";
     private static final String SQL_CREATE_TABLE_FAVORITES_TRANSLATED_ITEMS =
             "CREATE TABLE " + TranslatedItemEntry.TABLE_NAME_FAVORITES + " (" +
-                    TranslatedItemEntry._ID + INTEGER_TYPE + " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
+                    TranslatedItemEntry._ID + INTEGER_TYPE +
+                    " PRIMARY KEY AUTOINCREMENT NOT NULL" + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_SRC_LANG_API + TEXT_TYPE + COMMA_SEP +
                     TranslatedItemEntry.COLUMN_NAME_TRG_LANG_API + TEXT_TYPE + COMMA_SEP +
@@ -45,17 +47,19 @@ public class TablesDbHelper extends SQLiteOpenHelper{
                     TranslatedItemEntry.COLUMN_NAME_DICT_DEFINITION + TEXT_TYPE +
                     " );";
 
-    TablesDbHelper(Context context){
+    TablesDbHelper(final Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(final SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS);
         db.execSQL(SQL_CREATE_TABLE_FAVORITES_TRANSLATED_ITEMS);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(final SQLiteDatabase db,
+                          final int oldVersion,
+                          final int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TranslatedItemEntry.TABLE_NAME_HISTORY);
         db.execSQL(SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS);
         db.execSQL("DROP TABLE IF EXISTS " + TranslatedItemEntry.TABLE_NAME_FAVORITES);

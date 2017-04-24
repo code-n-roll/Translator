@@ -3,7 +3,6 @@ package com.karanchuk.roman.testtranslate.utils;
 import android.content.res.AssetManager;
 import android.util.Log;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -22,7 +21,8 @@ import java.util.List;
  */
 
 public class JsonUtils {
-    public static JsonObject getJsonObjectFromFile(AssetManager manager, String fileName){
+    public static JsonObject getJsonObjectFromFile(final AssetManager manager,
+                                                   final String fileName){
         byte[] buffer = null;
         String s;
         JsonObject jo = new JsonObject();
@@ -40,7 +40,7 @@ public class JsonUtils {
         return jo;
     }
 
-    public static DictDefinition getDictDefinitionFromJson(JsonObject jsonObject){
+    public static DictDefinition getDictDefinitionFromJson(final JsonObject jsonObject){
         JsonElement dictDefJSON = jsonObject.get("def");
         List<PartOfSpeech> dictDefinition = new ArrayList<>();
         if (dictDefJSON != null) {
@@ -129,7 +129,7 @@ public class JsonUtils {
         return dictDef;
     }
 
-    public static String getRepresentSynonyms(List<Synonym> synonyms){
+    public static String getRepresentSynonyms(final List<Synonym> synonyms){
         String result = "";
         for (Synonym synonym : synonyms) {
             result = result.concat(

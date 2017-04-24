@@ -1,11 +1,9 @@
 package com.karanchuk.roman.testtranslate.ui.stored;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -14,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.karanchuk.roman.testtranslate.R;
@@ -28,13 +25,10 @@ import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
+import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,14 +50,15 @@ public class StoredFragment extends Fragment implements
     private View mView, mMainActivityContainer;
     private TranslatorRepository mRepository;
     private ClearStoredDialogFragment mClearHistoryDialog;
-    private static String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG",
-                    CLEAR_HISTORY_FAVORITES = "CLEAR_HISTORY_FAVORITES";
+    private static String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG";
+    private static String CLEAR_HISTORY_FAVORITES = "CLEAR_HISTORY_FAVORITES";
     private ContentManager mContentManager;
-    private int curPosition = 0;
     private Handler mMainHandler;
     private List<TranslatedItem> mFavoritesItems, mHistoryItems;
+    private int curPosition = 0;
     private int mBottomPadding;
     private BottomNavigationView mNavigation;
+    private Bundle mBundle;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,42 +82,53 @@ public class StoredFragment extends Fragment implements
 
 
         mClearHistoryDialog = new ClearStoredDialogFragment();
-        final Bundle bundle = new Bundle();
+        mBundle = new Bundle();
 
 
-        mClearStored = (ImageButton) mView.findViewById(R.id.imagebutton_clear_stored);
+
+        UIUtils.changeSoftInputModeWithOrientation(getActivity());
+
+        findViewsOnFragment();
+
         if (mHistoryItems.isEmpty()){
             mClearStored.setVisibility(View.INVISIBLE);
         } else {
             mClearStored.setVisibility(View.VISIBLE);
         }
-        mClearStored.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch(mViewPager.getCurrentItem()) {
-                    case 0:
-                        bundle.putString("title"," History");
-                        mClearHistoryDialog.setArguments(bundle);
-                        mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_DIALOG);
-                        break;
-                    case 1:
-                        bundle.putString("title"," Favorites");
-                        mClearHistoryDialog.setArguments(bundle);
-                        mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_FAVORITES);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
+        mClearStored.setOnClickListener(bundle -> clickOnClearStored(mBundle));
+        mTabLayout.setupWithViewPager(mViewPager);
 
-        UIUtils.changeSoftInputModeWithOrientation(getActivity());
-        initViewPager(mView);
-        initTabLayout(mView);
-        initToolbar();
+        initViewPager();
         handleKeyboardVisibility();
+        initActionBar();
+
 
         return mView;
+    }
+
+    private void findViewsOnFragment(){
+        ViewSearcher viewSearcher = new ViewSearcher(mView);
+
+        mTabLayout = viewSearcher.findViewById(R.id.tablayout_favorites);
+        mViewPager = viewSearcher.findViewById(R.id.viewpager_stored);
+        mClearStored = viewSearcher.findViewById(R.id.imagebutton_clear_stored);
+    }
+
+    private void clickOnClearStored(final Bundle bundle){
+        switch(mViewPager.getCurrentItem()) {
+            case 0:
+                bundle.putString("title"," History");
+                mClearHistoryDialog.setArguments(bundle);
+                mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_DIALOG);
+                break;
+            case 1:
+                bundle.putString("title"," Favorites");
+                mClearHistoryDialog.setArguments(bundle);
+                mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_FAVORITES);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -132,12 +138,8 @@ public class StoredFragment extends Fragment implements
         mRepository.removeHistoryContentObserver(this);
     }
 
-    private void initTabLayout(View view){
-        mTabLayout = (TabLayout) view.findViewById(R.id.tablayout_favorites);
-        mTabLayout.setupWithViewPager(mViewPager);
-    }
-    
-    public void initToolbar(){
+
+    private void initActionBar(){
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setShowHideAnimationEnabled(false);
@@ -145,9 +147,7 @@ public class StoredFragment extends Fragment implements
         }
     }
 
-    private void initViewPager(View view){
-        mViewPager = (ViewPager) view.findViewById(R.id.viewpager_stored);
-
+    private void initViewPager(){
         mFragments = new ArrayList<>();
         mTitles = new ArrayList<>();
         mFavoritesAdapter = new StoredPagerAdapter(getChildFragmentManager(),mFragments, mTitles);
@@ -180,8 +180,6 @@ public class StoredFragment extends Fragment implements
             mContentManager.notifyTranslatedItemChanged();
         }
         curPosition = position;
-
-
 //        Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
     }
 
@@ -192,38 +190,29 @@ public class StoredFragment extends Fragment implements
 
     @Override
     public void onFavoritesTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mFavoritesItems.clear();
-                mFavoritesItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES));
-            }
+        mMainHandler.post(() -> {
+            mFavoritesItems.clear();
+            mFavoritesItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES));
         });
     }
 
     @Override
     public void onHistoryTranslatedItemsChanged() {
-        mMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mHistoryItems.clear();
-                mHistoryItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY));
-            }
+        mMainHandler.post(() -> {
+            mHistoryItems.clear();
+            mHistoryItems.addAll(mRepository.getTranslatedItems(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY));
         });
     }
 
-    public void handleKeyboardVisibility(){
+    private void handleKeyboardVisibility(){
         KeyboardVisibilityEvent.setEventListener(
                 getActivity(),
-                new KeyboardVisibilityEventListener() {
-                    @Override
-                    public void onVisibilityChanged(boolean isOpen) {
-                        // some code depending on keyboard visiblity status
-                        if (isOpen && isAdded()){
-                                mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(getActivity(),mMainActivityContainer,mNavigation);
-                        } else if (!isOpen && isAdded()){
-                                UIUtils.showBottomNavViewSetBottomPadding(getActivity(),mMainActivityContainer,mNavigation,mBottomPadding);
-                        }
+                isOpen -> {
+                    // some code depending on keyboard visiblity status
+                    if (isOpen && isAdded()){
+                            mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(getActivity(),mMainActivityContainer,mNavigation);
+                    } else if (!isOpen && isAdded()){
+                            UIUtils.showBottomNavViewSetBottomPadding(getActivity(),mMainActivityContainer,mNavigation,mBottomPadding);
                     }
                 });
     }

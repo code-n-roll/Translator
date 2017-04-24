@@ -19,12 +19,12 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
-        initToolbar();
+        initActionBar();
 
         return view;
     }
 
-    public void initToolbar(){
+    public void initActionBar(){
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) {
             actionBar.setShowHideAnimationEnabled(false);

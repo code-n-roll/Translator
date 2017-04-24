@@ -13,7 +13,11 @@ public class Translation {
     private String mExpressions;
     private String mRepresentSynonyms;
 
-    public Translation(String number, List<Synonym> synonyms, String meanings, String expressions, String representSynonyms) {
+    public Translation(final String number,
+                       final List<Synonym> synonyms,
+                       final String meanings,
+                       final String expressions,
+                       final String representSynonyms) {
         mNumber = number;
         mSynonyms = synonyms;
         mMeanings = meanings;
@@ -21,7 +25,7 @@ public class Translation {
         mRepresentSynonyms = representSynonyms;
     }
 
-    public void setRepresentSynonyms(String representSynonyms) {
+    public void setRepresentSynonyms(final String representSynonyms) {
         mRepresentSynonyms = representSynonyms;
     }
 
@@ -33,7 +37,7 @@ public class Translation {
         return mSynonyms;
     }
 
-    public void setSynonyms(List<Synonym> synonyms) {
+    public void setSynonyms(final List<Synonym> synonyms) {
         mSynonyms = synonyms;
     }
 
@@ -41,7 +45,7 @@ public class Translation {
         return mNumber;
     }
 
-    public void setNumber(String number) {
+    public void setNumber(final String number) {
         mNumber = number;
     }
 
@@ -50,7 +54,7 @@ public class Translation {
         return mMeanings;
     }
 
-    public void setMeanings(String meanings) {
+    public void setMeanings(final String meanings) {
         mMeanings = meanings;
     }
 
@@ -58,7 +62,7 @@ public class Translation {
         return mExpressions;
     }
 
-    public void setExpressions(String expressions) {
+    public void setExpressions(final String expressions) {
         mExpressions = expressions;
     }
 

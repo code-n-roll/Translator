@@ -3,7 +3,6 @@ package com.karanchuk.roman.testtranslate.ui.view;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -19,8 +18,8 @@ public class ClearStoredDialogFragment extends DialogFragment {
     private String mCurTitle;
 
     public interface ClearStoredDialogListener {
-        void onDialogPositiveClick(ClearStoredDialogFragment dialog);
-        void onDialogNegativeClick(ClearStoredDialogFragment dialog);
+        void onDialogPositiveClick(final ClearStoredDialogFragment dialog);
+        void onDialogNegativeClick(final ClearStoredDialogFragment dialog);
     }
 
 
@@ -40,21 +39,13 @@ public class ClearStoredDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         mCurTitle = getArguments().getString("title");
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(mCurTitle)
                 .setMessage(getResources().getString(R.string.dialog_clear)+mCurTitle+"?")
-                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogPositiveClick(ClearStoredDialogFragment.this);
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mListener.onDialogNegativeClick(ClearStoredDialogFragment.this);
-                    }
-                });
+                .setPositiveButton(R.string.yes,
+                        (dialog, which) -> mListener.onDialogPositiveClick(ClearStoredDialogFragment.this))
+                .setNegativeButton(R.string.cancel,
+                        (dialog, which) -> mListener.onDialogNegativeClick(ClearStoredDialogFragment.this));
         return builder.create();
     }
 }

@@ -1,7 +1,6 @@
 package com.karanchuk.roman.testtranslate.data.source;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceContract.TranslatedItemEntry;
@@ -22,8 +21,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
     private final TranslatorDataSource mTranslatorLocalDataSource;
 
-    private List<HistoryTranslatedItemsRepositoryObserver> mHistoryObservers = new ArrayList<>();
-    private List<FavoritesTranslatedItemsRepositoryObserver> mFavoritesObservers = new ArrayList<>();
+    private final List<HistoryTranslatedItemsRepositoryObserver> mHistoryObservers = new ArrayList<>();
+    private final List<FavoritesTranslatedItemsRepositoryObserver> mFavoritesObservers = new ArrayList<>();
 
     private Map<String, TranslatedItem> mHistoryCachedTranslatedItems,
                                         mFavoritesCachedTranslatedItems;
@@ -31,14 +30,14 @@ public class TranslatorRepository  implements TranslatorDataSource{
     private boolean mHistoryCacheTranslatedItemsIsDirty = true,
                     mFavoritesCacheTranslatedItemsIdDirty = true;
 
-    public static TranslatorRepository getInstance(TranslatorDataSource translatorLocalDataSource){
+    public static TranslatorRepository getInstance(final TranslatorDataSource translatorLocalDataSource){
         if (INSTANCE == null){
             INSTANCE = new TranslatorRepository(translatorLocalDataSource);
         }
         return INSTANCE;
     }
 
-    private TranslatorRepository(@NonNull TranslatorDataSource translatorLocalDataSource){
+    private TranslatorRepository(@NonNull final TranslatorDataSource translatorLocalDataSource){
         mTranslatorLocalDataSource = checkNotNull(translatorLocalDataSource);
     }
 
@@ -53,13 +52,13 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
 
-    public void addHistoryContentObserver(HistoryTranslatedItemsRepositoryObserver observer){
+    public void addHistoryContentObserver(final HistoryTranslatedItemsRepositoryObserver observer){
         if (!mHistoryObservers.contains(observer)){
             mHistoryObservers.add(observer);
         }
     }
 
-    public void removeHistoryContentObserver(HistoryTranslatedItemsRepositoryObserver observer){
+    public void removeHistoryContentObserver(final HistoryTranslatedItemsRepositoryObserver observer){
         if (mHistoryObservers.contains(observer)){
             mHistoryObservers.remove(observer);
         }
@@ -72,7 +71,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     @Override
-    public boolean saveTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+    public boolean saveTranslatedItem(@NonNull final String tableName,
+                                      @NonNull final TranslatedItem translatedItem) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)){
             if (mHistoryCachedTranslatedItems == null){
                 mHistoryCachedTranslatedItems = new LinkedHashMap<>();
@@ -104,7 +104,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
 
     @Override
-    public void deleteTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+    public void deleteTranslatedItem(@NonNull final String tableName,
+                                     @NonNull final TranslatedItem translatedItem) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
             mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
 
@@ -126,12 +127,12 @@ public class TranslatorRepository  implements TranslatorDataSource{
 
     @NonNull
     @Override
-    public List<TranslatedItem> getTranslatedItems(@NonNull String tableName) {
+    public List<TranslatedItem> getTranslatedItems(@NonNull final String tableName) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
             if (!mHistoryCacheTranslatedItemsIsDirty) {
                 return getHistoryCachedTranslatedItems();
             }
-            List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems(tableName);
+            final List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems(tableName);
 
             mHistoryCachedTranslatedItems = new LinkedHashMap<>();
             for (TranslatedItem item : items) {
@@ -145,7 +146,7 @@ public class TranslatorRepository  implements TranslatorDataSource{
         if (!mFavoritesCacheTranslatedItemsIdDirty){
             return getFavoritesCachedTranslatedItems();
         }
-        List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems(tableName);
+        final List<TranslatedItem> items = mTranslatorLocalDataSource.getTranslatedItems(tableName);
 
         mFavoritesCachedTranslatedItems = new LinkedHashMap<>();
         for (TranslatedItem item : items) {
@@ -157,7 +158,7 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     @Override
-    public void deleteTranslatedItems(@NonNull String tableName) {
+    public void deleteTranslatedItems(@NonNull final String tableName) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
             mTranslatorLocalDataSource.deleteTranslatedItems(tableName);
 
@@ -169,7 +170,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
         } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
             mTranslatorLocalDataSource.deleteTranslatedItems(tableName);
 
-            if (mFavoritesCachedTranslatedItems != null && !mFavoritesCachedTranslatedItems.isEmpty()){
+            if (mFavoritesCachedTranslatedItems != null &&
+                    !mFavoritesCachedTranslatedItems.isEmpty()){
                 mFavoritesCachedTranslatedItems.clear();
             }
             notifyFavoritesTranslatedItemsChanged();
@@ -177,7 +179,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     @Override
-    public void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem) {
+    public void updateTranslatedItem(@NonNull final String tableName,
+                                     @NonNull final TranslatedItem translatedItem) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
             mTranslatorLocalDataSource.updateTranslatedItem(tableName, translatedItem);
             notifyHistoryTranslatedItemsChanged();
@@ -188,7 +191,8 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     @Override
-    public void updateIsFavoriteTranslatedItems(@NonNull String tableName, @NonNull boolean isFavorite){
+    public void updateIsFavoriteTranslatedItems(@NonNull final String tableName,
+                                                @NonNull final boolean isFavorite){
         mTranslatorLocalDataSource.updateIsFavoriteTranslatedItems(tableName, isFavorite);
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)) {
             notifyFavoritesTranslatedItemsChanged();
@@ -198,18 +202,20 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     @Override
-    public void printAllTranslatedItems(@NonNull String tableName) {
+    public void printAllTranslatedItems(@NonNull final String tableName) {
         mTranslatorLocalDataSource.printAllTranslatedItems(tableName);
     }
 
 
-    public void addFavoritesContentObserver(FavoritesTranslatedItemsRepositoryObserver observer){
+    public void addFavoritesContentObserver(
+            final FavoritesTranslatedItemsRepositoryObserver observer){
         if (!mFavoritesObservers.contains(observer)){
             mFavoritesObservers.add(observer);
         }
     }
 
-    public void removeFavoritesContentObserver(FavoritesTranslatedItemsRepositoryObserver observer){
+    public void removeFavoritesContentObserver(
+            final FavoritesTranslatedItemsRepositoryObserver observer){
         if (mFavoritesObservers.contains(observer)){
             mFavoritesObservers.remove(observer);
         }

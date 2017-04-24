@@ -34,12 +34,12 @@
         android:imeOptions="actionDone|flagNoExtractUi"
         />
         <ImageButton
-            android:id="@+id/clearEditText"
+            android:id="@+id/clear_edittext"
             android:layout_width="38dp"
             android:layout_height="38dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/getAudioSpelling"
+            android:layout_below="@id/get_audio_spelling"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/cancel_dark512"
@@ -59,7 +59,7 @@
             android:background="@android:color/transparent"
             />
         <ImageButton
-            android:id="@+id/getAudioSpelling"
+            android:id="@+id/get_audio_spelling"
             android:layout_height="38dp"
             android:layout_width="38dp"
             android:adjustViewBounds="true"

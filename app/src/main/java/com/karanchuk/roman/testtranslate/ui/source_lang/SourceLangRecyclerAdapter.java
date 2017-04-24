@@ -1,10 +1,8 @@
 package com.karanchuk.roman.testtranslate.ui.source_lang;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +11,8 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Language;
+import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,14 +21,16 @@ import java.util.List;
 
 public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRecyclerAdapter.ViewHolder>{
     public interface OnItemClickListener {
-        void onItemClick(Language item);
+        void onItemClick(final Language item);
     }
 
     private final List<Language> mItems;
     private final OnItemClickListener mListener;
-    private Context mContext;
+    private final Context mContext;
 
-    public SourceLangRecyclerAdapter(List<Language> items, OnItemClickListener listener, Context context){
+    public SourceLangRecyclerAdapter(final List<Language> items,
+                                     final OnItemClickListener listener,
+                                     final Context context){
         mItems = items;
         mListener = listener;
         mContext = context;
@@ -54,15 +54,16 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private ImageView mIsSelected;
-        private TextView mLanguage;
-        private View mView;
+        private final ImageView mIsSelected;
+        private final TextView mLanguage;
+        private final View mView;
 
-        public ViewHolder(View view){
+        public ViewHolder(final View view){
             super(view);
             mView = view;
-            mLanguage = (TextView) view.findViewById(R.id.choose_src_trg_lang);
-            mIsSelected = (ImageView) view.findViewById(R.id.selected_choose_src_trg_lang);
+            ViewSearcher viewSearcher = new ViewSearcher(mView);
+            mLanguage = viewSearcher.findViewById(R.id.choose_src_trg_lang);
+            mIsSelected = viewSearcher.findViewById(R.id.selected_choose_src_trg_lang);
         }
 
 
@@ -77,12 +78,7 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
                 mIsSelected.setVisibility(View.INVISIBLE);
                 mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
             }
-            mView.setOnClickListener(new View.OnClickListener(){
-                @Override public void onClick(View v){
-                    listener.onItemClick(item);
-                }
-            });
-
+            mView.setOnClickListener(v -> listener.onItemClick(item));
         }
     }
 }

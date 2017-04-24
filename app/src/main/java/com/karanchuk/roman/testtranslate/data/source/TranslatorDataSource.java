@@ -11,18 +11,22 @@ import java.util.List;
  */
 
 public interface TranslatorDataSource {
-    boolean saveTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
+    boolean saveTranslatedItem(@NonNull final String tableName,
+                               @NonNull final TranslatedItem translatedItem);
 
-    void deleteTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
+    void deleteTranslatedItem(@NonNull final String tableName,
+                              @NonNull final TranslatedItem translatedItem);
 
     @NonNull
-    List<TranslatedItem> getTranslatedItems(@NonNull String tableName);
+    List<TranslatedItem> getTranslatedItems(@NonNull final String tableName);
 
-    void deleteTranslatedItems(@NonNull String tableName);
+    void deleteTranslatedItems(@NonNull final String tableName);
 
-    void updateTranslatedItem(@NonNull String tableName, @NonNull TranslatedItem translatedItem);
+    void updateTranslatedItem(@NonNull final String tableName,
+                              @NonNull final TranslatedItem translatedItem);
 
-    void updateIsFavoriteTranslatedItems(@NonNull String tableName, @NonNull boolean isFavorite);
+    void updateIsFavoriteTranslatedItems(@NonNull final String tableName,
+                                         @NonNull final boolean isFavorite);
 
-    void printAllTranslatedItems(@NonNull String tableName);
+    void printAllTranslatedItems(@NonNull final String tableName);
 }

@@ -10,7 +10,8 @@ public class PartOfSpeech {
     private String mName;
     private List<Translation> mTranslations;
 
-    public PartOfSpeech(String name, List<Translation> translations){
+    public PartOfSpeech(final String name,
+                        final List<Translation> translations){
         mName = name;
         mTranslations = translations;
     }
@@ -19,7 +20,7 @@ public class PartOfSpeech {
         return mName;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         mName = name;
     }
 
@@ -28,7 +29,7 @@ public class PartOfSpeech {
         return mTranslations;
     }
 
-    public void setTranslations(List<Translation> translations) {
+    public void setTranslations(final List<Translation> translations) {
         mTranslations = translations;
     }
 

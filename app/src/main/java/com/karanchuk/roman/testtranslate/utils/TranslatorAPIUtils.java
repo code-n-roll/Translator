@@ -11,8 +11,8 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.List;
@@ -70,15 +70,13 @@ public class TranslatorAPIUtils {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
+                mHandler.post(() -> {
 //                        TranslatedItem item = new TranslatedItem("srcLangAPI","trgLangAPI",
 //                        srcLangUser,trgLangUser,"srcMean","trgMean","isFavor","dictDef");
 //                        TranslatedItem item = new TranslatedItem(srcLangAPI,trgLangAPI,
 //                                null,null,translatedText,null,null,null);
 //                        if (!historyTranslatedItems.contains(item)) {
-                        TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(false);
+            TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(false);
 //                        } else {
 //                            TranslatedItem newItem = historyTranslatedItems.get(historyTranslatedItems.indexOf(item));
 //                            tvTranslateResult.setText(newItem.getTrgMeaning());
@@ -90,7 +88,6 @@ public class TranslatorAPIUtils {
 //                            saveToSharedPreferences(newItem);
 //                            TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
 //                        }
-                    }
                 });
             }
 
@@ -113,13 +110,10 @@ public class TranslatorAPIUtils {
                 Log.d("http response", response.toString());
 
 
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!result.isEmpty()) {
-                            tvTranslateResult.setText(result);
-                            DictionaryAPIUtils.lookup(mHandler, translatedText,translDirection,rvTranslate, saver);
-                        }
+                mHandler.post(() -> {
+                    if (!result.isEmpty()) {
+                        tvTranslateResult.setText(result);
+                        DictionaryAPIUtils.lookup(mHandler, translatedText,translDirection,rvTranslate, saver);
                     }
                 });
 

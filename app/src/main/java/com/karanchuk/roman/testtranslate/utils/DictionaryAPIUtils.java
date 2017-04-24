@@ -9,9 +9,9 @@ import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.data.DictDefinition;
 import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.data.Translation;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ import okhttp3.Response;
 public class DictionaryAPIUtils {
     public static void lookup(
             final Handler handler,
-            String lookupText,
-            String translDirection,
+            final String lookupText,
+            final String translDirection,
             final RecyclerView rvTranslate,
             final TranslatorFragment.TranslationSaver saver
     ){
@@ -61,24 +61,19 @@ public class DictionaryAPIUtils {
                 Log.d("api response", strResponse);
                 Log.d("http response", response.toString());
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        List<Translation> translations = new ArrayList<>();
-                        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(jo);
-                        for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
-                            for (Translation transl : POS.getTranslations()){
-                                translations.add(transl);
-                            }
-                        }
-                        TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)rvTranslate.getAdapter();
-                        adapter.updateData(translations);
-
-                        saver.setDictDefinition(dictDefinition);
-                        new Thread(saver).start();
-
-                        TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
+                handler.post(() -> {
+                    List<Translation> translations = new ArrayList<>();
+                    DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(jo);
+                    for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
+                        translations.addAll(POS.getTranslations());
                     }
+                    TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)rvTranslate.getAdapter();
+                    adapter.updateData(translations);
+
+                    saver.setDictDefinition(dictDefinition);
+                    new Thread(saver).start();
+
+                    TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
                 });
             }
         });

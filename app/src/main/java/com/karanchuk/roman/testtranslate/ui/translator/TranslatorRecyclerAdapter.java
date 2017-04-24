@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Translation;
+import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +18,9 @@ import java.util.List;
  */
 
 public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>{
-    private ArrayList<Translation> mItems;
+    private final ArrayList<Translation> mItems;
 
-    public TranslatorRecyclerAdapter(ArrayList<Translation> items){
+    public TranslatorRecyclerAdapter(final ArrayList<Translation> items){
         mItems = items;
     }
 
@@ -41,22 +42,24 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView mNumberDictDefinItem,
+        private final TextView mNumberDictDefinItem,
                          mTranslDictDefinItem,
                          mMeanDictDefinItem,
                          mExprDictDefinItem;
-        private View mView;
+        private final View mView;
 
-        public ViewHolder(View view){
+        public ViewHolder(final View view){
             super(view);
             mView = view;
-            mNumberDictDefinItem = (TextView) mView.findViewById(R.id.number_dict_defin_item);
-            mTranslDictDefinItem = (TextView) mView.findViewById(R.id.transl_dict_defin_item);
-            mMeanDictDefinItem = (TextView) mView.findViewById(R.id.mean_dict_defin_item);
-            mExprDictDefinItem = (TextView) mView.findViewById(R.id.expr_dict_defin_item);
+
+            ViewSearcher viewSearcher = new ViewSearcher(mView);
+            mNumberDictDefinItem = viewSearcher.findViewById(R.id.number_dict_defin_item);
+            mTranslDictDefinItem = viewSearcher.findViewById(R.id.transl_dict_defin_item);
+            mMeanDictDefinItem = viewSearcher.findViewById(R.id.mean_dict_defin_item);
+            mExprDictDefinItem = viewSearcher.findViewById(R.id.expr_dict_defin_item);
         }
 
-        public void bind(Translation item){
+        public void bind(final Translation item){
             mNumberDictDefinItem.setText(item.getNumber());
             mTranslDictDefinItem.setText(item.getRepresentSynonyms());
             if (!item.getMeanings().isEmpty()) {
@@ -73,7 +76,7 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
             }
         }
     }
-    public void updateData(List<Translation> translations){
+    public void updateData(final List<Translation> translations){
         mItems.clear();
         mItems.addAll(translations);
         notifyDataSetChanged();

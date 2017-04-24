@@ -8,7 +8,8 @@ public class Synonym {
     private String mText;
     private String mGen;
 
-    public Synonym(String text, String gen) {
+    public Synonym(final String text,
+                   final String gen) {
         mText = text;
         mGen = gen;
     }
@@ -18,7 +19,7 @@ public class Synonym {
         return mText;
     }
 
-    public void setText(String text) {
+    public void setText(final String text) {
         mText = text;
     }
 
@@ -26,7 +27,7 @@ public class Synonym {
         return mGen;
     }
 
-    public void setGen(String gen) {
+    public void setGen(final String gen) {
         mGen = gen;
     }
 

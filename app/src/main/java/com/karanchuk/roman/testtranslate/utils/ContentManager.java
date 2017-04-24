@@ -19,12 +19,12 @@ public class ContentManager {
     }
 
     public interface TranslatedItemChanged{
-        void onTranslatedItemChanged();
+        void onTranslatedItemsChanged();
     }
 
     public void notifyTranslatedItemChanged(){
         for (TranslatedItemChanged observer : mObservers){
-            observer.onTranslatedItemChanged();
+            observer.onTranslatedItemsChanged();
         }
     }
 

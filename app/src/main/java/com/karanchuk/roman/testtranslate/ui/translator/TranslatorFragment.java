@@ -111,6 +111,8 @@ public class TranslatorFragment extends Fragment implements
             CONT_ERROR_VISIBILITY = "CONT_ERROR_VISIBILITY",
             PROGRESS_BAR_VISIBILITY = "PROGRESS_BAR_VISIBILITY",
             IS_FAVORITE ="SetFavorite";
+    private final static int SRC_LANG_ACTIVITY_REQUEST_CODE = 1,
+                             TRG_LANG_ACTIVITY_REQUEST_CODE = 2;
     private SharedPreferences mSettings;
     private TranslationSaver mSaver;
     private DictDefinition mCurDictDefinition;
@@ -215,13 +217,13 @@ public class TranslatorFragment extends Fragment implements
 
     private boolean clickOnGeneralContainer() {
         hideKeyboard();
-        UIUtils.showToast(getContext(), "clicked outside keyboard, keyboard hided");
+//        UIUtils.showToast(getContext(), "clicked outside keyboard, keyboard hided");
         return true;
     }
 
     private void clickOnSrcLangButton() {
         final Intent intent = new Intent(getActivity(), SourceLangActivity.class);
-        startActivityForResult(intent,1);
+        startActivityForResult(intent,SRC_LANG_ACTIVITY_REQUEST_CODE);
     }
 
     private void clickOnSwitchLangButton() {
@@ -240,12 +242,12 @@ public class TranslatorFragment extends Fragment implements
 
     private void clickOnTrgLangButton() {
         final Intent intent = new Intent(getActivity(), TargetLangActivity.class);
-        startActivityForResult(intent,2);
+        startActivityForResult(intent,TRG_LANG_ACTIVITY_REQUEST_CODE);
     }
 
     private void clickOnRetryButton() {
         requestTranslatorAPI();
-        UIUtils.showToast(getContext(), "retry was clicked");
+//        UIUtils.showToast(getContext(), "retry was clicked");
     }
 
     private void clickOnFullscreenButton() {
@@ -259,38 +261,43 @@ public class TranslatorFragment extends Fragment implements
     }
 
     private void clickOnGetPhotoOrSrcVoiceButton(){
-        UIUtils.showToast(getContext(), "get photo or source audio was clicked");
+//        UIUtils.showToast(getContext(), "get photo or source audio was clicked");
+        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
     private void clickOnGetSourceVoiceButton(){
-        UIUtils.showToast(getContext(), "get source voice was clicked");
+//        UIUtils.showToast(getContext(), "get source voice was clicked");
+        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
 
     private void clickOnGetTargetVoiceButton(){
-        UIUtils.showToast(getContext(), "get target audio was clicked");
+//        UIUtils.showToast(getContext(), "get target audio was clicked");
+        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
     private void clickOnSetFavoriteButton(final ImageButton view) {
-         final TranslatedItem item = mSaver.getCurTranslatedItem();
-         if (!item.isFavorite()) {
-             item.isFavoriteUp(true);
-             mSaver.setCurTranslatedItem(item);
-             mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
-             view.setImageResource(R.drawable.bookmark_black_shape_gold512);
-         } else {
-             item.isFavoriteUp(false);
-             mSaver.setCurTranslatedItem(item);
-             mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
-             view.setImageResource(R.drawable.bookmark_black_shape_dark512);
-         }
-        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-        UIUtils.showToast(getContext(), "set favorite was clicked");
+//         final TranslatedItem item = mSaver.getCurTranslatedItem();
+//         if (!item.isFavorite()) {
+//             item.isFavoriteUp(true);
+//             mSaver.setCurTranslatedItem(item);
+//             mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+//             view.setImageResource(R.drawable.bookmark_black_shape_gold512);
+//         } else {
+//             item.isFavoriteUp(false);
+//             mSaver.setCurTranslatedItem(item);
+//             mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+//             view.setImageResource(R.drawable.bookmark_black_shape_dark512);
+//         }
+//        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+//        UIUtils.showToast(getContext(), "set favorite was clicked");
+        UIUtils.showToast(getContext(), getResources().getString(R.string.set_favorite_message));
     }
 
 
     private void clickOnShareButton(){
-        UIUtils.showToast(getContext(), "share was clicked");
+//        UIUtils.showToast(getContext(), "share was clicked");
+        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
 
@@ -468,9 +475,8 @@ public class TranslatorFragment extends Fragment implements
                                             getResources(),
                                             getResources().getLayout(R.layout.edittext_border_active)));
                             mCustomEditText.setCursorVisible(true);
-
-
-                            mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(getActivity(),mMainActivityContainer,mNavigation);
+                            mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(
+                                    getActivity(),mMainActivityContainer,mNavigation);
                         } catch (XmlPullParserException | IOException e) {
                             e.printStackTrace();
                         }
@@ -481,8 +487,15 @@ public class TranslatorFragment extends Fragment implements
                                             getResources(),
                                             getResources().getLayout(R.layout.edittext_border)));
                             mCustomEditText.setCursorVisible(false);
+                            UIUtils.showBottomNavViewSetBottomPadding(getActivity(),
+                                    mMainActivityContainer,mNavigation,mBottomPadding);
 
-                            UIUtils.showBottomNavViewSetBottomPadding(getActivity(),mMainActivityContainer,mNavigation,mBottomPadding);
+                            if (!mCustomEditText.getText().toString().isEmpty() &&
+                                    mSaver != null &&
+                                    mSaver.getCurTranslatedItem() != null &&
+                                    !mSaver.getCurTranslatedItem().getSrcMeaning().
+                                            equals(mCustomEditText.getText().toString()))
+                                requestTranslatorAPI();
                         } catch (XmlPullParserException | IOException e) {
                             e.printStackTrace();
                         }
@@ -491,22 +504,24 @@ public class TranslatorFragment extends Fragment implements
     }
 
     public void hideKeyboard(){
-        final InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        final InputMethodManager in = (InputMethodManager)
+                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(mView.getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     public void showKeyboard(){
-        final InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        final InputMethodManager in = (InputMethodManager)
+                getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         in.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     public void initCustomEditText(){
+        mCustomEditText.setText(mSettings.getString(EDITTEXT_DATA, ""));
         if (!mCustomEditText.getText().toString().isEmpty()){
             mClearEditText.setVisibility(View.VISIBLE);
         } else {
             mClearEditText.setVisibility(View.INVISIBLE);
         }
-        mCustomEditText.setText(mSettings.getString(EDITTEXT_DATA, ""));
         mCustomEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         mCustomEditText.setOnEditorActionListener((v, actionId, event) -> {
@@ -611,9 +626,12 @@ public class TranslatorFragment extends Fragment implements
                 final int index = mHistoryTranslatedItems.indexOf(mCurTranslatedItem);
                 mCurTranslatedItem.setIsFavorite(mHistoryTranslatedItems.get(index).getIsFavorite());
                 mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
+                if (mCurTranslatedItem.isFavorite()){
+                    mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, mHistoryTranslatedItems.get(index));
+                    mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, mCurTranslatedItem);
+                }
             }
-        }
-    }
+    }   }
 
 
 
@@ -626,13 +644,13 @@ public class TranslatorFragment extends Fragment implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, final Intent data) {
         switch(requestCode){
-            case 1:
+            case SRC_LANG_ACTIVITY_REQUEST_CODE:
                 if (resultCode == AppCompatActivity.RESULT_OK){
                     String result = data.getStringExtra("result");
                     mButtonSrcLang.setText(result);
                 }
                 break;
-            case 2:
+            case TRG_LANG_ACTIVITY_REQUEST_CODE:
                 if (resultCode == AppCompatActivity.RESULT_OK){
                     String result = data.getStringExtra("result");
                     mButtonTrgLang.setText(result);

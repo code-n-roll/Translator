@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * Created by roman on 21.4.17.
+ *
  */
 
 public class TranslatorStateHolder {

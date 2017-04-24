@@ -16,4 +16,6 @@
     <string name="connection_error_content">Unable to connect to server. Please check your internet connection and try again.</string>
     <string name="retry_button">RETRY</string>
     <string name="empty_search">No matches were found</string>
+    <string name="next_release_message">Feature is not implemented, wait in the next release.</string>
+    <string name="set_favorite_message">Feature is implemented, but available in history/favorites tabs, more in the next release.</string>
 </resources>

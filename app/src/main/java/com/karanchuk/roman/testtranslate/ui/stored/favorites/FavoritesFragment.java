@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
@@ -27,6 +26,7 @@ import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceCont
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
+import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,7 +122,7 @@ public class FavoritesFragment extends Fragment implements
         mSearchViewFavorites.setIconifiedByDefault(false);
         mSearchViewFavorites.setQueryHint("Search in Favorites");
         mSearchViewFavorites.setOnQueryTextListener(this);
-
+        mSearchViewFavorites.setVisibility(View.GONE);
 
         mDividerItemDecoration =
                 new DividerItemDecoration(mFavoritesRecycler.getContext(), RecyclerView.VERTICAL);
@@ -156,7 +156,7 @@ public class FavoritesFragment extends Fragment implements
         }
         mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
 
-        Toast.makeText(getContext(),"isFavorite was clicked in favorites", Toast.LENGTH_SHORT).show();
+//        UIUtils.showToast(getContext(),"isFavorite was clicked in favorites");
     }
 
     private void clickOnItemStoredRecycler(final TranslatedItem item, final View view){
@@ -170,7 +170,7 @@ public class FavoritesFragment extends Fragment implements
         editor.putString(CUR_SELECTED_ITEM_TRG_LANG, item.getTrgLanguageForAPI());
         editor.apply();
         view.performClick();
-        Toast.makeText(getContext(),"item was clicked in favorites", Toast.LENGTH_SHORT).show();
+//        UIUtils.showToast(getContext(),"item was clicked in favorites");
     }
 
     private void findViewsOnFragment(){
@@ -223,6 +223,7 @@ public class FavoritesFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
+//        mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         newText = newText.toLowerCase();
         ArrayList<TranslatedItem> newList = new ArrayList<>();
         for (TranslatedItem item : mFavoritesTranslatedItems){
@@ -256,6 +257,8 @@ public class FavoritesFragment extends Fragment implements
             mCopyFavoritesTranslatedItems.clear();
             mCopyFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
             Collections.reverse(mCopyFavoritesTranslatedItems);
+
+//            mFavoritesRecycler.getAdapter().notifyDataSetChanged();
         });
     }
 
@@ -270,7 +273,7 @@ public class FavoritesFragment extends Fragment implements
     }
 
     @Override
-    public void onTranslatedItemChanged() {
+    public void onTranslatedItemsChanged() {
         if (mFavoritesRecycler != null) {
             mFavoritesTranslatedItems.clear();
             mFavoritesTranslatedItems.addAll(mCopyFavoritesTranslatedItems);
@@ -293,7 +296,7 @@ public class FavoritesFragment extends Fragment implements
                     performContextItemDeletion();
                     chooseCurView();
                     chooseClearStoredVisibility();
-                    Toast.makeText(getContext(), "item was longclicked contextmenu in favorites", Toast.LENGTH_SHORT).show();
+                    UIUtils.showToast(getContext(),"item was longclicked contextmenu in favorites");
                     return true;
                 default:
                     return super.onContextItemSelected(item);

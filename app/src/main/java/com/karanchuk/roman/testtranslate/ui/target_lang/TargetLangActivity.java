@@ -9,13 +9,13 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Language;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
+import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,7 +84,7 @@ public class TargetLangActivity extends AppCompatActivity {
             Intent returnIntent = new Intent();
             returnIntent.putExtra("result",language.getName());
             setResult(AppCompatActivity.RESULT_OK,returnIntent);
-            Toast.makeText(getApplicationContext(),"selected "+language,Toast.LENGTH_SHORT).show();
+            UIUtils.showToast(getApplicationContext(),"selected "+language);
         }
         finish();
     }

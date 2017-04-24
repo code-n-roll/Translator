@@ -7,7 +7,6 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
@@ -145,19 +144,21 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDialogPositiveClick(ClearStoredDialogFragment dialog) {
-        Toast.makeText(this, "yes was clicked", Toast.LENGTH_SHORT).show();
+//        UIUtils.showToast(this, "yes was clicked");
         String curTitle = dialog.getArguments().getString("title");
         if (curTitle != null) {
             switch (curTitle) {
                 case " History":
                     if (!mHistoryTranslatedItems.isEmpty()) {
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+//                        mContentManager.notifyTranslatedItemChanged();
                     }
                     break;
                 case " Favorites":
                     if (!mFavoritesTranslatedItems.isEmpty()) {
                         mRepository.updateIsFavoriteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY, false);
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+//                        mContentManager.notifyTranslatedItemChanged();
                     }
                     break;
                 default:
@@ -170,8 +171,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDialogNegativeClick(ClearStoredDialogFragment dialog) {
-        Toast.makeText(this,"cancel was clicked", Toast.LENGTH_SHORT).show();
-
+//        UIUtils.showToast(this,"cancel was clicked");
     }
 
     @Override

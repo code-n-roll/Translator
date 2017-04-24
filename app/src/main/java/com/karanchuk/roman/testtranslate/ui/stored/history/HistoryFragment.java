@@ -26,7 +26,6 @@ import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceCont
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
-import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,7 +109,7 @@ public class HistoryFragment extends Fragment implements
         mSearchViewHistory.setIconifiedByDefault(false);
         mSearchViewHistory.setQueryHint("Search in History");
         mSearchViewHistory.setOnQueryTextListener(this);
-
+        mSearchViewHistory.setVisibility(View.GONE);
 
         final BottomNavigationView navigation = (BottomNavigationView)
                 getActivity().findViewById(R.id.navigation);
@@ -149,7 +148,7 @@ public class HistoryFragment extends Fragment implements
         editor.apply();
         view.performClick();
 //                        TranslatorStateHolder.getInstance().notifyShowSelectedItem();
-        UIUtils.showToast(getContext(), "item was clicked in history");
+//        UIUtils.showToast(getContext(), "item was clicked in history");
     }
 
     private void clickOnSetFavoriteItem(final TranslatedItem item){
@@ -163,7 +162,7 @@ public class HistoryFragment extends Fragment implements
         mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
         mHistoryRecycler.getAdapter().notifyItemChanged(mHistoryTranslatedItems.indexOf(item));
 
-        UIUtils.showToast(getContext(), "isFavorite was clicked in history");
+//        UIUtils.showToast(getContext(), "isFavorite was clicked in history");
     }
 
     private void findViewsOnFragment(){
@@ -217,10 +216,13 @@ public class HistoryFragment extends Fragment implements
 
     @Override
     public void onHistoryTranslatedItemsChanged() {
+
         mMainHandler.post(() -> {
             mHistoryTranslatedItems.clear();
             mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
             Collections.reverse(mHistoryTranslatedItems);
+
+//            mHistoryRecycler.getAdapter().notifyDataSetChanged();
         });
     }
 
@@ -230,6 +232,7 @@ public class HistoryFragment extends Fragment implements
             mFavoritesTranslatedItems.clear();
             mFavoritesTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
             Collections.reverse(mFavoritesTranslatedItems);
+
         });
     }
 
@@ -240,7 +243,7 @@ public class HistoryFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-
+//        mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
         newText = newText.toLowerCase();
         final ArrayList<TranslatedItem> newList = new ArrayList<>();
         for (TranslatedItem item : mHistoryTranslatedItems){
@@ -269,10 +272,11 @@ public class HistoryFragment extends Fragment implements
 
 
     @Override
-    public void onTranslatedItemChanged() {
+    public void onTranslatedItemsChanged() {
         if (mHistoryRecycler != null) {
             mHistoryTranslatedItems.clear();
-            mHistoryTranslatedItems.addAll(mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+            mHistoryTranslatedItems.addAll(
+                    mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
             Collections.reverse(mHistoryTranslatedItems);
             chooseCurView();
             mHistoryRecycler.getAdapter().notifyDataSetChanged();
@@ -293,7 +297,7 @@ public class HistoryFragment extends Fragment implements
                     performContextItemDeletion();
                     chooseCurView();
                     chooseClearStoredVisibility();
-                    UIUtils.showToast(getContext(), "item was longclicked contextmenu in history");
+//                    UIUtils.showToast(getContext(), "item was longclicked contextmenu in history");
                     return true;
                 default:
                     return super.onContextItemSelected(item);

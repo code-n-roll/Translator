@@ -58,6 +58,8 @@ public class StoredFragment extends Fragment implements
     private int mBottomPadding;
     private BottomNavigationView mNavigation;
     private Bundle mBundle;
+    private static final int HISTORY_FRAGMENT = 0,
+                             FAVORITES_FRAGMENT = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,19 +115,20 @@ public class StoredFragment extends Fragment implements
 
     private void clickOnClearStored(final Bundle bundle){
         switch(mViewPager.getCurrentItem()) {
-            case 0:
-                bundle.putString("title"," History");
-                mClearHistoryDialog.setArguments(bundle);
-                mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_DIALOG);
+            case HISTORY_FRAGMENT:
+//                bundle.putString("title"," History");
+//                mClearHistoryDialog.setArguments(bundle);
+//                mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_DIALOG);
                 break;
-            case 1:
-                bundle.putString("title"," Favorites");
-                mClearHistoryDialog.setArguments(bundle);
-                mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_FAVORITES);
+            case FAVORITES_FRAGMENT:
+//                bundle.putString("title"," Favorites");
+//                mClearHistoryDialog.setArguments(bundle);
+//                mClearHistoryDialog.show(getFragmentManager(), CLEAR_HISTORY_FAVORITES);
                 break;
             default:
                 break;
         }
+        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
     @Override

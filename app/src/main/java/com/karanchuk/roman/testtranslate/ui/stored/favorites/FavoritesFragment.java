@@ -27,7 +27,6 @@ import com.karanchuk.roman.testtranslate.data.source.local.TablesPersistenceCont
 import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -175,17 +174,16 @@ public class FavoritesFragment extends Fragment implements
     }
 
     private void findViewsOnFragment(){
-        ViewSearcher viewSearcher = new ViewSearcher(mView);
-        mEmptyView =  viewSearcher.findViewById(R.id.include_content_favorites_empty_item_list);
-        mContentView = viewSearcher.findViewById(R.id.include_content_favorites_full_item_list);
-        mEmptySearchView = viewSearcher.findViewById(R.id.include_content_favorites_empty_search);
-        mTextViewEmptyFavorites = viewSearcher.findViewById(R.id.textview_empty_item_list);
-        mImageViewEmptyFavorites = viewSearcher.findViewById(R.id.imageview_empty_item_list);
-        mTextViewEmptySearch = viewSearcher.findViewById(R.id.textview_empty_search);
-        mImageViewEmptySearch = viewSearcher.findViewById(R.id.imageview_empty_search);
-        mButtonIsFavorite = viewSearcher.findViewById(R.id.imagebutton_isfavorite_favorite_item);
-        mFavoritesRecycler = viewSearcher.findViewById(R.id.favorites_items_list);
-        mSearchViewFavorites = viewSearcher.findViewById(R.id.search_view_favorites);
+        mEmptyView =  mView.findViewById(R.id.include_content_favorites_empty_item_list);
+        mContentView = mView.findViewById(R.id.include_content_favorites_full_item_list);
+        mEmptySearchView = mView.findViewById(R.id.include_content_favorites_empty_search);
+        mTextViewEmptyFavorites = (TextView) mView.findViewById(R.id.textview_empty_item_list);
+        mImageViewEmptyFavorites = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
+        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
+        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
+        mButtonIsFavorite = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+        mFavoritesRecycler = (RecyclerView) mView.findViewById(R.id.favorites_items_list);
+        mSearchViewFavorites = (SearchView) mView.findViewById(R.id.search_view_favorites);
     }
 
     @Override

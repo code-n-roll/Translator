@@ -27,7 +27,6 @@ import com.karanchuk.roman.testtranslate.data.source.local.TranslatorLocalDataSo
 import com.karanchuk.roman.testtranslate.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,7 +83,7 @@ public class HistoryFragment extends Fragment implements
 
         View parentView = getParentFragment().getView();
         if (parentView != null)
-            mClearStored = new ViewSearcher(parentView).findViewById(R.id.imagebutton_clear_stored);
+            mClearStored = (ImageButton) parentView.findViewById(R.id.imagebutton_clear_stored);
 
 
         mContentManager = ContentManager.getInstance();
@@ -168,20 +167,19 @@ public class HistoryFragment extends Fragment implements
     }
 
     private void findViewsOnFragment(){
-        final ViewSearcher viewSearcher = new ViewSearcher(mView);
 
-        mEmptyView = viewSearcher.findViewById(R.id.include_content_history_empty_item_list);
-        mContentView = viewSearcher.findViewById(R.id.include_content_history_full_item_list);
-        mEmptySearchView = viewSearcher.findViewById(R.id.include_content_history_empty_search);
+        mEmptyView = mView.findViewById(R.id.include_content_history_empty_item_list);
+        mContentView = mView.findViewById(R.id.include_content_history_full_item_list);
+        mEmptySearchView = mView.findViewById(R.id.include_content_history_empty_search);
 
-        mTextViewEmptyContent = viewSearcher.findViewById(R.id.textview_empty_item_list);
-        mImageViewEmptyContent = viewSearcher.findViewById(R.id.imageview_empty_item_list);
+        mTextViewEmptyContent = (TextView) mView.findViewById(R.id.textview_empty_item_list);
+        mImageViewEmptyContent = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
 
-        mTextViewEmptySearch = viewSearcher.findViewById(R.id.textview_empty_search);
-        mImageViewEmptySearch = viewSearcher.findViewById(R.id.imageview_empty_search);
+        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
+        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
 
-        mHistoryRecycler = viewSearcher.findViewById(R.id.history_items_list);
-        mSearchViewHistory = viewSearcher.findViewById(R.id.search_view_history);
+        mHistoryRecycler = (RecyclerView) mView.findViewById(R.id.history_items_list);
+        mSearchViewHistory = (SearchView) mView.findViewById(R.id.search_view_history);
     }
 
     @Override

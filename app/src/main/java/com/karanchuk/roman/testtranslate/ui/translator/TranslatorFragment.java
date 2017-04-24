@@ -48,7 +48,6 @@ import com.karanchuk.roman.testtranslate.ui.view.CustomEditText;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.TranslatorAPIUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
@@ -181,36 +180,34 @@ public class TranslatorFragment extends Fragment implements
 
 
     private void findViewsOnFragment(){
-        ViewSearcher viewSearcher = new ViewSearcher(mView);
-        mCustomEditText = viewSearcher.findViewById(R.id.edittext);
-        mButtonGetPhotoOrSrcVoice = viewSearcher.findViewById(R.id.get_audio_spelling);
-        mButtonGetSourceVoice = viewSearcher.findViewById(R.id.get_source_voice);
-        mButtonGetTargetVoice = viewSearcher.findViewById(R.id.get_target_voice);
-        mButtonSetFavorite = viewSearcher.findViewById(R.id.set_favorite);
-        mButtonShare = viewSearcher.findViewById(R.id.share_translated_word);
-        mButtonFullscreen = viewSearcher.findViewById(R.id.fullscreen_translated_word);
-        mClearEditText = viewSearcher.findViewById(R.id.clear_edittext);
-        mButtonRetry = viewSearcher.findViewById(R.id.button_connection_error_retry);
-        mTranslatedResult = viewSearcher.findViewById(R.id.textview_translate_result);
-        mContainerEdittext = viewSearcher.findViewById(R.id.container_edittext);
-        mContainerSuccesful = viewSearcher.findViewById(R.id.connection_succesful_content);
-        mContainerError = viewSearcher.findViewById(R.id.connection_error_content);
-        mTranslateRecyclerView = viewSearcher.findViewById(R.id.container_dict_defin);
-        mGeneralContainer = viewSearcher.findViewById(R.id.general_container);
-        mProgressBar = viewSearcher.findViewById(R.id.fragment_translator_progressbar);
+        mCustomEditText = (CustomEditText) mView.findViewById(R.id.edittext);
+        mButtonGetPhotoOrSrcVoice = (ImageButton) mView.findViewById(R.id.get_audio_spelling);
+        mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
+        mButtonGetTargetVoice = (ImageButton) mView.findViewById(R.id.get_target_voice);
+        mButtonSetFavorite = (ImageButton) mView.findViewById(R.id.set_favorite);
+        mButtonShare = (ImageButton) mView.findViewById(R.id.share_translated_word);
+        mButtonFullscreen = (ImageButton) mView.findViewById(R.id.fullscreen_translated_word);
+        mClearEditText = (ImageButton) mView.findViewById(R.id.clear_edittext);
+        mButtonRetry = (Button) mView.findViewById(R.id.button_connection_error_retry);
+        mTranslatedResult = (TextView) mView.findViewById(R.id.textview_translate_result);
+        mContainerEdittext = (RelativeLayout) mView.findViewById(R.id.container_edittext);
+        mContainerSuccesful = (RelativeLayout) mView.findViewById(R.id.connection_succesful_content);
+        mContainerError = (RelativeLayout) mView.findViewById(R.id.connection_error_content);
+        mTranslateRecyclerView = (RecyclerView) mView.findViewById(R.id.container_dict_defin);
+        mGeneralContainer = (LinearLayout) mView.findViewById(R.id.general_container);
+        mProgressBar = (ProgressBar) mView.findViewById(R.id.fragment_translator_progressbar);
     }
 
     private void findViewsOnActivity(){
-        ViewSearcher viewSearcher = new ViewSearcher(getActivity().getWindow().getDecorView().getRootView());
-        mNavigation = viewSearcher.findViewById(R.id.navigation);
-        mMainActivityContainer = viewSearcher.findViewById(R.id.main_activity_container);
+        mNavigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
+        mMainActivityContainer = (FrameLayout) getActivity().findViewById(R.id.main_activity_container);
     }
 
     private void findViewsOnActionBar(){
-        ViewSearcher viewSearcher = new ViewSearcher(mActionBar.getCustomView());
-        mButtonSwitchLang = viewSearcher.findViewById(R.id.center_actionbar_button);
-        mButtonSrcLang = viewSearcher.findViewById(R.id.left_actionbar_button);
-        mButtonTrgLang = viewSearcher.findViewById(R.id.right_actionbar_button);
+        View mActionBarView = mActionBar.getCustomView();
+        mButtonSwitchLang = (ImageButton) mActionBarView.findViewById(R.id.center_actionbar_button);
+        mButtonSrcLang = (Button) mActionBarView.findViewById(R.id.left_actionbar_button);
+        mButtonTrgLang = (Button) mActionBarView.findViewById(R.id.right_actionbar_button);
         mButtonSrcLang.setText(mSettings.getString(SRC_LANG, "Choose language"));
         mButtonTrgLang.setText(mSettings.getString(TRG_LANG, "Choose language"));
     }

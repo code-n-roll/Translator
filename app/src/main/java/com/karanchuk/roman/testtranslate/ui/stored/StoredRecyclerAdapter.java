@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatedItem;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,11 +86,10 @@ public class StoredRecyclerAdapter extends
             mView = view;
             view.setOnCreateContextMenuListener(this);
 
-            ViewSearcher viewSearcher = new ViewSearcher(mView);
-            mIsFavoriteView = viewSearcher.findViewById(R.id.imagebutton_isfavorite_favorite_item);
-            mSrcTrgLanguage = viewSearcher.findViewById(R.id.src_trg_languages);
-            mSrcMeaning = viewSearcher.findViewById(R.id.src_meaning);
-            mTrgMeaning = viewSearcher.findViewById(R.id.trg_meaning);
+            mIsFavoriteView = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+            mSrcTrgLanguage = (TextView) mView.findViewById(R.id.src_trg_languages);
+            mSrcMeaning = (TextView) mView.findViewById(R.id.src_meaning);
+            mTrgMeaning = (TextView) mView.findViewById(R.id.trg_meaning);
         }
 
         public void bind(final TranslatedItem item,

@@ -25,7 +25,6 @@ import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.ui.view.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
@@ -107,11 +106,9 @@ public class StoredFragment extends Fragment implements
     }
 
     private void findViewsOnFragment(){
-        ViewSearcher viewSearcher = new ViewSearcher(mView);
-
-        mTabLayout = viewSearcher.findViewById(R.id.tablayout_favorites);
-        mViewPager = viewSearcher.findViewById(R.id.viewpager_stored);
-        mClearStored = viewSearcher.findViewById(R.id.imagebutton_clear_stored);
+        mTabLayout = (TabLayout) mView.findViewById(R.id.tablayout_favorites);
+        mViewPager = (ViewPager) mView.findViewById(R.id.viewpager_stored);
+        mClearStored = (ImageButton) mView.findViewById(R.id.imagebutton_clear_stored);
     }
 
     private void clickOnClearStored(final Bundle bundle){

@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Language;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.List;
 
@@ -58,9 +57,8 @@ public class TargetLangRecyclerAdapter extends
             super(view);
             mView = view;
 
-            ViewSearcher viewSearcher = new ViewSearcher(mView);
-            mLanguage = viewSearcher.findViewById(R.id.choose_src_trg_lang);
-            mIsSelected = viewSearcher.findViewById(R.id.selected_choose_src_trg_lang);
+            mLanguage = (TextView) mView.findViewById(R.id.choose_src_trg_lang);
+            mIsSelected = (ImageView) mView.findViewById(R.id.selected_choose_src_trg_lang);
         }
 
 

@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.Translation;
-import com.karanchuk.roman.testtranslate.utils.ViewSearcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +51,10 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
             super(view);
             mView = view;
 
-            ViewSearcher viewSearcher = new ViewSearcher(mView);
-            mNumberDictDefinItem = viewSearcher.findViewById(R.id.number_dict_defin_item);
-            mTranslDictDefinItem = viewSearcher.findViewById(R.id.transl_dict_defin_item);
-            mMeanDictDefinItem = viewSearcher.findViewById(R.id.mean_dict_defin_item);
-            mExprDictDefinItem = viewSearcher.findViewById(R.id.expr_dict_defin_item);
+            mNumberDictDefinItem = (TextView) mView.findViewById(R.id.number_dict_defin_item);
+            mTranslDictDefinItem = (TextView) mView.findViewById(R.id.transl_dict_defin_item);
+            mMeanDictDefinItem = (TextView) mView.findViewById(R.id.mean_dict_defin_item);
+            mExprDictDefinItem = (TextView) mView.findViewById(R.id.expr_dict_defin_item);
         }
 
         public void bind(final Translation item){

@@ -6,10 +6,10 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.karanchuk.roman.testtranslate.data.DictDefinition;
-import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
-import com.karanchuk.roman.testtranslate.data.Synonym;
-import com.karanchuk.roman.testtranslate.data.Translation;
+import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
+import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
+import com.karanchuk.roman.testtranslate.presentation.model.Synonym;
+import com.karanchuk.roman.testtranslate.presentation.model.Translation;
 
 import java.io.IOException;
 import java.io.InputStream;

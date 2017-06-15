@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.karanchuk.roman.testtranslate.data.TranslatedItem;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
+import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
+import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
+import com.karanchuk.roman.testtranslate.presentation.view.translator.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.List;

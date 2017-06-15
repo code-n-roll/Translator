@@ -6,12 +6,12 @@ import android.util.Log;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.karanchuk.roman.testtranslate.data.DictDefinition;
-import com.karanchuk.roman.testtranslate.data.PartOfSpeech;
-import com.karanchuk.roman.testtranslate.data.Translation;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorRecyclerAdapter;
-import com.karanchuk.roman.testtranslate.ui.translator.TranslatorStateHolder;
+import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
+import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
+import com.karanchuk.roman.testtranslate.presentation.model.Translation;
+import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
+import com.karanchuk.roman.testtranslate.presentation.view.translator.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;

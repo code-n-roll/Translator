@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.presentation.view;
+package com.karanchuk.roman.testtranslate.presentation.view.dialog_fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

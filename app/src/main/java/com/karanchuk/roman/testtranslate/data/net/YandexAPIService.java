@@ -1,5 +1,7 @@
 package com.karanchuk.roman.testtranslate.data.net;
 
+//import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
+
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 
 import io.reactivex.Observable;

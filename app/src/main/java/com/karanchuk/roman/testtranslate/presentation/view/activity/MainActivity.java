@@ -14,7 +14,7 @@ import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
-import com.karanchuk.roman.testtranslate.presentation.view.ClearStoredDialogFragment;
+import com.karanchuk.roman.testtranslate.presentation.view.dialog_fragment.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.presentation.view.fragment.SettingsFragment;
 import com.karanchuk.roman.testtranslate.presentation.view.fragment.StoredFragment;
 import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
@@ -23,15 +23,17 @@ import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
 import java.util.List;
 
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_FRAGMENT_TAG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.SETTINGS_FRAGMENT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.STORED_FRAGMENT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSLATOR_FRAGMENT;
+
 public class MainActivity extends AppCompatActivity implements
         ClearStoredDialogFragment.ClearStoredDialogListener,
         TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver{
 
-    public static String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT";
-    public static String STORED_FRAGMENT = "STORED_FRAGMENT";
-    public static String SETTINGS_FRAGMENT = "SETTINGS_FRAGMENT";
-    public static String CUR_FRAGMENT_TAG = "CUR_FRAGMENT_TAG";
+
     private String mCurFragmentTag = "TRANSLATOR_FRAGMENT";
     private List<TranslatedItem> mHistoryTranslatedItems;
     private List<TranslatedItem> mFavoritesTranslatedItems;

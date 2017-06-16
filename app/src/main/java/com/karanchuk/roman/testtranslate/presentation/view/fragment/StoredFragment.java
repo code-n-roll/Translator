@@ -20,8 +20,8 @@ import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.local.TablesPersistenceContract;
 import com.karanchuk.roman.testtranslate.data.local.TranslatorLocalDataSource;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
-import com.karanchuk.roman.testtranslate.presentation.view.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.StoredPagerAdapter;
+import com.karanchuk.roman.testtranslate.presentation.view.dialog_fragment.ClearStoredDialogFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
@@ -39,26 +39,30 @@ public class StoredFragment extends Fragment implements
         TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepository.FavoritesTranslatedItemsRepositoryObserver
 {
-    private ViewPager mViewPager;
+    private static final String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG";
+    private static final String CLEAR_HISTORY_FAVORITES = "CLEAR_HISTORY_FAVORITES";
+    private static final int HISTORY_FRAGMENT = 0;
+    private static final int FAVORITES_FRAGMENT = 1;
+
     private StoredPagerAdapter mFavoritesAdapter;
+    private ViewPager mViewPager;
     private TabLayout mTabLayout;
-    private List<Fragment> mFragments;
-    private List<String> mTitles;
     private ImageButton mClearStored;
     private View mView, mMainActivityContainer;
-    private TranslatorRepository mRepository;
+    private BottomNavigationView mNavigation;
+
+    private List<Fragment> mFragments;
+    private List<TranslatedItem> mFavoritesItems;
+    private List<TranslatedItem> mHistoryItems;
+    private List<String> mTitles;
+
     private ClearStoredDialogFragment mClearHistoryDialog;
-    private static String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG";
-    private static String CLEAR_HISTORY_FAVORITES = "CLEAR_HISTORY_FAVORITES";
+    private TranslatorRepository mRepository;
     private ContentManager mContentManager;
     private Handler mMainHandler;
-    private List<TranslatedItem> mFavoritesItems, mHistoryItems;
     private int curPosition = 0;
     private int mBottomPadding;
-    private BottomNavigationView mNavigation;
     private Bundle mBundle;
-    private static final int HISTORY_FRAGMENT = 0,
-                             FAVORITES_FRAGMENT = 1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,7 +73,7 @@ public class StoredFragment extends Fragment implements
         mMainHandler = new Handler(Looper.getMainLooper());
 
         mMainActivityContainer = getActivity().findViewById(R.id.main_activity_container);
-        mNavigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
+        mNavigation = getActivity().findViewById(R.id.navigation);
 
 
         mContentManager = ContentManager.getInstance();
@@ -107,9 +111,9 @@ public class StoredFragment extends Fragment implements
     }
 
     private void findViewsOnFragment(){
-        mTabLayout = (TabLayout) mView.findViewById(R.id.tablayout_favorites);
-        mViewPager = (ViewPager) mView.findViewById(R.id.viewpager_stored);
-        mClearStored = (ImageButton) mView.findViewById(R.id.imagebutton_clear_stored);
+        mTabLayout = mView.findViewById(R.id.tablayout_favorites);
+        mViewPager = mView.findViewById(R.id.viewpager_stored);
+        mClearStored = mView.findViewById(R.id.imagebutton_clear_stored);
     }
 
     private void clickOnClearStored(final Bundle bundle){

@@ -5,5 +5,7 @@ package com.karanchuk.roman.testtranslate.presentation.presenter;
  */
 
 public interface BasePresenter {
+    void subscribe();
 
+    void unsubscribe();
 }

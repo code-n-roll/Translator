@@ -31,14 +31,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.karanchuk.roman.testtranslate.presentation.view.activity.SourceLangActivity.CUR_SELECTED_ITEM_SRC_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.activity.TargetLangActivity.CUR_SELECTED_ITEM_TRG_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.EDITTEXT_DATA;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.PREFS_NAME;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.SRC_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.TRANSL_CONTENT;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.TRANSL_RESULT;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.EDITTEXT_DATA;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_CONTENT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_RESULT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.UNIQUE_HISTORY_FRAGMENT_ID;
 
 /**
  * Created by roman on 9.4.17.
@@ -71,7 +72,6 @@ public class HistoryFragment extends Fragment implements
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
 
-    public final static int UNIQUE_HISTORY_FRAGMENT_ID = 1;
 
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,7 +82,7 @@ public class HistoryFragment extends Fragment implements
 
         View parentView = getParentFragment().getView();
         if (parentView != null)
-            mClearStored = (ImageButton) parentView.findViewById(R.id.imagebutton_clear_stored);
+            mClearStored = parentView.findViewById(R.id.imagebutton_clear_stored);
 
 
         mContentManager = ContentManager.getInstance();
@@ -111,8 +111,7 @@ public class HistoryFragment extends Fragment implements
         mSearchViewHistory.setOnQueryTextListener(this);
         mSearchViewHistory.setVisibility(View.GONE);
 
-        final BottomNavigationView navigation = (BottomNavigationView)
-                getActivity().findViewById(R.id.navigation);
+        final BottomNavigationView navigation = getActivity().findViewById(R.id.navigation);
         final View translatorNavView = navigation.findViewById(R.id.navigation_translate);
 
         mDividerItemDecoration =
@@ -171,14 +170,14 @@ public class HistoryFragment extends Fragment implements
         mContentView = mView.findViewById(R.id.include_content_history_full_item_list);
         mEmptySearchView = mView.findViewById(R.id.include_content_history_empty_search);
 
-        mTextViewEmptyContent = (TextView) mView.findViewById(R.id.textview_empty_item_list);
-        mImageViewEmptyContent = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
+        mTextViewEmptyContent = mView.findViewById(R.id.textview_empty_item_list);
+        mImageViewEmptyContent = mView.findViewById(R.id.imageview_empty_item_list);
 
-        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
-        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
+        mTextViewEmptySearch = mView.findViewById(R.id.textview_empty_search);
+        mImageViewEmptySearch = mView.findViewById(R.id.imageview_empty_search);
 
-        mHistoryRecycler = (RecyclerView) mView.findViewById(R.id.history_items_list);
-        mSearchViewHistory = (SearchView) mView.findViewById(R.id.search_view_history);
+        mHistoryRecycler = mView.findViewById(R.id.history_items_list);
+        mSearchViewHistory = mView.findViewById(R.id.search_view_history);
     }
 
     @Override

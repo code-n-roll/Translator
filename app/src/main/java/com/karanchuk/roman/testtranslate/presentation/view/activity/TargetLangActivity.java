@@ -23,7 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.PREFS_NAME;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
 
 /**
  * Created by roman on 10.4.17.
@@ -37,7 +38,6 @@ public class TargetLangActivity extends AppCompatActivity {
     private JsonObject mLangs;
     private Language mCurSelectedItem;
     private SharedPreferences mSettings;
-    public static String CUR_SELECTED_ITEM_TRG_LANG = "CUR_SELECTED_ITEM_TRG_LANG";
 
 
 

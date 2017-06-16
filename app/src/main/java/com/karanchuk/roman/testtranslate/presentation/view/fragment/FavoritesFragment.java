@@ -32,14 +32,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.karanchuk.roman.testtranslate.presentation.view.activity.SourceLangActivity.CUR_SELECTED_ITEM_SRC_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.activity.TargetLangActivity.CUR_SELECTED_ITEM_TRG_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.EDITTEXT_DATA;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.PREFS_NAME;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.SRC_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.TRANSL_CONTENT;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.TRANSL_RESULT;
-import static com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment.TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.EDITTEXT_DATA;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_CONTENT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_RESULT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.UNIQUE_FAVORITES_FRAGMENT_ID;
 
 /**
  * Created by roman on 9.4.17.
@@ -73,7 +74,6 @@ public class FavoritesFragment extends Fragment implements
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
 
-    public static int UNIQUE_FAVORITES_FRAGMENT_ID = 2;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class FavoritesFragment extends Fragment implements
 
         View parentView = getParentFragment().getView();
         if (parentView != null)
-            mClearStored = (ImageButton) parentView.findViewById(R.id.imagebutton_clear_stored);
+            mClearStored = parentView.findViewById(R.id.imagebutton_clear_stored);
 
         mContentManager = ContentManager.getInstance();
 
@@ -128,7 +128,7 @@ public class FavoritesFragment extends Fragment implements
                 new DividerItemDecoration(mFavoritesRecycler.getContext(), RecyclerView.VERTICAL);
         mFavoritesRecycler.addItemDecoration(mDividerItemDecoration);
 
-        final BottomNavigationView navigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
+        final BottomNavigationView navigation = getActivity().findViewById(R.id.navigation);
         final View translatorNavigationItem = navigation.findViewById(R.id.navigation_translate);
 
         mFavoritesRecycler.setAdapter(new StoredRecyclerAdapter(
@@ -177,13 +177,13 @@ public class FavoritesFragment extends Fragment implements
         mEmptyView =  mView.findViewById(R.id.include_content_favorites_empty_item_list);
         mContentView = mView.findViewById(R.id.include_content_favorites_full_item_list);
         mEmptySearchView = mView.findViewById(R.id.include_content_favorites_empty_search);
-        mTextViewEmptyFavorites = (TextView) mView.findViewById(R.id.textview_empty_item_list);
-        mImageViewEmptyFavorites = (ImageView) mView.findViewById(R.id.imageview_empty_item_list);
-        mTextViewEmptySearch = (TextView) mView.findViewById(R.id.textview_empty_search);
-        mImageViewEmptySearch = (ImageView) mView.findViewById(R.id.imageview_empty_search);
-        mButtonIsFavorite = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
-        mFavoritesRecycler = (RecyclerView) mView.findViewById(R.id.favorites_items_list);
-        mSearchViewFavorites = (SearchView) mView.findViewById(R.id.search_view_favorites);
+        mTextViewEmptyFavorites =  mView.findViewById(R.id.textview_empty_item_list);
+        mImageViewEmptyFavorites =  mView.findViewById(R.id.imageview_empty_item_list);
+        mTextViewEmptySearch =  mView.findViewById(R.id.textview_empty_search);
+        mImageViewEmptySearch =  mView.findViewById(R.id.imageview_empty_search);
+        mButtonIsFavorite = mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+        mFavoritesRecycler = mView.findViewById(R.id.favorites_items_list);
+        mSearchViewFavorites = mView.findViewById(R.id.search_view_favorites);
     }
 
     @Override

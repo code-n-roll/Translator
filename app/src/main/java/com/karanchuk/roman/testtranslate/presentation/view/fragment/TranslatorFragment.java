@@ -18,6 +18,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -41,12 +42,14 @@ import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.presentation.model.Translation;
-import com.karanchuk.roman.testtranslate.presentation.view.CustomEditText;
+import com.karanchuk.roman.testtranslate.presentation.presenter.translator.TranslatorPresenter;
+import com.karanchuk.roman.testtranslate.presentation.view.TranslatorView;
 import com.karanchuk.roman.testtranslate.presentation.view.activity.FullscreenActivity;
 import com.karanchuk.roman.testtranslate.presentation.view.activity.SourceLangActivity;
 import com.karanchuk.roman.testtranslate.presentation.view.activity.TargetLangActivity;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
-import com.karanchuk.roman.testtranslate.presentation.view.translator.TranslatorStateHolder;
+import com.karanchuk.roman.testtranslate.presentation.view.custom.CustomEditText;
+import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.TranslatorAPIUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
@@ -59,8 +62,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.karanchuk.roman.testtranslate.presentation.view.activity.SourceLangActivity.CUR_SELECTED_ITEM_SRC_LANG;
-import static com.karanchuk.roman.testtranslate.presentation.view.activity.TargetLangActivity.CUR_SELECTED_ITEM_TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CONT_ERROR_VISIBILITY;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CONT_SUCCESS_VISIBILITY;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_TRG_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.EDITTEXT_DATA;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.IS_FAVORITE;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.PROGRESS_BAR_VISIBILITY;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_CONTENT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_RESULT;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
 
 /**
  * Created by roman on 8.4.17.
@@ -69,9 +82,13 @@ import static com.karanchuk.roman.testtranslate.presentation.view.activity.Targe
 
 
 public class TranslatorFragment extends Fragment implements
-        TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
-        TranslatorStateHolder.OnTranslatorStateObserver
-{
+    TranslatorRepository.HistoryTranslatedItemsRepositoryObserver,
+    TranslatorStateHolder.OnTranslatorStateObserver,
+    TranslatorView {
+
+    private final static int SRC_LANG_ACTIVITY_REQUEST_CODE = 1;
+    private final static int TRG_LANG_ACTIVITY_REQUEST_CODE = 2;
+
     private CustomEditText mCustomEditText;
     private ImageButton mButtonGetPhotoOrSrcVoice;
     private ImageButton mButtonGetSourceVoice;
@@ -82,49 +99,45 @@ public class TranslatorFragment extends Fragment implements
     private ImageButton mClearEditText;
     private Button mButtonRetry;
     private TextView mTranslatedResult;
-    private RelativeLayout mContainerEdittext;
-    private RelativeLayout mContainerSuccesful;
-    private RelativeLayout mContainerError;
     private RecyclerView mTranslateRecyclerView;
     private LinearLayout mGeneralContainer;
     private ProgressBar mProgressBar;
     private ImageButton mButtonSwitchLang;
     private Button mButtonSrcLang;
     private Button mButtonTrgLang;
-    private FrameLayout mMainActivityContainer;
-    private BottomNavigationView mNavigation;
-
-
     private View mView;
     private ActionBar mActionBar;
-    private ArrayList<Translation> mTranslations;
+    private BottomNavigationView mNavigation;
+
+    private RelativeLayout mContainerEdittext;
+    private RelativeLayout mContainerSuccesful;
+    private RelativeLayout mContainerError;
+    private FrameLayout mMainActivityContainer;
+
     private RecyclerView.LayoutManager mLayoutManager;
+    private List<TranslatedItem> mHistoryTranslatedItems;
+    private ArrayList<Translation> mTranslations;
+    private JsonObject mLanguagesMap;
     private TranslatorRepository mRepository;
     private Handler mMainHandler;
-    private List<TranslatedItem> mHistoryTranslatedItems;
-    private JsonObject mLanguagesMap;
-    public final static String PREFS_NAME = "MyPrefsFile",
-            EDITTEXT_DATA = "EdittextData",
-            SRC_LANG = "ButtonSrcLangData",
-            TRG_LANG = "ButtonTrgLangData",
-            TRANSL_RESULT = "TextviewTranslResult",
-            TRANSL_CONTENT = "RecyclerViewTranslContent",
-            CONT_SUCCESS_VISIBILITY = "CONT_SUCCESS_VISIBILITY",
-            CONT_ERROR_VISIBILITY = "CONT_ERROR_VISIBILITY",
-            PROGRESS_BAR_VISIBILITY = "PROGRESS_BAR_VISIBILITY",
-            IS_FAVORITE ="SetFavorite";
-    private final static int SRC_LANG_ACTIVITY_REQUEST_CODE = 1,
-                             TRG_LANG_ACTIVITY_REQUEST_CODE = 2;
+
     private SharedPreferences mSettings;
     private TranslationSaver mSaver;
     private DictDefinition mCurDictDefinition;
     private int mBottomPadding;
     private TranslatorStateHolder mTranslatorStateHolder;
 
+    private TranslatorPresenter mPresenter;
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_translator, container, false);
+        return inflater.inflate(R.layout.fragment_translator, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 
@@ -162,73 +175,74 @@ public class TranslatorFragment extends Fragment implements
         mMainHandler = new Handler(getContext().getMainLooper());
         mSaver = new TranslationSaver();
 
+        initListeners();
 
-        mGeneralContainer.setOnTouchListener((view, event) -> clickOnGeneralContainer());
-        mButtonSrcLang.setOnClickListener(view -> clickOnSrcLangButton());
-        mButtonSwitchLang.setOnClickListener(view -> clickOnSwitchLangButton());
-        mButtonTrgLang.setOnClickListener(view -> clickOnTrgLangButton());
-        mButtonRetry.setOnClickListener(view -> clickOnRetryButton());
-        mButtonFullscreen.setOnClickListener(view -> clickOnFullscreenButton());
-        mClearEditText.setOnClickListener(view -> clickOnClearEditText());
-        mButtonGetPhotoOrSrcVoice.setOnClickListener(view -> clickOnGetPhotoOrSrcVoiceButton());
-        mButtonGetSourceVoice.setOnClickListener(view -> clickOnGetSourceVoiceButton());
-        mButtonGetTargetVoice.setOnClickListener(view -> clickOnGetTargetVoiceButton());
-        mButtonSetFavorite.setOnClickListener(view -> clickOnSetFavoriteButton(mButtonSetFavorite));
-        mButtonShare.setOnClickListener(view -> clickOnShareButton());
 
 //        mTvLink = (TextView) mView.findViewById(R.id.tv_link);
 //        mTvLink.setMovementMethod(LinkMovementMethod.getInstance());
-
-        return mView;
     }
 
+    private void initListeners(){
+        mGeneralContainer.setOnTouchListener((ignored, event) -> clickOnGeneralContainer(ignored, event));
+        mButtonSrcLang.setOnClickListener(this::clickOnSrcLangButton);
+        mButtonSwitchLang.setOnClickListener(this::clickOnSwitchLangButton);
+        mButtonTrgLang.setOnClickListener(this::clickOnTrgLangButton);
+        mButtonRetry.setOnClickListener(this::clickOnRetryButton);
+        mButtonFullscreen.setOnClickListener(this::clickOnFullscreenButton);
+        mClearEditText.setOnClickListener(this::clickOnClearEditText);
+        mButtonGetPhotoOrSrcVoice.setOnClickListener(this::clickOnGetPhotoOrSrcVoiceButton);
+        mButtonGetSourceVoice.setOnClickListener(this::clickOnGetSourceVoiceButton);
+        mButtonGetTargetVoice.setOnClickListener(this::clickOnGetTargetVoiceButton);
+        mButtonSetFavorite.setOnClickListener((ignored) -> clickOnSetFavoriteButton(mButtonSetFavorite));
+        mButtonShare.setOnClickListener(this::clickOnShareButton);
+    }
 
     private void findViewsOnFragment(){
-        mCustomEditText = (CustomEditText) mView.findViewById(R.id.edittext);
-        mButtonGetPhotoOrSrcVoice = (ImageButton) mView.findViewById(R.id.get_audio_spelling);
-        mButtonGetSourceVoice = (ImageButton) mView.findViewById(R.id.get_source_voice);
-        mButtonGetTargetVoice = (ImageButton) mView.findViewById(R.id.get_target_voice);
-        mButtonSetFavorite = (ImageButton) mView.findViewById(R.id.set_favorite);
-        mButtonShare = (ImageButton) mView.findViewById(R.id.share_translated_word);
-        mButtonFullscreen = (ImageButton) mView.findViewById(R.id.fullscreen_translated_word);
-        mClearEditText = (ImageButton) mView.findViewById(R.id.clear_edittext);
-        mButtonRetry = (Button) mView.findViewById(R.id.button_connection_error_retry);
-        mTranslatedResult = (TextView) mView.findViewById(R.id.textview_translate_result);
-        mContainerEdittext = (RelativeLayout) mView.findViewById(R.id.container_edittext);
-        mContainerSuccesful = (RelativeLayout) mView.findViewById(R.id.connection_succesful_content);
-        mContainerError = (RelativeLayout) mView.findViewById(R.id.connection_error_content);
-        mTranslateRecyclerView = (RecyclerView) mView.findViewById(R.id.container_dict_defin);
-        mGeneralContainer = (LinearLayout) mView.findViewById(R.id.general_container);
-        mProgressBar = (ProgressBar) mView.findViewById(R.id.fragment_translator_progressbar);
+        mCustomEditText = mView.findViewById(R.id.edittext);
+        mButtonGetPhotoOrSrcVoice = mView.findViewById(R.id.get_audio_spelling);
+        mButtonGetSourceVoice = mView.findViewById(R.id.get_source_voice);
+        mButtonGetTargetVoice = mView.findViewById(R.id.get_target_voice);
+        mButtonSetFavorite = mView.findViewById(R.id.set_favorite);
+        mButtonShare = mView.findViewById(R.id.share_translated_word);
+        mButtonFullscreen = mView.findViewById(R.id.fullscreen_translated_word);
+        mClearEditText = mView.findViewById(R.id.clear_edittext);
+        mButtonRetry = mView.findViewById(R.id.button_connection_error_retry);
+        mTranslatedResult = mView.findViewById(R.id.textview_translate_result);
+        mContainerEdittext = mView.findViewById(R.id.container_edittext);
+        mContainerSuccesful = mView.findViewById(R.id.connection_succesful_content);
+        mContainerError = mView.findViewById(R.id.connection_error_content);
+        mTranslateRecyclerView = mView.findViewById(R.id.container_dict_defin);
+        mGeneralContainer = mView.findViewById(R.id.general_container);
+        mProgressBar = mView.findViewById(R.id.fragment_translator_progressbar);
     }
 
     private void findViewsOnActivity(){
-        mNavigation = (BottomNavigationView) getActivity().findViewById(R.id.navigation);
-        mMainActivityContainer = (FrameLayout) getActivity().findViewById(R.id.main_activity_container);
+        mNavigation = getActivity().findViewById(R.id.navigation);
+        mMainActivityContainer = getActivity().findViewById(R.id.main_activity_container);
     }
 
     private void findViewsOnActionBar(){
         View mActionBarView = mActionBar.getCustomView();
-        mButtonSwitchLang = (ImageButton) mActionBarView.findViewById(R.id.center_actionbar_button);
-        mButtonSrcLang = (Button) mActionBarView.findViewById(R.id.left_actionbar_button);
-        mButtonTrgLang = (Button) mActionBarView.findViewById(R.id.right_actionbar_button);
+        mButtonSwitchLang = mActionBarView.findViewById(R.id.center_actionbar_button);
+        mButtonSrcLang = mActionBarView.findViewById(R.id.left_actionbar_button);
+        mButtonTrgLang = mActionBarView.findViewById(R.id.right_actionbar_button);
         mButtonSrcLang.setText(mSettings.getString(SRC_LANG, "Choose language"));
         mButtonTrgLang.setText(mSettings.getString(TRG_LANG, "Choose language"));
     }
 
 
-    private boolean clickOnGeneralContainer() {
+    private boolean clickOnGeneralContainer(View view, MotionEvent event) {
         hideKeyboard();
 //        UIUtils.showToast(getContext(), "clicked outside keyboard, keyboard hided");
         return true;
     }
 
-    private void clickOnSrcLangButton() {
+    private void clickOnSrcLangButton(View view) {
         final Intent intent = new Intent(getActivity(), SourceLangActivity.class);
         startActivityForResult(intent,SRC_LANG_ACTIVITY_REQUEST_CODE);
     }
 
-    private void clickOnSwitchLangButton() {
+    private void clickOnSwitchLangButton(View view) {
         final String srcText = mButtonSrcLang.getText().toString(),
                 trgText = mButtonTrgLang.getText().toString();
         mButtonSrcLang.setText(trgText);
@@ -242,38 +256,38 @@ public class TranslatorFragment extends Fragment implements
         editor.apply();
     }
 
-    private void clickOnTrgLangButton() {
+    private void clickOnTrgLangButton(View view) {
         final Intent intent = new Intent(getActivity(), TargetLangActivity.class);
         startActivityForResult(intent,TRG_LANG_ACTIVITY_REQUEST_CODE);
     }
 
-    private void clickOnRetryButton() {
+    private void clickOnRetryButton(View view) {
         requestTranslatorAPI();
 //        UIUtils.showToast(getContext(), "retry was clicked");
     }
 
-    private void clickOnFullscreenButton() {
+    private void clickOnFullscreenButton(View view) {
         final Intent intent = new Intent(getActivity(), FullscreenActivity.class);
         intent.putExtra("translated_result", mTranslatedResult.getText().toString());
         startActivity(intent);
     }
 
-    private void clickOnClearEditText(){
+    private void clickOnClearEditText(View view){
         mCustomEditText.getText().clear();
     }
 
-    private void clickOnGetPhotoOrSrcVoiceButton(){
+    private void clickOnGetPhotoOrSrcVoiceButton(View view){
 //        UIUtils.showToast(getContext(), "get photo or source audio was clicked");
         UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
-    private void clickOnGetSourceVoiceButton(){
+    private void clickOnGetSourceVoiceButton(View view){
 //        UIUtils.showToast(getContext(), "get source voice was clicked");
         UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
 
-    private void clickOnGetTargetVoiceButton(){
+    private void clickOnGetTargetVoiceButton(View view){
 //        UIUtils.showToast(getContext(), "get target audio was clicked");
         UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
@@ -297,7 +311,7 @@ public class TranslatorFragment extends Fragment implements
     }
 
 
-    private void clickOnShareButton(){
+    private void clickOnShareButton(View view){
 //        UIUtils.showToast(getContext(), "share was clicked");
         UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
@@ -383,6 +397,32 @@ public class TranslatorFragment extends Fragment implements
         mRepository.addHistoryContentObserver(this);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mRepository.removeHistoryContentObserver(this);
+        mTranslatorStateHolder.removeOnTranslatorAPIResultObserver(this);
+
+        saveToSharedPreferences();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
     public void restoreVisibility(final Bundle savedInstanceState, final View view, final String key){
         switch (Integer.parseInt(savedInstanceState.getString(key))){
             case View.GONE:
@@ -408,20 +448,6 @@ public class TranslatorFragment extends Fragment implements
         outState.putString(CONT_ERROR_VISIBILITY, String.valueOf(mContainerError.getVisibility()));
         outState.putString(CONT_SUCCESS_VISIBILITY, String.valueOf(mContainerSuccesful.getVisibility()));
         outState.putString(PROGRESS_BAR_VISIBILITY, String.valueOf(mProgressBar.getVisibility()));
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mRepository.removeHistoryContentObserver(this);
-        mTranslatorStateHolder.removeOnTranslatorAPIResultObserver(this);
-
-        saveToSharedPreferences();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     public void saveToSharedPreferences(){
@@ -586,6 +612,11 @@ public class TranslatorFragment extends Fragment implements
     @Override
     public void onShowSelectedItem() {
         mContainerSuccesful.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void setPresenter(TranslatorPresenter presenter) {
+        mPresenter = presenter;
     }
 
 

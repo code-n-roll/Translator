@@ -11,7 +11,7 @@ import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.presentation.model.Translation;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
-import com.karanchuk.roman.testtranslate.presentation.view.translator.TranslatorStateHolder;
+import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;

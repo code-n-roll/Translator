@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.presentation.view;
+package com.karanchuk.roman.testtranslate.presentation.view.custom;
 
 
 import android.content.Context;

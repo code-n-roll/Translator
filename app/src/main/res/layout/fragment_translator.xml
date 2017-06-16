@@ -14,7 +14,7 @@
         android:background="@layout/edittext_border"
         >
 
-        <com.karanchuk.roman.testtranslate.presentation.view.CustomEditText
+        <com.karanchuk.roman.testtranslate.presentation.view.custom.CustomEditText
             android:id="@+id/edittext"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

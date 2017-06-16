@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
 
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSLATED_RESULT;
+
 /**
  * Created by roman on 13.4.17.
  */
@@ -15,7 +17,6 @@ import com.karanchuk.roman.testtranslate.R;
 public class FullscreenActivity extends AppCompatActivity{
     private ImageButton mCloseFullscreen;
     private TextView mFullscreenText;
-    public final static String TRANSLATED_RESULT = "translated_result";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

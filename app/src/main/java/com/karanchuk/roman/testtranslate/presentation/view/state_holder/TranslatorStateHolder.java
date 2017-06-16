@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.presentation.view.translator;
+package com.karanchuk.roman.testtranslate.presentation.view.state_holder;
 
 import java.util.ArrayList;
 import java.util.List;

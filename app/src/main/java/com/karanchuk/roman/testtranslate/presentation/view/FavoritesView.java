@@ -1,6 +1,6 @@
 package com.karanchuk.roman.testtranslate.presentation.view;
 
-import com.karanchuk.roman.testtranslate.presentation.presenter.favorites.FavoritesPresenter;
+import com.karanchuk.roman.testtranslate.presentation.presenter.FavoritesPresenter;
 
 /**
  * Created by roman on 16.6.17.

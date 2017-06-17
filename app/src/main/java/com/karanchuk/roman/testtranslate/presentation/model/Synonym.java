@@ -1,11 +1,16 @@
 package com.karanchuk.roman.testtranslate.presentation.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by roman on 20.4.17.
  */
 
 public class Synonym {
+    @SerializedName("text")
     private String mText;
+
+    @SerializedName("pos")
     private String mGen;
 
     public Synonym(final String text,

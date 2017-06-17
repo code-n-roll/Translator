@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.utils;
+package com.karanchuk.roman.testtranslate.trash;
 
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
@@ -9,9 +9,10 @@ import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.presentation.model.Translation;
+import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
-import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
+import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,10 +34,8 @@ public class DictionaryAPIUtils {
             final String lookupText,
             final String translDirection,
             final RecyclerView rvTranslate,
-            final TranslatorFragment.TranslationSaver saver
-    ){
-
-
+            final TranslatorPresenterImpl.TranslationSaver saver)
+    {
         OkHttpClient client = new OkHttpClient();
 
         String url = "https://dictionary.yandex.net/api/v1/dicservice.json/lookup?"+

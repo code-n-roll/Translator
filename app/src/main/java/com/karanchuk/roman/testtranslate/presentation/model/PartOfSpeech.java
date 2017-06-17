@@ -1,5 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -7,7 +9,10 @@ import java.util.List;
  */
 
 public class PartOfSpeech {
+    @SerializedName("pos")
     private String mName;
+
+    @SerializedName("tr")
     private List<Translation> mTranslations;
 
     public PartOfSpeech(final String name,

@@ -1,9 +1,5 @@
 package com.karanchuk.roman.testtranslate.presentation.model;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.karanchuk.roman.testtranslate.utils.JsonUtils;
-
 import java.util.UUID;
 
 /**
@@ -168,8 +164,8 @@ public class TranslatedItem {
         return false;
     }
 
-    public DictDefinition getDictDefinitionFromStringRepr(final String dictDefinition){
-        final JsonObject jo = new JsonParser().parse(dictDefinition).getAsJsonObject();
-        return JsonUtils.getDictDefinitionFromJson(jo);
-    }
+//    public DictDefinition getDictDefinitionFromStringRepr(final String dictDefinition){
+//        final JsonObject jo = new JsonParser().parse(dictDefinition).getAsJsonObject();
+//        return JsonUtils.getDictDefinitionFromJson(jo);
+//    }
 }

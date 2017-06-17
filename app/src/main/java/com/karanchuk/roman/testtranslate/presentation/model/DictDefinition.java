@@ -1,5 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,10 @@ import java.util.List;
 public class DictDefinition {
     private String mText;
     private String mTranscription;
+
+    @SerializedName("def")
     private List<PartOfSpeech> mPartsOfSpeech;
+
     private String mJsonToStringRepr;
 
     public DictDefinition(final String text,
@@ -60,10 +65,11 @@ public class DictDefinition {
 
     @Override
     public String toString() {
-        String result = mText.
-                concat(" ").
-                concat(mTranscription).
-                concat("\n");
+        String result = "";
+//        String result = mText.
+//                concat(" ").
+//                concat(mTranscription).
+//                concat("\n");
         for (PartOfSpeech pOfs : mPartsOfSpeech){
             result = result.concat(pOfs.toString()).concat("\n");
         }

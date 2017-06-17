@@ -1,5 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -8,15 +10,22 @@ import java.util.List;
 
 public class Translation {
     private String mNumber;
+
+    @SerializedName("syn")
     private List<Synonym> mSynonyms;
-    private String mMeanings;
-    private String mExpressions;
+
+    @SerializedName("mean")
+    private List<Meaning> mMeanings;
+
+    @SerializedName("ex")
+    private List<Expression> mExpressions;
+
     private String mRepresentSynonyms;
 
     public Translation(final String number,
                        final List<Synonym> synonyms,
-                       final String meanings,
-                       final String expressions,
+                       final List<Meaning> meanings,
+                       final List<Expression> expressions,
                        final String representSynonyms) {
         mNumber = number;
         mSynonyms = synonyms;
@@ -49,28 +58,12 @@ public class Translation {
         mNumber = number;
     }
 
-
-    public String getMeanings() {
-        return mMeanings;
-    }
-
-    public void setMeanings(final String meanings) {
-        mMeanings = meanings;
-    }
-
-    public String getExpressions() {
-        return mExpressions;
-    }
-
-    public void setExpressions(final String expressions) {
-        mExpressions = expressions;
-    }
-
-
     @Override
     public String toString() {
-        String result = "".concat(
-                mNumber.concat(" "));
+        String result = "";
+        if (mNumber != null) {
+            result = mNumber.concat(" ");
+        }
         for (Synonym synonym : mSynonyms){
             result = result.concat(
                     synonym.getText().
@@ -82,9 +75,25 @@ public class Translation {
             result = result.substring(0, result.length()-2);
         }
         if (!mMeanings.isEmpty())
-            result = result.concat("\n").concat(mMeanings);
+            result = result.concat("\n").concat(mMeanings.toString());
         if (!mExpressions.isEmpty())
-            result = result.concat("\n").concat(mExpressions);
+            result = result.concat("\n").concat(mExpressions.toString());
         return result;
+    }
+
+    public List<Meaning> getMeanings() {
+        return mMeanings;
+    }
+
+    public void setMeanings(List<Meaning> meanings) {
+        mMeanings = meanings;
+    }
+
+    public List<Expression> getExpressions() {
+        return mExpressions;
+    }
+
+    public void setExpressions(List<Expression> expressions) {
+        mExpressions = expressions;
     }
 }

@@ -51,23 +51,23 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
             super(view);
             mView = view;
 
-            mNumberDictDefinItem = (TextView) mView.findViewById(R.id.number_dict_defin_item);
-            mTranslDictDefinItem = (TextView) mView.findViewById(R.id.transl_dict_defin_item);
-            mMeanDictDefinItem = (TextView) mView.findViewById(R.id.mean_dict_defin_item);
-            mExprDictDefinItem = (TextView) mView.findViewById(R.id.expr_dict_defin_item);
+            mNumberDictDefinItem = mView.findViewById(R.id.number_dict_defin_item);
+            mTranslDictDefinItem = mView.findViewById(R.id.transl_dict_defin_item);
+            mMeanDictDefinItem = mView.findViewById(R.id.mean_dict_defin_item);
+            mExprDictDefinItem = mView.findViewById(R.id.expr_dict_defin_item);
         }
 
         public void bind(final Translation item){
             mNumberDictDefinItem.setText(item.getNumber());
             mTranslDictDefinItem.setText(item.getRepresentSynonyms());
             if (!item.getMeanings().isEmpty()) {
-                mMeanDictDefinItem.setText(item.getMeanings());
+                mMeanDictDefinItem.setText(item.getMeanings().toString());
                 mMeanDictDefinItem.setVisibility(View.VISIBLE);
             } else {
                 mMeanDictDefinItem.setVisibility(View.GONE);
             }
             if (!item.getExpressions().isEmpty()){
-                mExprDictDefinItem.setText(item.getExpressions());
+                mExprDictDefinItem.setText(item.getExpressions().toString());
                 mExprDictDefinItem.setVisibility(View.VISIBLE);
             } else {
                 mExprDictDefinItem.setVisibility(View.GONE);

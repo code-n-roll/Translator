@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.utils;
+package com.karanchuk.roman.testtranslate.trash;
 
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -11,8 +11,9 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
-import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
+import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl;
 import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
+import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,7 @@ public class TranslatorAPIUtils {
                                     String trgLang,
                                     final TextView tvTranslateResult,
                                     final RecyclerView rvTranslate,
-                                    final TranslatorFragment.TranslationSaver saver,
+                                    final TranslatorPresenterImpl.TranslationSaver saver,
                                     final List<TranslatedItem> historyTranslatedItems,
                                     final SharedPreferences settings
                                     )

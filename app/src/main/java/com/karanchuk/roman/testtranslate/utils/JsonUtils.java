@@ -105,8 +105,8 @@ public class JsonUtils {
                     }
 
 
-                    translations.add(new Translation(String.valueOf(i), synonyms, meanings, exprs,
-                            JsonUtils.getRepresentSynonyms(synonyms)));
+//                    translations.add(new Translation(String.valueOf(i), synonyms, meanings, exprs,
+//                            JsonUtils.getRepresentSynonyms(synonyms)));
                     ++i;
                 }
                 String namePOS = pOfsJSON.getAsJsonObject().get("pos").getAsString();

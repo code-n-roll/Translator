@@ -42,7 +42,6 @@ import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.presentation.model.Translation;
 import com.karanchuk.roman.testtranslate.presentation.presenter.TranslatorPresenter;
 import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl;
-import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl.TranslationSaver;
 import com.karanchuk.roman.testtranslate.presentation.view.TranslatorView;
 import com.karanchuk.roman.testtranslate.presentation.view.activity.FullscreenActivity;
 import com.karanchuk.roman.testtranslate.presentation.view.activity.SourceLangActivity;
@@ -315,17 +314,18 @@ public class TranslatorFragment extends Fragment implements
 
         mTranslations = new ArrayList<>();
 
+        DictDefinition dictDefinition = null;
         if (!dictDefString.isEmpty()) {
-            DictDefinition dictDefinition = new Gson().fromJson(dictDefString, DictDefinition.class);
+            dictDefinition = new Gson().fromJson(dictDefString, DictDefinition.class);
             //        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
             //                JsonUtils.getJsonObjectFromFile(
             //                        getActivity().getAssets(),"translator_response.json"));
-            for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
-                for (Translation transl : POS.getTranslations()){
+            for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()) {
+                for (Translation transl : POS.getTranslations()) {
                     mTranslations.add(transl);
                 }
             }
-        }
+
 //        List<Synonym> synonyms = new ArrayList<>();
 //        synonyms.add(new Synonym("время","ср"));
 //        synonyms.add(new Synonym("раз","м"));
@@ -340,7 +340,15 @@ public class TranslatorFragment extends Fragment implements
 //                    "dayling saving time \u2014 летнее время\ntake some time \u2014 занять некоторое время",
 //                    synonyms.toString()));
 //        }
-        mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(mTranslations));
+
+        }
+        if (dictDefinition != null){
+            mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(
+                    mTranslations, dictDefinition.getPartsOfSpeech()));
+        } else {
+            mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(mTranslations, null));
+        }
+
     }
 
 
@@ -447,16 +455,16 @@ public class TranslatorFragment extends Fragment implements
                         showActiveInput();
                     } else if (!isOpen && isAdded()){
                         hideActiveInput();
-                        TranslationSaver saver = ((TranslatorPresenterImpl)mPresenter).getSaver();
-                        if (!mCustomEditText.getText().toString().isEmpty() &&
-                                saver != null &&
-                                saver.getCurTranslatedItem() != null &&
-                                !saver.getCurTranslatedItem()
-                                        .getSrcMeaning()
-                                        .equals(mCustomEditText.getText().toString())) {
-                            showLoading();
-                            mPresenter.requestTranslatorAPI();
-                        }
+//                        TranslationSaver saver = ((TranslatorPresenterImpl)mPresenter).getSaver();
+//                        if (!mCustomEditText.getText().toString().isEmpty() &&
+//                                saver != null &&
+//                                saver.getCurTranslatedItem() != null &&
+//                                !saver.getCurTranslatedItem()
+//                                        .getSrcMeaning()
+//                                        .equals(mCustomEditText.getText().toString())) {
+//                            showLoading();
+//                            mPresenter.requestTranslatorAPI();
+//                        }
                     }
                 });
     }
@@ -496,6 +504,8 @@ public class TranslatorFragment extends Fragment implements
 
         mCustomEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE && mCustomEditText.getText().length() != 0) {
+                showLoading();
+                hideSuccess();
                 mPresenter.requestTranslatorAPI();
                 Log.d("keyboard state", "ACTION_DONE & customEditText is not empty");
             }

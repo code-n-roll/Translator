@@ -69,11 +69,12 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     private DictionaryYandexAPI mDictionaryAPI;
     private String mRequestedText;
     private String mTranslationDirection;
+    private Gson mGson;
 
     public TranslatorPresenterImpl(TranslatorFragment view) {
         mView = view;
 
-
+        mGson = new Gson();
         mSaver = new TranslationSaver();
 
         mSettings = view.getActivity().getSharedPreferences(PREFS_NAME, 0);
@@ -90,7 +91,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
         final String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
         if (!dictDefString.isEmpty()){
-            mCurDictDefinition = new Gson().fromJson(dictDefString, DictDefinition.class);
+            mCurDictDefinition = mGson.fromJson(dictDefString, DictDefinition.class);
         }
 
         initTranslatorYandexAPI();
@@ -148,9 +149,9 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     public void requestDictionaryAPI() {
         mCompositeDisposable.add(mDictionaryAPI.getDictDefinition(DICTIONARY_API_KEY,
                 mRequestedText, mTranslationDirection)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeOn(Schedulers.io())
-        .subscribe(this::handleDictionaryResponse, this::handleDictionaryError));
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::handleDictionaryResponse, this::handleDictionaryError));
     }
 
     private void initTranslatorYandexAPI(){
@@ -205,7 +206,6 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     private void handleTranslatingResponse(TranslationResponse translation){
         Log.d("myLogs", translation.getText().toString());
         mView.mTranslatedResult.setText(translation.getText().get(0));
-        mView.showSuccess();
 
         requestDictionaryAPI();
     }
@@ -242,9 +242,9 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
             editor.putString(IS_FAVORITE, String.valueOf(false));
         }
         if (mSaver.getDictDefinition() != null) {
-            editor.putString(TRANSL_CONTENT, new Gson().toJson(mSaver.getDictDefinition()));
+            editor.putString(TRANSL_CONTENT, mGson.toJson(mSaver.getDictDefinition()));
         } else if (mCurDictDefinition != null){
-            editor.putString(TRANSL_CONTENT, mCurDictDefinition.getJsonToStringRepr());
+            editor.putString(TRANSL_CONTENT, mGson.toJson(mCurDictDefinition));
         } else {
             editor.putString(TRANSL_CONTENT, "");
         }
@@ -296,7 +296,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
                     mView.mCustomEditText.getText().toString(),
                     mView.mTranslatedResult.getText().toString(),
                     "false",
-                    mDictDefinition.getJsonToStringRepr()
+                    mGson.toJson(mDictDefinition)
             );
             if (!mHistoryTranslatedItems.contains(mCurTranslatedItem)) {
                 mRepository.saveTranslatedItem(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);

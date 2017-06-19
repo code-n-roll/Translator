@@ -26,8 +26,9 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
     private final ArrayList<Translation> mItems;
     private List<PartOfSpeech> mPartsOfSpeech;
 
-    public TranslatorRecyclerAdapter(final ArrayList<Translation> items){
+    public TranslatorRecyclerAdapter(final ArrayList<Translation> items, List<PartOfSpeech> partsOfSpeech){
         mItems = items;
+        mPartsOfSpeech = partsOfSpeech;
     }
 
     @Override
@@ -94,9 +95,12 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
         private void initHeaderAndSubHeaders(Translation item){
             if (item.getNumber().equals("1")){
                 if (mItems.indexOf(item) == 0) {
-                    if (mPartsOfSpeech != null){
+                    if (mPartsOfSpeech != null) {
                         mTextTranscription.setText(mPartsOfSpeech.get(0).getText());
-                        mTextTranscription.setGen(" ["+mPartsOfSpeech.get(0).getTranscription()+"]");
+                        mTextTranscription.setGenStyle(Typeface.NORMAL);
+                        if (mPartsOfSpeech.get(0).getTranscription() != null) {
+                            mTextTranscription.setGen(" [" + mPartsOfSpeech.get(0).getTranscription() + "]");
+                        }
                     }
                     mTextTranscription.setVisibility(View.VISIBLE);
                 } else {

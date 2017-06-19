@@ -30,7 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
@@ -50,7 +50,6 @@ import com.karanchuk.roman.testtranslate.presentation.view.activity.TargetLangAc
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.presentation.view.custom.CustomEditText;
 import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
-import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -167,13 +166,7 @@ public class TranslatorFragment extends Fragment implements
         initCustomEditText();
         initEventListenerKeyboardVisibility();
 
-
-
         initListeners();
-
-
-//        mTvLink = (TextView) mView.findViewById(R.id.tv_link);
-//        mTvLink.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void initListeners(){
@@ -256,8 +249,8 @@ public class TranslatorFragment extends Fragment implements
     }
 
     private void clickOnRetryButton(View view) {
-        hideSuccess();
         showLoading();
+        hideSuccess();
         mPresenter.requestTranslatorAPI();
         //        UIUtils.showToast(getContext(), "retry was clicked");
     }
@@ -323,9 +316,7 @@ public class TranslatorFragment extends Fragment implements
         mTranslations = new ArrayList<>();
 
         if (!dictDefString.isEmpty()) {
-            final DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
-                    new JsonParser().parse(dictDefString).getAsJsonObject()
-            );
+            DictDefinition dictDefinition = new Gson().fromJson(dictDefString, DictDefinition.class);
             //        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
             //                JsonUtils.getJsonObjectFromFile(
             //                        getActivity().getAssets(),"translator_response.json"));
@@ -478,6 +469,16 @@ public class TranslatorFragment extends Fragment implements
     }
 
     @Override
+    public void showClear() {
+        mClearEditText.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideClear() {
+        mClearEditText.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
     public void showKeyboard(){
         final InputMethodManager in = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -487,9 +488,9 @@ public class TranslatorFragment extends Fragment implements
     public void initCustomEditText(){
         mCustomEditText.setText(mSettings.getString(EDITTEXT_DATA, ""));
         if (!mCustomEditText.getText().toString().isEmpty()){
-            mClearEditText.setVisibility(View.VISIBLE);
+            showClear();
         } else {
-            mClearEditText.setVisibility(View.INVISIBLE);
+            hideClear();
         }
         mCustomEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
@@ -511,13 +512,13 @@ public class TranslatorFragment extends Fragment implements
                 if (mContainerError.getVisibility() == View.VISIBLE)
                     hideRetry();
                 if (mCustomEditText.getText().length() != 0 && !mClearEditText.isShown()){
-                    mClearEditText.setVisibility(View.VISIBLE);
+                    showClear();
                     mButtonGetPhotoOrSrcVoice.setImageResource(R.drawable.volume_up_indicator_dark512);
                 } else if (mCustomEditText.getText().length() == 0 && mClearEditText.isShown()){
-                    mClearEditText.setVisibility(View.INVISIBLE);
-                    mButtonGetPhotoOrSrcVoice.setImageResource(R.drawable.camera_dark512);
+                    hideClear();
                     hideSuccess();
                     clearContainerSuccess();
+                    mButtonGetPhotoOrSrcVoice.setImageResource(R.drawable.camera_dark512);
                     mPresenter.saveToSharedPreferences();
                 }
             }
@@ -552,6 +553,8 @@ public class TranslatorFragment extends Fragment implements
     public void onShowSelectedItem() {
         showSuccess();
     }
+
+
 
     @Override
     public void setPresenter(TranslatorPresenter presenter) {

@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
@@ -12,7 +13,6 @@ import com.karanchuk.roman.testtranslate.presentation.model.Translation;
 import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
-import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class DictionaryAPIUtils {
 
                 handler.post(() -> {
                     List<Translation> translations = new ArrayList<>();
-                    DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(jo);
+                    DictDefinition dictDefinition = new Gson().fromJson(jo, DictDefinition.class);
                     for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
                         translations.addAll(POS.getTranslations());
                     }

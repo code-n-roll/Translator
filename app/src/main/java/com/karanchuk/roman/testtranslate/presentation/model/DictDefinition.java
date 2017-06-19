@@ -66,10 +66,6 @@ public class DictDefinition {
     @Override
     public String toString() {
         String result = "";
-//        String result = mText.
-//                concat(" ").
-//                concat(mTranscription).
-//                concat("\n");
         for (PartOfSpeech pOfs : mPartsOfSpeech){
             result = result.concat(pOfs.toString()).concat("\n");
         }

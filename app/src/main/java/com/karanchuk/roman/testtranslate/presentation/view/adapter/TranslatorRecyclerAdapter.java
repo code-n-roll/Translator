@@ -94,17 +94,21 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
         private void initHeaderAndSubHeaders(Translation item){
             if (item.getNumber().equals("1")){
                 if (mItems.indexOf(item) == 0) {
-                    mTextTranscription.setText(mPartsOfSpeech.get(0).getText());
-                    mTextTranscription.setGen(" ["+mPartsOfSpeech.get(0).getTranscription()+"]");
+                    if (mPartsOfSpeech != null){
+                        mTextTranscription.setText(mPartsOfSpeech.get(0).getText());
+                        mTextTranscription.setGen(" ["+mPartsOfSpeech.get(0).getTranscription()+"]");
+                    }
                     mTextTranscription.setVisibility(View.VISIBLE);
                 } else {
                     mTextTranscription.setVisibility(View.GONE);
                 }
 
-                for (PartOfSpeech partOfSpeech : mPartsOfSpeech){
-                    if (partOfSpeech.getTranslations().contains(item)){
-                        mLabelPartOfSpeech.setText(partOfSpeech.getName());
-                        break;
+                if (mPartsOfSpeech != null) {
+                    for (PartOfSpeech partOfSpeech : mPartsOfSpeech) {
+                        if (partOfSpeech.getTranslations().contains(item)) {
+                            mLabelPartOfSpeech.setText(partOfSpeech.getName());
+                            break;
+                        }
                     }
                 }
                 mLabelPartOfSpeech.setVisibility(View.VISIBLE);

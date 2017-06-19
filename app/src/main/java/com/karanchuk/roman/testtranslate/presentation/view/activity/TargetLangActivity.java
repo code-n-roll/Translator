@@ -50,7 +50,7 @@ public class TargetLangActivity extends AppCompatActivity {
 
 
         initToolbar();
-        mLangs = JsonUtils.getJsonObjectFromFile(getAssets(),"langs.json");
+        mLangs = JsonUtils.getJsonObjectFromAssetsFile(this, "langs.json");
 
         mLayoutManager = new LinearLayoutManager(this);
         mTrgLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_trg_lang);

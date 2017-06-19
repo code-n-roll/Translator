@@ -86,10 +86,10 @@ public class StoredRecyclerAdapter extends
             mView = view;
             view.setOnCreateContextMenuListener(this);
 
-            mIsFavoriteView = (ImageButton) mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
-            mSrcTrgLanguage = (TextView) mView.findViewById(R.id.src_trg_languages);
-            mSrcMeaning = (TextView) mView.findViewById(R.id.src_meaning);
-            mTrgMeaning = (TextView) mView.findViewById(R.id.trg_meaning);
+            mIsFavoriteView = mView.findViewById(R.id.imagebutton_isfavorite_favorite_item);
+            mSrcTrgLanguage = mView.findViewById(R.id.src_trg_languages);
+            mSrcMeaning = mView.findViewById(R.id.src_meaning);
+            mTrgMeaning = mView.findViewById(R.id.trg_meaning);
         }
 
         public void bind(final TranslatedItem item,

@@ -7,8 +7,8 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.karanchuk.roman.testtranslate.data.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
@@ -86,13 +86,11 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
         mMainHandler = new Handler(view.getContext().getMainLooper());
 
-        mLanguagesMap = JsonUtils.getJsonObjectFromFile(
-                view.getActivity().getAssets(), "langs.json");
+        mLanguagesMap = JsonUtils.getJsonObjectFromAssetsFile(mView.getContext(), "langs.json");
 
         final String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
         if (!dictDefString.isEmpty()){
-            mCurDictDefinition = JsonUtils.getDictDefinitionFromJson(
-                    new JsonParser().parse(dictDefString).getAsJsonObject());
+            mCurDictDefinition = new Gson().fromJson(dictDefString, DictDefinition.class);
         }
 
         initTranslatorYandexAPI();
@@ -128,23 +126,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     @Override
     public void requestTranslatorAPI() {
-//        try {
-//            TranslatorAPIUtils.getTranslate(mView.mCustomEditText.getTextTextView().toString(),
-//                    mView.getContext().getAssets(),
-//                    mView.mButtonSrcLang.getTextTextView().toString().toLowerCase(),
-//                    mView.mButtonTrgLang.getTextTextView().toString().toLowerCase(),
-//                    mView.mTranslatedResult,
-//                    mView.mTranslateRecyclerView,
-//                    mSaver,
-//                    mHistoryTranslatedItems,
-//                    mSettings
-//            );
-//
-//        } catch (IOException e){
-//            e.printStackTrace();
-//        }
-
-        JsonObject langs = JsonUtils.getJsonObjectFromFile(mView.getContext().getAssets(), "langs.json");
+        JsonObject langs = JsonUtils.getJsonObjectFromAssetsFile(mView.getContext(), "langs.json");
 
         String srcLang = mView.mButtonSrcLang.getText().toString().toLowerCase();
         String trgLang = mView.mButtonTrgLang.getText().toString().toLowerCase();
@@ -212,7 +194,6 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     private void handleDictionaryError(Throwable error){
         error.printStackTrace();
-        mView.showRetry();
         mView.hideLoading();
         if (isOnline()){
 
@@ -261,7 +242,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
             editor.putString(IS_FAVORITE, String.valueOf(false));
         }
         if (mSaver.getDictDefinition() != null) {
-            editor.putString(TRANSL_CONTENT, mSaver.getDictDefinition().getJsonToStringRepr());
+            editor.putString(TRANSL_CONTENT, new Gson().toJson(mSaver.getDictDefinition()));
         } else if (mCurDictDefinition != null){
             editor.putString(TRANSL_CONTENT, mCurDictDefinition.getJsonToStringRepr());
         } else {
@@ -331,3 +312,19 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
         }
     }
 }
+
+//        try {
+//            TranslatorAPIUtils.getTranslate(mView.mCustomEditText.getTextTextView().toString(),
+//                    mView.getContext().getAssets(),
+//                    mView.mButtonSrcLang.getTextTextView().toString().toLowerCase(),
+//                    mView.mButtonTrgLang.getTextTextView().toString().toLowerCase(),
+//                    mView.mTranslatedResult,
+//                    mView.mTranslateRecyclerView,
+//                    mSaver,
+//                    mHistoryTranslatedItems,
+//                    mSettings
+//            );
+//
+//        } catch (IOException e){
+//            e.printStackTrace();
+//        }

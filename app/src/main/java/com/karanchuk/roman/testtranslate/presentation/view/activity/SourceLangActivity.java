@@ -49,7 +49,7 @@ public class SourceLangActivity extends AppCompatActivity {
 
 
         initToolbar();
-        mLangs = JsonUtils.getJsonObjectFromFile(getAssets(),"langs.json");
+        mLangs = JsonUtils.getJsonObjectFromAssetsFile(this, "langs.json");
 
         mLayoutManager = new LinearLayoutManager(this);
         mSrcLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_src_lang);

@@ -19,7 +19,6 @@ import com.karanchuk.roman.testtranslate.presentation.view.fragment.SettingsFrag
 import com.karanchuk.roman.testtranslate.presentation.view.fragment.StoredFragment;
 import com.karanchuk.roman.testtranslate.presentation.view.fragment.TranslatorFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
-import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
 import java.util.List;
 
@@ -89,10 +88,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        JsonUtils.getDictDefinitionFromJson(JsonUtils.getJsonObjectFromFile(
-                getAssets(),
-                "translator_response.json"));
 
         mMainHandler = new Handler(getMainLooper());
         mContentManager = ContentManager.getInstance();

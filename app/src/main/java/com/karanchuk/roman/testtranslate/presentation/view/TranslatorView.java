@@ -17,4 +17,6 @@ public interface TranslatorView extends BaseView<TranslatorPresenter> {
     void hideActiveInput();
     void showKeyboard();
     void hideKeyboard();
+    void showClear();
+    void hideClear();
 }

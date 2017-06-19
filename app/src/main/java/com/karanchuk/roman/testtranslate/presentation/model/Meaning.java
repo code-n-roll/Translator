@@ -17,4 +17,9 @@ public class Meaning {
     public void setText(String text) {
         mText = text;
     }
+
+    @Override
+    public String toString() {
+        return mText;
+    }
 }

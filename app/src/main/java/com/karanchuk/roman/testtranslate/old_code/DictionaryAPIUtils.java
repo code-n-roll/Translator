@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.trash;
+package com.karanchuk.roman.testtranslate.old_code;
 
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
@@ -67,7 +67,7 @@ public class DictionaryAPIUtils {
                         translations.addAll(POS.getTranslations());
                     }
                     TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)rvTranslate.getAdapter();
-                    adapter.updateData(translations);
+                    adapter.updateData(translations, dictDefinition.getPartsOfSpeech());
 
                     saver.setDictDefinition(dictDefinition);
                     new Thread(saver).start();

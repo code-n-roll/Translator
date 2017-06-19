@@ -11,6 +11,12 @@ import java.util.List;
 public class Translation {
     private String mNumber;
 
+    @SerializedName("text")
+    private String mText;
+
+    @SerializedName("gen")
+    private String mGen;
+
     @SerializedName("syn")
     private List<Synonym> mSynonyms;
 
@@ -21,6 +27,8 @@ public class Translation {
     private List<Expression> mExpressions;
 
     private String mRepresentSynonyms;
+    private String mRepresentMeanings;
+    private String mRepresentExpressions;
 
     public Translation(final String number,
                        final List<Synonym> synonyms,
@@ -34,11 +42,69 @@ public class Translation {
         mRepresentSynonyms = representSynonyms;
     }
 
+    public String getRepresentExpressions(){
+        mRepresentExpressions = "";
+        if (mExpressions != null) {
+            for (Expression expression : mExpressions) {
+                mRepresentExpressions = mRepresentExpressions.concat(expression.toString());
+            }
+        }
+        int length = mRepresentExpressions.length();
+        if (length >= 1){
+            mRepresentExpressions = mRepresentExpressions.substring(0, length-1);
+        }
+        return mRepresentExpressions;
+    }
+
+    public String getRepresentMeanings() {
+        if (mMeanings != null) {
+            mRepresentMeanings = "(";
+            for (Meaning meaning : mMeanings) {
+                mRepresentMeanings = mRepresentMeanings.concat(meaning.toString() + ", ");
+            }
+        }
+        return mRepresentMeanings.substring(0, mRepresentMeanings.length()-2) + ")";
+    }
+
+    public String getGen() {
+        return mGen;
+    }
+
+    public void setGen(String gen) {
+        mGen = gen;
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String text) {
+        mText = text;
+    }
+
+    public void setRepresentExpressions(String representExpressions) {
+        mRepresentExpressions = representExpressions;
+    }
+
+    public void setRepresentMeanings(String representMeanings) {
+        mRepresentMeanings = representMeanings;
+    }
+
     public void setRepresentSynonyms(final String representSynonyms) {
         mRepresentSynonyms = representSynonyms;
     }
 
     public String getRepresentSynonyms(){
+        mRepresentSynonyms = mText.concat(", ");
+        if (mSynonyms != null) {
+            for (Synonym synonym : mSynonyms) {
+                mRepresentSynonyms = mRepresentSynonyms.concat(synonym.toString());
+            }
+        }
+        int length = mRepresentSynonyms.length();
+        if (length >= 2){
+            mRepresentSynonyms = mRepresentSynonyms.substring(0, length - 2);
+        }
         return mRepresentSynonyms;
     }
 
@@ -64,20 +130,26 @@ public class Translation {
         if (mNumber != null) {
             result = mNumber.concat(" ");
         }
-        for (Synonym synonym : mSynonyms){
-            result = result.concat(
-                    synonym.getText().
-                    concat(" ").
-                    concat(synonym.getGen()).
-                    concat(", "));
+        if (mSynonyms != null) {
+            for (Synonym synonym : mSynonyms) {
+                result = result.concat(synonym.toString());
+            }
         }
         if (result.length() >= 2){
             result = result.substring(0, result.length()-2);
         }
-        if (!mMeanings.isEmpty())
-            result = result.concat("\n").concat(mMeanings.toString());
-        if (!mExpressions.isEmpty())
-            result = result.concat("\n").concat(mExpressions.toString());
+        result = result.concat("\n").concat("(");
+        if (mMeanings != null) {
+            for (Meaning meaning : mMeanings) {
+                result = result.concat(meaning.toString() + " ");
+            }
+        }
+        result = result.concat(")").concat("\n");
+        if (mExpressions != null) {
+            for (Expression expression : mExpressions) {
+                result = result.concat(expression.toString());
+            }
+        }
         return result;
     }
 

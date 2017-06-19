@@ -26,6 +26,6 @@
         android:textSize="18sp"
 
         />
-    <!--android:text="@string/empty_favorites"-->
+    <!--android:textTextView="@string/empty_favorites"-->
 
 </RelativeLayout>

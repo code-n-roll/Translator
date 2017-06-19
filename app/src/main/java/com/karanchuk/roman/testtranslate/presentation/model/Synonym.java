@@ -10,7 +10,7 @@ public class Synonym {
     @SerializedName("text")
     private String mText;
 
-    @SerializedName("pos")
+    @SerializedName("gen")
     private String mGen;
 
     public Synonym(final String text,
@@ -38,6 +38,6 @@ public class Synonym {
 
     @Override
     public String toString() {
-        return mText.concat(" ").concat(mGen);
+        return mText.concat(", ");
     }
 }

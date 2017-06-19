@@ -95,7 +95,6 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
                     new JsonParser().parse(dictDefString).getAsJsonObject());
         }
 
-        mCompositeDisposable = new CompositeDisposable();
         initTranslatorYandexAPI();
         initDictionaryYandexAPI();
     }
@@ -116,6 +115,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     @Override
     public void onStart() {
+        mCompositeDisposable = new CompositeDisposable();
         mRepository.addHistoryContentObserver(this);
     }
 
@@ -129,10 +129,10 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     @Override
     public void requestTranslatorAPI() {
 //        try {
-//            TranslatorAPIUtils.getTranslate(mView.mCustomEditText.getText().toString(),
+//            TranslatorAPIUtils.getTranslate(mView.mCustomEditText.getTextTextView().toString(),
 //                    mView.getContext().getAssets(),
-//                    mView.mButtonSrcLang.getText().toString().toLowerCase(),
-//                    mView.mButtonTrgLang.getText().toString().toLowerCase(),
+//                    mView.mButtonSrcLang.getTextTextView().toString().toLowerCase(),
+//                    mView.mButtonTrgLang.getTextTextView().toString().toLowerCase(),
 //                    mView.mTranslatedResult,
 //                    mView.mTranslateRecyclerView,
 //                    mSaver,
@@ -191,12 +191,18 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
         Log.d("myLogs", dictDefinition.toString());
 
         List<Translation> translations = new ArrayList<>();
+        int index;
         for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()){
             translations.addAll(POS.getTranslations());
+            index = 1;
+            for (Translation translation : POS.getTranslations()){
+                translation.setNumber(String.valueOf(index++));
+            }
         }
+
         TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)
                 mView.mTranslateRecyclerView.getAdapter();
-        adapter.updateData(translations);
+        adapter.updateData(translations, dictDefinition.getPartsOfSpeech());
 
         mSaver.setDictDefinition(dictDefinition);
         new Thread(mSaver).start();
@@ -206,6 +212,8 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     private void handleDictionaryError(Throwable error){
         error.printStackTrace();
+        mView.showRetry();
+        mView.hideLoading();
         if (isOnline()){
 
         } else {
@@ -223,6 +231,8 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     private void handleTranslatingError(Throwable error){
         error.printStackTrace();
+        mView.showRetry();
+        mView.hideLoading();
         if (isOnline()){
 
         } else {

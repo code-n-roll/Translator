@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_text_layout_textgen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textStyle="normal"
+        android:textSize="18sp"
+        android:text="время"/>
+    <TextView
+        android:id="@+id/tv_gen_layout_textgen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/darker_gray"
+        android:textStyle="italic"
+        android:textSize="18sp"
+        android:text=" ср"
+        android:textIsSelectable="true"/>
+    <TextView
+        android:id="@+id/tv_comma_layout_textgen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textStyle="normal"
+        android:textSize="18sp"
+        android:text=","
+        android:textIsSelectable="true"/>
+</LinearLayout>

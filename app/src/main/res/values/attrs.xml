@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TextGenLayout">
+        <attr name="textText" format="string"/>
+        <attr name="genText" format="string"/>
+        <attr name="commaText" format="string"/>
+        <attr name="textColor" format="color"/>
+        <attr name="genColor" format="color"/>
+        <attr name="commaColor" format="color"/>
+        <attr name="textSize" format="dimension"/>
+        <attr name="genSize" format="dimension"/>
+        <attr name="commaSize" format="dimension"/>
+        <attr name="textTextStyle"/>
+        <attr name="genTextStyle"/>
+        <attr name="commaTextStyle"/>
+    </declare-styleable>
+    <attr name="textTextStyle">
+        <flag name="normal" value="0"/>
+        <flag name="bold" value="1"/>
+        <flag name="italic" value="2"/>
+        <flag name="bold_italic" value="3"/>
+    </attr>
+    <attr name="genTextStyle">
+        <flag name="normal" value="0"/>
+        <flag name="bold" value="1"/>
+        <flag name="italic" value="2"/>
+        <flag name="bold_italic" value="3"/>
+    </attr>
+    <attr name="commaTextStyle">
+        <flag name="normal" value="0"/>
+        <flag name="bold" value="1"/>
+        <flag name="italic" value="2"/>
+        <flag name="bold_italic" value="3"/>
+    </attr>
+</resources>

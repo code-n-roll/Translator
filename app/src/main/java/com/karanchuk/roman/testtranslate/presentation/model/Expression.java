@@ -30,4 +30,13 @@ public class Expression {
     public void setExpressionTranslation(List<ExpressionTranslation> expressionTranslation) {
         mExpressionTranslation = expressionTranslation;
     }
+
+    @Override
+    public String toString() {
+        String result = mText + " \u2014 ";
+        for (ExpressionTranslation exprTransl : mExpressionTranslation){
+            result = result.concat(exprTransl.getText() + "\n");
+        }
+        return result;
+    }
 }

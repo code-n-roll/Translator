@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.trash;
+package com.karanchuk.roman.testtranslate.old_code;
 
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
@@ -80,7 +80,7 @@ public class TranslatorAPIUtils {
             TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(false);
 //                        } else {
 //                            TranslatedItem newItem = historyTranslatedItems.get(historyTranslatedItems.indexOf(item));
-//                            tvTranslateResult.setText(newItem.getTrgMeaning());
+//                            tvTranslateResult.setTextTextView(newItem.getTrgMeaning());
 
 //                            List<Translation> newData = newItem.getDictDefinitionFromStringRepr(newItem.getDictDefinition()).getTranslations();
 //                            ((TranslatorRecyclerAdapter)rvTranslate.getAdapter()).updateData(newData);

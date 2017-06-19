@@ -9,6 +9,12 @@ import java.util.List;
  */
 
 public class PartOfSpeech {
+    @SerializedName("text")
+    private String mText;
+
+    @SerializedName("ts")
+    private String mTranscription;
+
     @SerializedName("pos")
     private String mName;
 
@@ -19,6 +25,22 @@ public class PartOfSpeech {
                         final List<Translation> translations){
         mName = name;
         mTranslations = translations;
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String text) {
+        mText = text;
+    }
+
+    public String getTranscription() {
+        return mTranscription;
+    }
+
+    public void setTranscription(String transcription) {
+        mTranscription = transcription;
     }
 
     public String getName() {

@@ -71,7 +71,7 @@ public class TranslatorRepository  implements TranslatorDataSource{
     }
 
     @Override
-    public boolean saveTranslatedItem(@NonNull final String tableName,
+    public synchronized boolean saveTranslatedItem(@NonNull final String tableName,
                                       @NonNull final TranslatedItem translatedItem) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)){
             if (mHistoryCachedTranslatedItems == null){

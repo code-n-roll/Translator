@@ -65,9 +65,7 @@ public class TargetLangActivity extends AppCompatActivity {
 
 
         mTrgLangRecycler.setAdapter(new TargetLangRecyclerAdapter(
-                mItems,
-                (language)->clickOnTargetLangRecyclerItem(language)
-        ));
+                mItems, this::clickOnTargetLangRecyclerItem));
     }
 
     private void clickOnTargetLangRecyclerItem(Language language){

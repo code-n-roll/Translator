@@ -16,7 +16,7 @@ public interface TranslatorYandexAPI {
     String API_BASE_URL_TRANSLATOR = "https://translate.yandex.net/";
 
     @GET("api/v1.5/tr.json/translate?")
-    Observable<TranslationResponse> getTranslation(@Query("key") String key,
-                                                   @Query("text") String text,
-                                                   @Query("lang") String lang);
+    Observable<TranslationResponse> fetchTranslation(@Query("key") String key,
+                                                     @Query("text") String text,
+                                                     @Query("lang") String lang);
 }

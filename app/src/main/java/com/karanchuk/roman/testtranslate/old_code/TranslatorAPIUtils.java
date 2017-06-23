@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
-import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl;
-import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +33,7 @@ public class TranslatorAPIUtils {
                                     String trgLang,
                                     final TextView tvTranslateResult,
                                     final RecyclerView rvTranslate,
-                                    final TranslatorPresenterImpl.TranslationSaver saver,
+//                                    final TranslatorPresenterImpl.TranslationSaver saver,
                                     final List<TranslatedItem> historyTranslatedItems,
                                     final SharedPreferences settings) throws IOException{
         OkHttpClient client = new OkHttpClient();
@@ -70,7 +68,7 @@ public class TranslatorAPIUtils {
 //                        TranslatedItem item = new TranslatedItem(srcLangAPI,trgLangAPI,
 //                                null,null,translatedText,null,null,null);
 //                        if (!historyTranslatedItems.contains(item)) {
-            TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(false);
+//            TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(false);
 //                        } else {
 //                            TranslatedItem newItem = historyTranslatedItems.get(historyTranslatedItems.indexOf(item));
 //                            tvTranslateResult.setTextTextView(newItem.getTrgMeaning());

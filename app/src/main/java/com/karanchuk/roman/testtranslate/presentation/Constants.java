@@ -22,8 +22,11 @@ public class Constants {
     public static final String CONT_ERROR_VISIBILITY = "CONT_ERROR_VISIBILITY";
     public static final String PROGRESS_BAR_VISIBILITY = "PROGRESS_BAR_VISIBILITY";
     public static final String IS_FAVORITE ="SetFavorite";
-    public static final int UNIQUE_FAVORITES_FRAGMENT_ID = 2;
-    public static final int UNIQUE_HISTORY_FRAGMENT_ID = 1;
     public static final String TRANSLATOR_API_KEY = "trnsl.1.1.20170410T011338Z.07c9f77e0dd5777b.400bcbcacf7bdafcdaa1a38cfa576dbc9fae4010";
     public static final String DICTIONARY_API_KEY = "dict.1.1.20170410T015740Z.ee40f6ea33d8dc7b.e7d46a78203404678611c91d1ff0e4183b6aae13";
+    public static final String SPEECH_KIT_API_KEY = "dcc7627a-2eab-47ba-bf1e-be47ec22bc3c";
+    public static final String CUR_DICT_DEFINITION = "curDictDefinition";
+    public static final int UNIQUE_FAVORITES_FRAGMENT_ID = 2;
+    public static final int UNIQUE_HISTORY_FRAGMENT_ID = 1;
+    public static final int RECOGNIZING_REQUEST_PERMISSION_CODE = 1;
 }

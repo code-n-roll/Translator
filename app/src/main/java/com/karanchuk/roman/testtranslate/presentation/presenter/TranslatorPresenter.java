@@ -9,4 +9,7 @@ public interface TranslatorPresenter extends BasePresenter {
     void requestDictionaryAPI();
     void saveToSharedPreferences();
     void clearContainerSuccess();
+    void vocalizeSourceText();
+    void vocalizeTargetText();
+    void recognizeSourceText();
 }

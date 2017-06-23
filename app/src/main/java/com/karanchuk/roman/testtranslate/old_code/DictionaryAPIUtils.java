@@ -10,9 +10,7 @@ import com.google.gson.JsonParser;
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.presentation.model.Translation;
-import com.karanchuk.roman.testtranslate.presentation.presenter.impl.TranslatorPresenterImpl;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
-import com.karanchuk.roman.testtranslate.presentation.view.state_holder.TranslatorStateHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,8 +31,8 @@ public class DictionaryAPIUtils {
             final Handler handler,
             final String lookupText,
             final String translDirection,
-            final RecyclerView rvTranslate,
-            final TranslatorPresenterImpl.TranslationSaver saver)
+            final RecyclerView rvTranslate)
+//            final TranslatorPresenterImpl.TranslationSaver saver)
     {
         OkHttpClient client = new OkHttpClient();
 
@@ -69,10 +67,10 @@ public class DictionaryAPIUtils {
                     TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)rvTranslate.getAdapter();
                     adapter.updateData(translations, dictDefinition.getPartsOfSpeech());
 
-                    saver.setDictDefinition(dictDefinition);
-                    new Thread(saver).start();
+//                    saver.setDictDefinition(dictDefinition);
+//                    new Thread(saver).start();
 
-                    TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
+//                    TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
                 });
             }
         });

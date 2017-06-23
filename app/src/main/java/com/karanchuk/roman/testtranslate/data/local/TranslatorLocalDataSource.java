@@ -211,13 +211,13 @@ public class TranslatorLocalDataSource implements TranslatorDataSource{
         final SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         final Cursor c = db.query(tableName, null, null, null, null, null, null);
-        logCursor(c);
 
-        if (c!= null){
+        logCursor(c);
+        if (c != null){
             c.close();
         }
-        db.close();
 
+        db.close();
     }
 
 

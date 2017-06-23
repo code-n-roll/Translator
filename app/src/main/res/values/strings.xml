@@ -18,4 +18,6 @@
     <string name="empty_search">No matches were found</string>
     <string name="next_release_message">Feature is not implemented, wait in the next release.</string>
     <string name="set_favorite_message">Feature is implemented, but available in history/favorites tabs, more in the next release.</string>
+    <string name="share_subject">Result of TestTranslator</string>
+    <string name="chooser_title">Share to&#8230;</string>
 </resources>

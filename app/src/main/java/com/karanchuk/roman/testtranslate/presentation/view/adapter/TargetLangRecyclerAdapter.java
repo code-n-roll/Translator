@@ -57,8 +57,8 @@ public class TargetLangRecyclerAdapter extends
             super(view);
             mView = view;
 
-            mLanguage = (TextView) mView.findViewById(R.id.choose_src_trg_lang);
-            mIsSelected = (ImageView) mView.findViewById(R.id.selected_choose_src_trg_lang);
+            mLanguage = mView.findViewById(R.id.choose_src_trg_lang);
+            mIsSelected = mView.findViewById(R.id.selected_choose_src_trg_lang);
         }
 
 
@@ -77,7 +77,7 @@ public class TargetLangRecyclerAdapter extends
                         mView.getContext(),
                         R.color.white));
             }
-            mView.setOnClickListener(v -> listener.onItemClick(item));
+            mView.setOnClickListener(view -> listener.onItemClick(item));
         }
     }
 }

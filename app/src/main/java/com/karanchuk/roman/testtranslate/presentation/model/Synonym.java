@@ -38,6 +38,6 @@ public class Synonym {
 
     @Override
     public String toString() {
-        return mText.concat(", ");
+        return mText;
     }
 }

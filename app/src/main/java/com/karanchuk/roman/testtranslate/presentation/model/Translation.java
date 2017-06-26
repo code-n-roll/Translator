@@ -95,15 +95,30 @@ public class Translation {
     }
 
     public String getRepresentSynonyms(){
-        mRepresentSynonyms = mText.concat(", ");
+        if (mText != null){
+            mRepresentSynonyms = mText;
+        }
+        if (mGen != null) {
+            mRepresentSynonyms += " " + mGen.concat(", ");
+        } else {
+            if (mSynonyms != null){
+                mRepresentSynonyms += ", ";
+            }
+        }
         if (mSynonyms != null) {
             for (Synonym synonym : mSynonyms) {
-                mRepresentSynonyms = mRepresentSynonyms.concat(synonym.toString());
+                if (synonym.getGen() != null) {
+                    mRepresentSynonyms += synonym.toString() + " " + synonym.getGen() + ", ";
+                } else {
+                    mRepresentSynonyms += synonym.toString() + ", ";
+                }
             }
         }
         int length = mRepresentSynonyms.length();
-        if (length >= 2){
+        if (mRepresentSynonyms.endsWith(", ")){
             mRepresentSynonyms = mRepresentSynonyms.substring(0, length - 2);
+        } else if (mRepresentSynonyms.endsWith(",")){
+            mRepresentSynonyms = mRepresentSynonyms.substring(0, length - 1);
         }
         return mRepresentSynonyms;
     }
@@ -132,7 +147,11 @@ public class Translation {
         }
         if (mSynonyms != null) {
             for (Synonym synonym : mSynonyms) {
-                result = result.concat(synonym.toString());
+                if (synonym.getGen() != null && !synonym.getGen().isEmpty()) {
+                    result += synonym.toString() + " " + synonym.getGen() + ", ";
+                } else {
+                    result += synonym.toString() + ", ";
+                }
             }
         }
         if (result.length() >= 2){
@@ -143,6 +162,9 @@ public class Translation {
             for (Meaning meaning : mMeanings) {
                 result = result.concat(meaning.toString() + " ");
             }
+        }
+        if (result.length() >= 1){
+            result = result.substring(0, result.length()-1);
         }
         result = result.concat(")").concat("\n");
         if (mExpressions != null) {

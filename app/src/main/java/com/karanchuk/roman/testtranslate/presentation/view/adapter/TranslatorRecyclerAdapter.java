@@ -1,26 +1,18 @@
 package com.karanchuk.roman.testtranslate.presentation.view.adapter;
 
 import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
-import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
-import com.karanchuk.roman.testtranslate.presentation.model.Synonym;
 import com.karanchuk.roman.testtranslate.presentation.model.Translation;
+import com.karanchuk.roman.testtranslate.presentation.view.custom.CustomSynonyms;
 import com.karanchuk.roman.testtranslate.presentation.view.custom.TextGenLayout;
-
-import org.apmem.tools.layouts.FlowLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +57,7 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         private TextView mNumberDictDefinItem;
-        private FlowLayout mTranslDictDefinItem;
+        private TextView mTranslDictDefinItem;
         private TextView mMeanDictDefinItem;
         private TextView mExprDictDefinItem;
         private TextView mLabelPartOfSpeech;
@@ -140,51 +132,11 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
 
 
         private void initSynonyms(Translation item) {
-            TextView textView = new TextView(mView.getContext());
-            String result = item.getText();
-            if (item.getGen() != null) {
-//                textGenLayout.setGen(" " + item.getGen());
-                result = result.concat(" " + item.getGen());
-            }
-            if (item.getSynonyms() != null) {
-//                textGenLayout.setComma(", ");
-                result = result.concat(", ");
-            }
-            Spannable spanText = Spannable.Factory.getInstance().newSpannable(result);
-            ClickableSpan spanTextListener = new ClickableSpan() {
+//            String result = item.getText();
 
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(mView.getContext(), "span text clicked", Toast.LENGTH_LONG).show();
-                }
-
-                @Override
-                public void updateDrawState(TextPaint ds) {
-                    ds.setUnderlineText(false);
-//                    ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
-                    ds.setColor(ContextCompat.getColor(mView.getContext(), R.color.colorTransl));
-                    ds.setTextSize(50f);
-                }
-            };
-            ClickableSpan spanCommaListener = new ClickableSpan() {
-                @Override
-                public void onClick(View view) {
-
-                }
-
-                @Override
-                public void updateDrawState(TextPaint ds) {
-                    ds.setUnderlineText(false);
-                    ds.setTextSize(50f);
-                    ds.setColor(ContextCompat.getColor(mView.getContext(), R.color.colorTransl));
-                }
-            };
-            spanText.setSpan(spanTextListener, 0, item.getText().length(), Spanned.SPAN_COMPOSING);
-            spanText.setSpan(spanCommaListener, item.getText().length(), spanText.length(), Spanned.SPAN_COMPOSING);
-            textView.setText(spanText);
-            textView.setMovementMethod(LinkMovementMethod.getInstance());
-            mTranslDictDefinItem.removeAllViews();
-            mTranslDictDefinItem.addView(textView);
+            CustomSynonyms synonyms = new CustomSynonyms(mView.getContext(), item);
+            mTranslDictDefinItem.setText(synonyms.toSpannable(mOnItemClickListener));
+            mTranslDictDefinItem.setMovementMethod(LinkMovementMethod.getInstance());
 //            TextGenLayout textGenLayout = new TextGenLayout(mView.getContext());
 //            textGenLayout.setTextColor(R.color.colorTransl);
 //            textGenLayout.setGenColor(android.R.color.darker_gray);
@@ -202,10 +154,10 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
 //            mTranslDictDefinItem.addView(textGenLayout);
 
 
-            if (item.getSynonyms() != null) {
-                int index = 0;
-                for (Synonym synonym : item.getSynonyms()) {
-                    index++;
+//            if (item.getSynonyms() != null) {
+//                int index = 0;
+//                for (Synonym synonym : item.getSynonyms()) {
+//                    index++;
 //                    textGenLayout = new TextGenLayout(mView.getContext());
 //                    textGenLayout.setTextColor(R.color.colorTransl);
 //                    textGenLayout.setGenColor(android.R.color.darker_gray);
@@ -213,22 +165,22 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
 //                    textGenLayout.setCommaColor(R.color.colorTransl);
 //                    textGenLayout.setBackgroundResource(R.drawable.selector_synonym);
 
-                    if (synonym.getGen() == null) {
+//                    if (synonym.getGen() == null) {
 //                        textGenLayout.setText(synonym.getText() + "");
-                    } else {
+//                    } else {
 //                        textGenLayout.setText(synonym.getText() + " ");
-                    }
+//                    }
 //                    textGenLayout.setGen(synonym.getGen());
-                    if (item.getSynonyms().size() != index) {
+//                    if (item.getSynonyms().size() != index) {
 //                        textGenLayout.setComma(", ");
-                    } else {
+//                    } else {
 //                        textGenLayout.setComma("");
-                    }
+//                    }
 //                    textGenLayout.setOnClickListener(view ->
 //                            mOnItemClickListener.onItemClick(view, synonym.getText()));
 //                    mTranslDictDefinItem.addView(textGenLayout);
-                }
-            }
+//                }
+//            }
         }
     }
 

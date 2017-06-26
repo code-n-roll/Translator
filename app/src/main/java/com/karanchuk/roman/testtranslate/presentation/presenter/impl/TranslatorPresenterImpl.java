@@ -15,10 +15,10 @@ import com.karanchuk.roman.testtranslate.data.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.local.TablesPersistenceContract;
 import com.karanchuk.roman.testtranslate.data.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.data.net.DictionaryYandexAPI;
-import com.karanchuk.roman.testtranslate.data.net.TranslatorYandexAPI;
-import com.karanchuk.roman.testtranslate.presentation.TextDataStorage;
-import com.karanchuk.roman.testtranslate.presentation.TranslationSaver;
+import com.karanchuk.roman.testtranslate.data.network.DictionaryYandexAPI;
+import com.karanchuk.roman.testtranslate.data.network.TranslatorYandexAPI;
+import com.karanchuk.roman.testtranslate.data.storage.TextDataStorage;
+import com.karanchuk.roman.testtranslate.data.storage.TranslationSaver;
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
@@ -51,9 +51,8 @@ import ru.yandex.speechkit.VocalizerListener;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static com.karanchuk.roman.testtranslate.data.net.DictionaryYandexAPI.API_BASE_URL_DICTIONARY;
-import static com.karanchuk.roman.testtranslate.data.net.TranslatorYandexAPI.API_BASE_URL_TRANSLATOR;
-import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_DICT_DEFINITION;
+import static com.karanchuk.roman.testtranslate.data.network.DictionaryYandexAPI.API_BASE_URL_DICTIONARY;
+import static com.karanchuk.roman.testtranslate.data.network.TranslatorYandexAPI.API_BASE_URL_TRANSLATOR;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.DICTIONARY_API_KEY;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.EDITTEXT_DATA;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
@@ -110,7 +109,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
 
         final String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
-        if (!dictDefString.isEmpty()){
+        if (!dictDefString.equals("null")){
             mCurDictDefinition = mGson.fromJson(dictDefString, DictDefinition.class);
         }
 
@@ -204,26 +203,29 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
         saveToRepository(dictDefinition);
 
-        mView.hideLoading();
+        mView.hideLoadingDictionary();
         mView.hideRetry();
         mView.showSuccess();
 //        TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
     }
 
     private void saveToRepository(DictDefinition dictDefinition){
-        mSaver.setDictDefinition(dictDefinition);
+        mCurDictDefinition = dictDefinition;
         Map<String, Object> savedData = new HashMap<>();
         savedData.put(SRC_LANG, mView.mButtonSrcLang.getText().toString());
         savedData.put(TRG_LANG, mView.mButtonTrgLang.getText().toString());
         savedData.put(EDITTEXT_DATA, mView.mCustomEditText.getText().toString());
         savedData.put(TRANSL_RESULT, mView.mTranslatedResult.getText().toString());
+        savedData.put(TRANSL_CONTENT, dictDefinition);
         mSaver.setSavedData(savedData);
         new Thread(mSaver).start();
     }
 
     private void handleDictionaryError(Throwable error){
         error.printStackTrace();
-        mView.hideLoading();
+        mView.hideLoadingDictionary();
+        mView.hideRetry();
+        mView.hideSuccess();
         if (isOnline()){
 
         } else {
@@ -241,7 +243,8 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     private void handleTranslatingError(Throwable error){
         error.printStackTrace();
         mView.showRetry();
-        mView.hideLoading();
+        mView.hideSuccess();
+        mView.hideLoadingDictionary();
         if (isOnline()){
 
         } else {
@@ -264,7 +267,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
         data.put(SRC_LANG, mView.mButtonSrcLang.getText().toString());
         data.put(TRG_LANG, mView.mButtonTrgLang.getText().toString());
         data.put(TRANSL_RESULT, mView.mTranslatedResult.getText().toString());
-        data.put(CUR_DICT_DEFINITION, mCurDictDefinition);
+        data.put(TRANSL_CONTENT, mCurDictDefinition);
 
         mTextDataStorage.saveToSharedPreferences(data);
     }
@@ -272,7 +275,6 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     @Override
     public void clearContainerSuccess() {
         mView.mTranslateRecyclerView.getAdapter().notifyDataSetChanged();
-        mSaver.setDictDefinition(null);
         mCurDictDefinition = null;
     }
 
@@ -307,6 +309,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     @Override
     public void recognizeSourceText() {
         createAndStartRecognizer();
+        mView.activateVoiceRecognizer();
     }
 
     private void createAndStartRecognizer() {
@@ -337,7 +340,8 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
         }
     }
 
-    private void resetRecognizer() {
+    @Override
+    public void resetRecognizer() {
         if (mRecognizer != null) {
             mRecognizer.cancel();
             mRecognizer = null;
@@ -352,63 +356,69 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     @Override
     public void onSynthesisBegin(Vocalizer vocalizer) {
-
+        Log.d("myLogs", " onSynthesisBegin");
     }
 
     @Override
     public void onSynthesisDone(Vocalizer vocalizer, Synthesis synthesis) {
-
+        Log.d("myLogs", " onSynthesisDone");
     }
 
     @Override
     public void onPlayingBegin(Vocalizer vocalizer) {
-
+        Log.d("myLogs", " onPlayingBegin");
     }
 
     @Override
     public void onPlayingDone(Vocalizer vocalizer) {
-
+        Log.d("myLogs", " onPlayingDone");
+        mView.hideLoadingTargetVoice();
+        mView.hideLoadingSourceVoice();
+        mView.showIconTargetVoice();
+        mView.showIconSourceVoice();
     }
 
     @Override
     public void onVocalizerError(Vocalizer vocalizer, Error error) {
         resetVocalizer();
         Log.d("myLogs", error.getString());
+        Log.d("myLogs", " onVocalizerError");
     }
 
     @Override
     public void onRecordingBegin(Recognizer recognizer) {
-
+        Log.d("myLogs", " onRecordingBegin");
     }
 
     @Override
     public void onSpeechDetected(Recognizer recognizer) {
-
+        Log.d("myLogs", " onSpeechDetected");
     }
 
     @Override
     public void onSpeechEnds(Recognizer recognizer) {
-
+        Log.d("myLogs", " onSpeechEnds");
     }
 
     @Override
     public void onRecordingDone(Recognizer recognizer) {
-
+        Log.d("myLogs", " onRecordingDone");
+        mView.desactivateVoiceRecognizer();
     }
 
     @Override
     public void onSoundDataRecorded(Recognizer recognizer, byte[] bytes) {
-
+        Log.d("myLogs", " onSoundDataRecorded");
     }
 
     @Override
     public void onPowerUpdated(Recognizer recognizer, float v) {
-
+        Log.d("myLogs", " onPowerUpdated");
     }
 
     @Override
     public void onPartialResults(Recognizer recognizer, Recognition recognition, boolean b) {
-
+        Log.d("myLogs", " onPartialResults");
     }
 
     @Override
@@ -418,6 +428,10 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     @Override
     public void onError(Recognizer recognizer, Error error) {
-
+        Log.d("myLogs", " onError");
+        mView.hideLoadingTargetVoice();
+        mView.hideLoadingSourceVoice();
+        mView.showIconTargetVoice();
+        mView.showIconSourceVoice();
     }
 }

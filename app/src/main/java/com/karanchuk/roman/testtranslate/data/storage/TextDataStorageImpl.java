@@ -1,17 +1,14 @@
-package com.karanchuk.roman.testtranslate.presentation;
+package com.karanchuk.roman.testtranslate.data.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_DICT_DEFINITION;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.EDITTEXT_DATA;
-import static com.karanchuk.roman.testtranslate.presentation.Constants.IS_FAVORITE;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.SRC_LANG;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_CONTENT;
@@ -41,20 +38,15 @@ public class TextDataStorageImpl implements TextDataStorage {
         editor.putString(SRC_LANG, (String) data.get(SRC_LANG));
         editor.putString(TRG_LANG, (String) data.get(TRG_LANG));
         editor.putString(TRANSL_RESULT,(String) data.get(TRANSL_RESULT));
-        DictDefinition curDictDefinition = (DictDefinition) data.get(CUR_DICT_DEFINITION);
+        editor.putString(TRANSL_CONTENT, mGson.toJson(data.get(TRANSL_CONTENT)));
+//        DictDefinition curDictDefinition = (DictDefinition) data.get(TRANSL_CONTENT);
 
-        if (mSaver.getCurTranslatedItem()!= null && mSaver.getCurTranslatedItem().getIsFavorite()!=null) {
-            editor.putString(IS_FAVORITE, mSaver.getCurTranslatedItem().getIsFavorite());
-        } else {
-            editor.putString(IS_FAVORITE, String.valueOf(false));
-        }
-        if (mSaver.getDictDefinition() != null) {
-            editor.putString(TRANSL_CONTENT, mGson.toJson(mSaver.getDictDefinition()));
-        } else if (curDictDefinition != null){
-            editor.putString(TRANSL_CONTENT, mGson.toJson(curDictDefinition));
-        } else {
-            editor.putString(TRANSL_CONTENT, "");
-        }
+//        if (mSaver.getCurTranslatedItem()!= null && mSaver.getCurTranslatedItem().getIsFavorite()!=null) {
+//            editor.putString(IS_FAVORITE, mSaver.getCurTranslatedItem().getIsFavorite());
+//        } else {
+//            editor.putString(IS_FAVORITE, String.valueOf(false));
+//        }
+//        editor.putString(TRANSL_CONTENT, mGson.toJson(curDictDefinition));
 
         editor.apply();
     }

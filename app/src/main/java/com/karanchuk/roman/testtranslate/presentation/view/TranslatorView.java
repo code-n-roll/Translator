@@ -7,8 +7,8 @@ import com.karanchuk.roman.testtranslate.presentation.presenter.TranslatorPresen
  */
 
 public interface TranslatorView extends BaseView<TranslatorPresenter> {
-    void showLoading();
-    void hideLoading();
+    void showLoadingDictionary();
+    void hideLoadingDictionary();
     void showRetry();
     void hideRetry();
     void showSuccess();
@@ -19,4 +19,14 @@ public interface TranslatorView extends BaseView<TranslatorPresenter> {
     void hideKeyboard();
     void showClear();
     void hideClear();
+    void showLoadingTargetVoice();
+    void hideLoadingTargetVoice();
+    void showIconTargetVoice();
+    void hideIconTargetVoice();
+    void showLoadingSourceVoice();
+    void hideLoadingSourceVoice();
+    void showIconSourceVoice();
+    void hideIconSourceVoice();
+    void activateVoiceRecognizer();
+    void desactivateVoiceRecognizer();
 }

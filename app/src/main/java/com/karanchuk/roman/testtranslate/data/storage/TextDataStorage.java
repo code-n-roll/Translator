@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.presentation;
+package com.karanchuk.roman.testtranslate.data.storage;
 
 import java.util.Map;
 

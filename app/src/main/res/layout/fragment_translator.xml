@@ -3,16 +3,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/general_container"
-                android:orientation="vertical"
-    >
+                android:orientation="vertical">
     <RelativeLayout
         android:id="@+id/container_edittext"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_margin="10dp"
-        android:background="@layout/edittext_border"
-        >
+        android:background="@layout/edittext_border">
 
         <com.karanchuk.roman.testtranslate.presentation.view.custom.CustomEditText
             android:id="@+id/edittext"
@@ -30,8 +28,7 @@
             android:paddingTop="5dp"
             android:paddingBottom="42dp"
             android:gravity="top|start"
-            android:imeOptions="actionDone"
-        />
+            android:imeOptions="actionDone"/>
         <ImageButton
             android:id="@+id/clear_edittext"
             android:layout_width="38dp"
@@ -43,42 +40,54 @@
             android:scaleType="fitCenter"
             android:src="@drawable/cancel_dark512"
             android:background="@android:color/transparent"
-            android:adjustViewBounds="true"
+            android:adjustViewBounds="true"/>
 
-            />
+        <include android:id="@+id/include_content_micro_waves"
+            layout="@layout/content_micro_waves"/>
+
         <ImageButton
-            android:id="@+id/get_source_voice"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
+            android:id="@+id/get_audio_spelling"
             android:layout_height="38dp"
             android:layout_width="38dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:adjustViewBounds="true"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/tool_dark512"
             android:background="@android:color/transparent"
-            />
-        <ImageButton
-            android:id="@+id/get_audio_spelling"
-            android:layout_height="38dp"
+            android:layout_gravity="end"/>
+
+
+        <FrameLayout
+            android:id="@+id/get_audio_spelling_container"
             android:layout_width="38dp"
-            android:adjustViewBounds="true"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/camera_dark512"
-            android:background="@android:color/transparent"
+            android:layout_height="38dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="40dp"
-            />
+            android:layout_marginTop="40dp">
+            <ImageButton
+                android:id="@+id/get_source_voice"
+                android:layout_height="38dp"
+                android:layout_width="38dp"
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/camera_dark512"
+                android:background="@android:color/transparent"/>
+            <ProgressBar
+                android:id="@+id/get_source_voice_progress"
+                android:layout_width="38dp"
+                android:layout_height="38dp"/>
+        </FrameLayout>
     </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/translate_result_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        >
+        android:layout_weight="3">
+
         <include
             android:id="@+id/connection_succesful_content"
             layout="@layout/content_connection_succesful"/>
@@ -91,7 +100,6 @@
             android:id="@+id/fragment_translator_progressbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            />
+            android:layout_gravity="center"/>
     </FrameLayout>
 </LinearLayout>

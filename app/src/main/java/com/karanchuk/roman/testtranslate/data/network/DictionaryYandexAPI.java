@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.data.net;
+package com.karanchuk.roman.testtranslate.data.network;
 
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 

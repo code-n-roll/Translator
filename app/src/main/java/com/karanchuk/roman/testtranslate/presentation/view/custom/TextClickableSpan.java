@@ -29,7 +29,7 @@ public class TextClickableSpan extends ClickableSpan {
 
     @Override
     public void onClick(View view) {
-        mOnItemClickListener.onItemClick(view, mText);
+        mOnItemClickListener.onSynonymItemClick(view, mText);
         Toast.makeText(mContext, "span text clicked ", Toast.LENGTH_SHORT).show();
     }
 

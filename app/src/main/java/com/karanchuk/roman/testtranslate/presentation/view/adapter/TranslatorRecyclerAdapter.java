@@ -21,38 +21,39 @@ import java.util.List;
  * Created by roman on 11.4.17.
  */
 
-public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>{
+public class TranslatorRecyclerAdapter extends
+        RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>{
     private final ArrayList<Translation> mItems;
     private List<PartOfSpeech> mPartsOfSpeech;
     private OnItemClickListener mOnItemClickListener;
 
     public interface OnItemClickListener{
-        void onItemClick(View view, String text);
+        void onSynonymItemClick(View view, String text);
     }
 
     public TranslatorRecyclerAdapter(final ArrayList<Translation> items,
                                      List<PartOfSpeech> partsOfSpeech,
-                                     OnItemClickListener onItemClickListenerlistener){
+                                     OnItemClickListener onItemClickListener){
         mItems = items;
         mPartsOfSpeech = partsOfSpeech;
-        mOnItemClickListener = onItemClickListenerlistener;
+        mOnItemClickListener = onItemClickListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(
+        final View view = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.content_dict_definition_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.bind(mItems.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return (mItems != null) ? mItems.size() : 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -68,7 +69,6 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
             super(view);
             mView = view;
 
-
             mLabelPartOfSpeech = mView.findViewById(R.id.tv_label_part_of_speech);
             mTextTranscription = mView.findViewById(R.id.layout_text_transcription);
             mNumberDictDefinItem = mView.findViewById(R.id.number_dict_defin_item);
@@ -80,11 +80,7 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
         public void bind(final Translation item){
             initHeaderAndSubHeaders(item);
             mNumberDictDefinItem.setText(item.getNumber());
-
-
             initSynonyms(item);
-//            mTranslDictDefinItem.setText(item.getRepresentSynonyms());
-
 
             if (item.getMeanings() != null && !item.getMeanings().isEmpty()) {
                 mMeanDictDefinItem.setText(item.getRepresentMeanings());
@@ -100,7 +96,7 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
             }
         }
 
-        private void initHeaderAndSubHeaders(Translation item){
+        private void initHeaderAndSubHeaders(final Translation item){
             if (item.getNumber().equals("1")){
                 if (mItems.indexOf(item) == 0) {
                     if (mPartsOfSpeech != null) {
@@ -130,60 +126,12 @@ public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRe
             }
         }
 
-
-        private void initSynonyms(Translation item) {
-//            String result = item.getText();
-
+        private void initSynonyms(final Translation item) {
             CustomSynonyms synonyms = new CustomSynonyms(mView.getContext(), item);
             mTranslDictDefinItem.setText(synonyms.toSpannable(mOnItemClickListener));
             mTranslDictDefinItem.setMovementMethod(LinkMovementMethod.getInstance());
-//            TextGenLayout textGenLayout = new TextGenLayout(mView.getContext());
-//            textGenLayout.setTextColor(R.color.colorTransl);
-//            textGenLayout.setGenColor(android.R.color.darker_gray);
-//            textGenLayout.setGenStyle(Typeface.ITALIC);
-//            textGenLayout.setCommaColor(R.color.colorTransl);
-//            textGenLayout.setBackgroundResource(R.drawable.selector_synonym);
-//
-//            textGenLayout.setText(item.getText());
-
-            // adding comma or space were here
-
-//            textGenLayout.setOnClickListener(view ->
-//                    mOnItemClickListener.onItemClick(view, item.getText()));
-//            mTranslDictDefinItem.removeAllViews();
-//            mTranslDictDefinItem.addView(textGenLayout);
-
-
-//            if (item.getSynonyms() != null) {
-//                int index = 0;
-//                for (Synonym synonym : item.getSynonyms()) {
-//                    index++;
-//                    textGenLayout = new TextGenLayout(mView.getContext());
-//                    textGenLayout.setTextColor(R.color.colorTransl);
-//                    textGenLayout.setGenColor(android.R.color.darker_gray);
-//                    textGenLayout.setGenStyle(Typeface.ITALIC);
-//                    textGenLayout.setCommaColor(R.color.colorTransl);
-//                    textGenLayout.setBackgroundResource(R.drawable.selector_synonym);
-
-//                    if (synonym.getGen() == null) {
-//                        textGenLayout.setText(synonym.getText() + "");
-//                    } else {
-//                        textGenLayout.setText(synonym.getText() + " ");
-//                    }
-//                    textGenLayout.setGen(synonym.getGen());
-//                    if (item.getSynonyms().size() != index) {
-//                        textGenLayout.setComma(", ");
-//                    } else {
-//                        textGenLayout.setComma("");
-//                    }
-//                    textGenLayout.setOnClickListener(view ->
-//                            mOnItemClickListener.onItemClick(view, synonym.getText()));
-//                    mTranslDictDefinItem.addView(textGenLayout);
-//                }
-//            }
         }
     }
-
 
 
     public void updateData(final List<Translation> translations,

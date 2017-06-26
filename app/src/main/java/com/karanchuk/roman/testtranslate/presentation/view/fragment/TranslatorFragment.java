@@ -1,5 +1,8 @@
 package com.karanchuk.roman.testtranslate.presentation.view.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +29,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -37,8 +41,8 @@ import com.karanchuk.roman.testtranslate.data.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.local.TablesPersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.presentation.TextDataStorage;
-import com.karanchuk.roman.testtranslate.presentation.TextDataStorageImpl;
+import com.karanchuk.roman.testtranslate.data.storage.TextDataStorage;
+import com.karanchuk.roman.testtranslate.data.storage.TextDataStorageImpl;
 import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.presentation.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
@@ -82,14 +86,13 @@ import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
 
 
 
-public class TranslatorFragment extends Fragment implements
-    TranslatorView {
+public class TranslatorFragment extends Fragment implements TranslatorView {
 
     private final static int SRC_LANG_ACTIVITY_REQUEST_CODE = 1;
     private final static int TRG_LANG_ACTIVITY_REQUEST_CODE = 2;
 
-    private ImageButton mButtonGetPhotoOrSrcVoice;
-    private ImageButton mButtonGetSourceVoice;
+    private ImageButton mButtonGetPhotoOrSourceVoice;
+    private ImageButton mButtonGetAudioSpelling;
     private ImageButton mButtonGetTargetVoice;
     private ImageButton mButtonSetFavorite;
     private ImageButton mButtonShare;
@@ -97,7 +100,11 @@ public class TranslatorFragment extends Fragment implements
     private ImageButton mClearEditText;
     private Button mButtonRetry;
     private LinearLayout mGeneralContainer;
-    private ProgressBar mProgressBar;
+
+    private ProgressBar mProgressDictionary;
+    public ProgressBar mProgressTargetVoice;
+    public ProgressBar mProgressSourceVoice;
+
     private ImageButton mButtonSwitchLang;
     private View mView;
     private ActionBar mActionBar;
@@ -121,6 +128,12 @@ public class TranslatorFragment extends Fragment implements
     private SharedPreferences mSettings;
 //    private TranslationSaver mSaver;
     private int mBottomPadding;
+
+    private AnimatorSet mAnimatorSet;
+    private ImageView mCircleFirst;
+    private ImageView mCircleSecond;
+    private ImageView mCircleThird;
+    private ImageView mCircleForth;
 
     private TranslatorPresenter mPresenter;
 
@@ -147,7 +160,9 @@ public class TranslatorFragment extends Fragment implements
         findViewsOnActivity();
         findViewsOnActionBar();
 
-        hideLoading();
+        hideLoadingDictionary();
+        hideLoadingTargetVoice();
+        hideLoadingSourceVoice();
         hideRetry();
 
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
@@ -181,8 +196,8 @@ public class TranslatorFragment extends Fragment implements
         mButtonRetry.setOnClickListener(this::clickOnRetryButton);
         mButtonFullscreen.setOnClickListener(this::clickOnFullscreenButton);
         mClearEditText.setOnClickListener(this::clickOnClearEditText);
-        mButtonGetPhotoOrSrcVoice.setOnClickListener(this::clickOnRecognizePhotoOrVocalizeSourceText);
-        mButtonGetSourceVoice.setOnClickListener(this::clickOnRecognizeSourceText);
+        mButtonGetPhotoOrSourceVoice.setOnClickListener(this::clickOnRecognizePhotoOrVocalizeSourceText);
+        mButtonGetAudioSpelling.setOnClickListener(this::clickOnRecognizeSourceText);
         mButtonGetTargetVoice.setOnClickListener(this::clickOnVocalizeTargetText);
         mButtonSetFavorite.setOnClickListener((ignored) -> clickOnSetFavoriteButton(mButtonSetFavorite));
         mButtonShare.setOnClickListener(this::clickOnShareButton);
@@ -190,8 +205,8 @@ public class TranslatorFragment extends Fragment implements
 
     private void findViewsOnFragment(){
         mCustomEditText = mView.findViewById(R.id.edittext);
-        mButtonGetPhotoOrSrcVoice = mView.findViewById(R.id.get_audio_spelling);
-        mButtonGetSourceVoice = mView.findViewById(R.id.get_source_voice);
+        mButtonGetPhotoOrSourceVoice = mView.findViewById(R.id.get_source_voice);
+        mButtonGetAudioSpelling = mView.findViewById(R.id.get_audio_spelling);
         mButtonGetTargetVoice = mView.findViewById(R.id.get_target_voice);
         mButtonSetFavorite = mView.findViewById(R.id.set_favorite);
         mButtonShare = mView.findViewById(R.id.share_translated_word);
@@ -204,7 +219,14 @@ public class TranslatorFragment extends Fragment implements
         mContainerError = mView.findViewById(R.id.connection_error_content);
         mTranslateRecyclerView = mView.findViewById(R.id.container_dict_defin);
         mGeneralContainer = mView.findViewById(R.id.general_container);
-        mProgressBar = mView.findViewById(R.id.fragment_translator_progressbar);
+        mProgressDictionary = mView.findViewById(R.id.fragment_translator_progressbar);
+        mProgressTargetVoice = mView.findViewById(R.id.get_target_voice_progress);
+        mProgressSourceVoice = mView.findViewById(R.id.get_source_voice_progress);
+
+        mCircleFirst = mView.findViewById(R.id.circle_first);
+        mCircleSecond = mView.findViewById(R.id.circle_second);
+        mCircleThird = mView.findViewById(R.id.circle_third);
+        mCircleForth = mView.findViewById(R.id.circle_forth);
     }
 
     private void findViewsOnActivity(){
@@ -249,6 +271,8 @@ public class TranslatorFragment extends Fragment implements
 
         if (!mCustomEditText.getText().toString().isEmpty()) {
             mCustomEditText.setText(mTranslatedResult.getText());
+            showLoadingDictionary();
+            hideSuccess();
             mPresenter.requestTranslatorAPI();
         }
     }
@@ -259,7 +283,7 @@ public class TranslatorFragment extends Fragment implements
     }
 
     private void clickOnRetryButton(View view) {
-        showLoading();
+        showLoadingDictionary();
         hideSuccess();
         mPresenter.requestTranslatorAPI();
         //        UIUtils.showToast(getContext(), "retry was clicked");
@@ -276,13 +300,13 @@ public class TranslatorFragment extends Fragment implements
     }
 
     private void clickOnRecognizePhotoOrVocalizeSourceText(View view){
-//        UIUtils.showToast(getContext(), "get photo or source audio was clicked");
+        showLoadingSourceVoice();
+        hideIconSourceVoice();
         mPresenter.vocalizeSourceText();
-
-//        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
     private void clickOnRecognizeSourceText(View view){
+        showAnimationMicroWaves();
         mPresenter.recognizeSourceText();
     }
 
@@ -304,6 +328,8 @@ public class TranslatorFragment extends Fragment implements
 
 
     private void clickOnVocalizeTargetText(View view){
+        showLoadingTargetVoice();
+        hideIconTargetVoice();
         mPresenter.vocalizeTargetText();
     }
 
@@ -327,13 +353,11 @@ public class TranslatorFragment extends Fragment implements
 
 
     private void clickOnShareButton(View view){
-//        UIUtils.showToast(getContext(), "share was clicked");
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.share_subject));
         intent.putExtra(Intent.EXTRA_TEXT, mTranslatedResult.getText().toString());
         startActivity(Intent.createChooser(intent, getResources().getString(R.string.chooser_title)));
-//        UIUtils.showToast(getContext(), getResources().getString(R.string.next_release_message));
     }
 
 
@@ -352,10 +376,11 @@ public class TranslatorFragment extends Fragment implements
             //        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
             //                JsonUtils.getJsonObjectFromFile(
             //                        getActivity().getAssets(),"translator_response.json"));
-            for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()) {
-                mTranslations.addAll(POS.getTranslations());
+            if (dictDefinition != null) {
+                for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()) {
+                    mTranslations.addAll(POS.getTranslations());
+                }
             }
-
 //        List<Synonym> synonyms = new ArrayList<>();
 //        synonyms.add(new Synonym("время","ср"));
 //        synonyms.add(new Synonym("раз","м"));
@@ -370,7 +395,6 @@ public class TranslatorFragment extends Fragment implements
 //                    "dayling saving time \u2014 летнее время\ntake some time \u2014 занять некоторое время",
 //                    synonyms.toString()));
 //        }
-
         }
         if (dictDefinition != null){
             mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(
@@ -385,6 +409,8 @@ public class TranslatorFragment extends Fragment implements
         if (!text.isEmpty()){
             mButtonSwitchLang.performClick();
             mCustomEditText.setText(text);
+            showLoadingDictionary();
+            hideSuccess();
             mPresenter.requestTranslatorAPI();
         }
     }
@@ -398,7 +424,7 @@ public class TranslatorFragment extends Fragment implements
         if (savedInstanceState != null){
             restoreVisibility(savedInstanceState,mContainerError,CONT_ERROR_VISIBILITY);
             restoreVisibility(savedInstanceState, mContainerSuccess,CONT_SUCCESS_VISIBILITY);
-            restoreVisibility(savedInstanceState,mProgressBar,PROGRESS_BAR_VISIBILITY);
+            restoreVisibility(savedInstanceState, mProgressDictionary,PROGRESS_BAR_VISIBILITY);
         }
     }
 
@@ -436,7 +462,7 @@ public class TranslatorFragment extends Fragment implements
 
         outState.putString(CONT_ERROR_VISIBILITY, String.valueOf(mContainerError.getVisibility()));
         outState.putString(CONT_SUCCESS_VISIBILITY, String.valueOf(mContainerSuccess.getVisibility()));
-        outState.putString(PROGRESS_BAR_VISIBILITY, String.valueOf(mProgressBar.getVisibility()));
+        outState.putString(PROGRESS_BAR_VISIBILITY, String.valueOf(mProgressDictionary.getVisibility()));
     }
 
     public void initActionBar(){
@@ -469,7 +495,7 @@ public class TranslatorFragment extends Fragment implements
 //                                !mSaver.getCurTranslatedItem()
 //                                        .getSrcMeaning()
 //                                        .equals(mCustomEditText.getText().toString())) {
-//                            showLoading();
+//                            showLoadingDictionary();
 //                            mPresenter.requestTranslatorAPI();
 //                        }
                     }
@@ -494,6 +520,166 @@ public class TranslatorFragment extends Fragment implements
     }
 
     @Override
+    public void showLoadingTargetVoice() {
+        mProgressTargetVoice.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoadingTargetVoice() {
+        mProgressTargetVoice.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showIconTargetVoice() {
+        mButtonGetTargetVoice.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideIconTargetVoice() {
+        mButtonGetTargetVoice.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showLoadingSourceVoice() {
+        mProgressSourceVoice.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideLoadingSourceVoice() {
+        mProgressSourceVoice.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void showIconSourceVoice() {
+        mButtonGetPhotoOrSourceVoice.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideIconSourceVoice() {
+        mButtonGetPhotoOrSourceVoice.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void activateVoiceRecognizer() {
+//        hideClear();
+//        hideKeyboard();
+        hideIconSourceVoice();
+        showActiveRecognizerInput();
+        hideCursorInput();
+        hideHintOnInput();
+    }
+
+    @Override
+    public void desactivateVoiceRecognizer() {
+//        showClear();
+        showIconSourceVoice();
+        showActiveBorderInput();
+        showCursorInput();
+        showHintOnInput();
+    }
+
+    private void showAnimationMicroWaves(){
+        Animator animatorSecond = AnimatorInflater.loadAnimator(getContext(),
+                R.animator.micro_waves_second);
+        Animator animatorSecondBack = AnimatorInflater.loadAnimator(getContext(),
+                R.animator.micro_waves_second_back);
+
+        Animator animatorThird = AnimatorInflater.loadAnimator(getContext(),
+                R.animator.micro_waves_third);
+        Animator animatorThirdBack = AnimatorInflater.loadAnimator(getContext(),
+                R.animator.micro_waves_third_back);
+
+        Animator animatorForth = AnimatorInflater.loadAnimator(getContext(),
+                R.animator.micro_waves_forth);
+        Animator animatorForthBack = AnimatorInflater.loadAnimator(getContext(),
+                R.animator.micro_waves_forth_back);
+
+        animatorSecond.setTarget(mCircleSecond);
+        animatorSecondBack.setTarget(mCircleSecond);
+        animatorThird.setTarget(mCircleThird);
+        animatorThirdBack.setTarget(mCircleThird);
+        animatorForth.setTarget(mCircleForth);
+        animatorForthBack.setTarget(mCircleForth);
+
+        mAnimatorSet = new AnimatorSet();
+        mAnimatorSet.play(animatorSecond).before(animatorSecondBack);
+        mAnimatorSet.play(animatorSecondBack)
+                .after(getResources().getInteger(R.integer.dur_second_to_back));
+
+        mAnimatorSet.play(animatorThird).after(animatorSecond);
+        mAnimatorSet.play(animatorThird).before(animatorThirdBack);
+        mAnimatorSet.play(animatorThirdBack)
+                .after(getResources().getInteger(R.integer.dur_third_to_back));
+
+        mAnimatorSet.play(animatorForth).after(animatorThird);
+        mAnimatorSet.play(animatorForth).before(animatorForthBack);
+        mAnimatorSet.play(animatorForthBack)
+                .after(getResources().getInteger(R.integer.dur_forth_to_back));
+        mAnimatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                animator.start();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+
+        mAnimatorSet.start();
+    }
+
+    private void hideAnimationMicroWaves(){
+        mAnimatorSet.cancel();
+    }
+
+    private void showHintOnInput(){
+        mCustomEditText.setHint(getResources().getString(R.string.translate_hint));
+    }
+
+    private void hideHintOnInput(){
+        mCustomEditText.setHint("");
+    }
+
+    private void showActiveBorderInput() {
+        try {
+            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
+                    getResources().getLayout(R.layout.edittext_border_active)));
+        } catch (XmlPullParserException | IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void hideActiveBorderInput() {
+        try {
+            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
+                    getResources().getLayout(R.layout.edittext_border)));
+        } catch (XmlPullParserException | IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void showActiveRecognizerInput() {
+        try {
+            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
+                    getResources().getLayout(R.layout.edittext_recognizer_active)));
+        } catch (XmlPullParserException | IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void showKeyboard(){
         final InputMethodManager in = (InputMethodManager)
                 getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -511,7 +697,7 @@ public class TranslatorFragment extends Fragment implements
 
         mCustomEditText.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE && mCustomEditText.getText().length() != 0) {
-                showLoading();
+                showLoadingDictionary();
                 hideSuccess();
                 mPresenter.requestTranslatorAPI();
                 Log.d("keyboard state", "ACTION_DONE & customEditText is not empty");
@@ -530,12 +716,12 @@ public class TranslatorFragment extends Fragment implements
                     hideRetry();
                 if (mCustomEditText.getText().length() != 0 && !mClearEditText.isShown()){
                     showClear();
-                    mButtonGetPhotoOrSrcVoice.setImageResource(R.drawable.volume_up_indicator_dark512);
+                    mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.volume_up_indicator_dark512);
                 } else if (mCustomEditText.getText().length() == 0 && mClearEditText.isShown()){
                     hideClear();
                     hideSuccess();
                     clearContainerSuccess();
-                    mButtonGetPhotoOrSrcVoice.setImageResource(R.drawable.camera_dark512);
+                    mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.camera_dark512);
                     mPresenter.saveToSharedPreferences();
                 }
             }
@@ -544,7 +730,11 @@ public class TranslatorFragment extends Fragment implements
             public void afterTextChanged(Editable s) {
             }
         });
+        mCustomEditText.setOnClickListener(this::handleRecognizerOnEdittext);
+    }
 
+    private void handleRecognizerOnEdittext(View view){
+        mPresenter.resetRecognizer();
     }
 
     public void clearContainerSuccess(){
@@ -560,13 +750,13 @@ public class TranslatorFragment extends Fragment implements
     }
 
     @Override
-    public void showLoading() {
-        mProgressBar.setVisibility(View.VISIBLE);
+    public void showLoadingDictionary() {
+        mProgressDictionary.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void hideLoading() {
-        mProgressBar.setVisibility(View.INVISIBLE);
+    public void hideLoadingDictionary() {
+        mProgressDictionary.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -591,31 +781,27 @@ public class TranslatorFragment extends Fragment implements
 
     @Override
     public void showActiveInput() {
-        mCustomEditText.setCursorVisible(true);
-        mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(
-                getActivity(),mMainActivityContainer,mNavigation);
-        try {
-            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
-                    getResources().getLayout(R.layout.edittext_border_active)));
-        } catch (XmlPullParserException | IOException e){
-            e.printStackTrace();
-        }
+        showCursorInput();
+        mBottomPadding =  UIUtils.hideBottomNavViewGetBottomPadding(getActivity(),
+                mMainActivityContainer, mNavigation);
+        showActiveBorderInput();
     }
 
     @Override
     public void hideActiveInput() {
-        mCustomEditText.setCursorVisible(false);
-        UIUtils.showBottomNavViewSetBottomPadding(getActivity(),
-                mMainActivityContainer,mNavigation,mBottomPadding);
-        try {
-            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
-                    getResources().getLayout(R.layout.edittext_border)));
-        } catch (XmlPullParserException | IOException e){
-            e.printStackTrace();
-        }
+        hideCursorInput();
+        UIUtils.showBottomNavViewSetBottomPadding(getActivity(), mMainActivityContainer,
+                mNavigation, mBottomPadding);
+        hideActiveBorderInput();
     }
 
+    private void hideCursorInput(){
+        mCustomEditText.setCursorVisible(false);
+    }
 
+    private void showCursorInput(){
+        mCustomEditText.setCursorVisible(true);
+    }
 
 
     @Override
@@ -647,6 +833,8 @@ public class TranslatorFragment extends Fragment implements
                         mButtonSrcLang.setText(result);
 //                    }
                     if (!mCustomEditText.getText().toString().isEmpty()) {
+                        showLoadingDictionary();
+                        hideSuccess();
                         mPresenter.requestTranslatorAPI();
                     }
                 }
@@ -660,6 +848,8 @@ public class TranslatorFragment extends Fragment implements
 //                    }
                     mButtonTrgLang.setText(result);
                     if (!mCustomEditText.getText().toString().isEmpty()) {
+                        showLoadingDictionary();
+                        hideSuccess();
                         mPresenter.requestTranslatorAPI();
                     }
                 }

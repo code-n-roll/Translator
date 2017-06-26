@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.presentation;
+package com.karanchuk.roman.testtranslate.data.storage;
 
 import android.content.Context;
 
@@ -8,7 +8,6 @@ import com.karanchuk.roman.testtranslate.data.TranslatorDataSource;
 import com.karanchuk.roman.testtranslate.data.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.local.TablesPersistenceContract;
 import com.karanchuk.roman.testtranslate.data.local.TranslatorLocalDataSource;
-import com.karanchuk.roman.testtranslate.presentation.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import static com.karanchuk.roman.testtranslate.presentation.Constants.EDITTEXT_DATA;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_CONTENT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_RESULT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
 
@@ -25,7 +25,6 @@ import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
  */
 
 public class TranslationSaver implements Runnable{
-    private DictDefinition mDictDefinition;
     private TranslatedItem mCurTranslatedItem;
     private Gson mGson;
     private Map<String, Object> mSavedData;
@@ -51,21 +50,6 @@ public class TranslationSaver implements Runnable{
         mSavedData = savedData;
     }
 
-    public TranslatedItem getCurTranslatedItem() {
-        return mCurTranslatedItem;
-    }
-
-    public void setCurTranslatedItem(final TranslatedItem curTranslatedItem) {
-        mCurTranslatedItem = curTranslatedItem;
-    }
-
-    public DictDefinition getDictDefinition() {
-        return mDictDefinition;
-    }
-
-    public void setDictDefinition(final DictDefinition dictDefinition) {
-        mDictDefinition = dictDefinition;
-    }
 
     @Override
     public void run() {
@@ -77,7 +61,7 @@ public class TranslationSaver implements Runnable{
                 (String) mSavedData.get(EDITTEXT_DATA),
                 (String) mSavedData.get(TRANSL_RESULT),
                 "false",
-                mGson.toJson(mDictDefinition));
+                mGson.toJson(mSavedData.get(TRANSL_CONTENT)));
         if (!mHistoryTranslatedItems.contains(mCurTranslatedItem)) {
             mRepository.saveTranslatedItem(TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
         } else {

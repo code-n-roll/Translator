@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="dur_switch_circles">150</integer>
+    <integer name="dur_forth_to_back">650</integer>
+    <integer name="dur_third_to_back">850</integer>
+    <integer name="dur_second_to_back">1050</integer>
+</resources>

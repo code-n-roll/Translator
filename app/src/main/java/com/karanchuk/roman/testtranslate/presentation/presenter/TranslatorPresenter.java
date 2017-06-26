@@ -12,4 +12,5 @@ public interface TranslatorPresenter extends BasePresenter {
     void vocalizeSourceText();
     void vocalizeTargetText();
     void recognizeSourceText();
+    void resetRecognizer();
 }

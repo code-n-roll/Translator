@@ -135,6 +135,13 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
     private ImageView mCircleThird;
     private ImageView mCircleForth;
 
+    private Animator mAnimatorSecond;
+    private Animator mAnimatorSecondBack;
+    private Animator mAnimatorThird;
+    private Animator mAnimatorThirdBack;
+    private Animator mAnimatorForth;
+    private Animator mAnimatorForthBack;
+
     private TranslatorPresenter mPresenter;
 
     @Override
@@ -579,41 +586,43 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
     }
 
     private void showAnimationMicroWaves(){
-        Animator animatorSecond = AnimatorInflater.loadAnimator(getContext(),
+        mCircleFirst.setAlpha(1f);
+
+        mAnimatorSecond = AnimatorInflater.loadAnimator(getContext(),
                 R.animator.micro_waves_second);
-        Animator animatorSecondBack = AnimatorInflater.loadAnimator(getContext(),
+        mAnimatorSecondBack = AnimatorInflater.loadAnimator(getContext(),
                 R.animator.micro_waves_second_back);
 
-        Animator animatorThird = AnimatorInflater.loadAnimator(getContext(),
+        mAnimatorThird = AnimatorInflater.loadAnimator(getContext(),
                 R.animator.micro_waves_third);
-        Animator animatorThirdBack = AnimatorInflater.loadAnimator(getContext(),
+        mAnimatorThirdBack = AnimatorInflater.loadAnimator(getContext(),
                 R.animator.micro_waves_third_back);
 
-        Animator animatorForth = AnimatorInflater.loadAnimator(getContext(),
+        mAnimatorForth = AnimatorInflater.loadAnimator(getContext(),
                 R.animator.micro_waves_forth);
-        Animator animatorForthBack = AnimatorInflater.loadAnimator(getContext(),
+        mAnimatorForthBack = AnimatorInflater.loadAnimator(getContext(),
                 R.animator.micro_waves_forth_back);
 
-        animatorSecond.setTarget(mCircleSecond);
-        animatorSecondBack.setTarget(mCircleSecond);
-        animatorThird.setTarget(mCircleThird);
-        animatorThirdBack.setTarget(mCircleThird);
-        animatorForth.setTarget(mCircleForth);
-        animatorForthBack.setTarget(mCircleForth);
+        mAnimatorSecond.setTarget(mCircleSecond);
+        mAnimatorSecondBack.setTarget(mCircleSecond);
+        mAnimatorThird.setTarget(mCircleThird);
+        mAnimatorThirdBack.setTarget(mCircleThird);
+        mAnimatorForth.setTarget(mCircleForth);
+        mAnimatorForthBack.setTarget(mCircleForth);
 
         mAnimatorSet = new AnimatorSet();
-        mAnimatorSet.play(animatorSecond).before(animatorSecondBack);
-        mAnimatorSet.play(animatorSecondBack)
+        mAnimatorSet.play(mAnimatorSecond).before(mAnimatorSecondBack);
+        mAnimatorSet.play(mAnimatorSecondBack)
                 .after(getResources().getInteger(R.integer.dur_second_to_back));
 
-        mAnimatorSet.play(animatorThird).after(animatorSecond);
-        mAnimatorSet.play(animatorThird).before(animatorThirdBack);
-        mAnimatorSet.play(animatorThirdBack)
+        mAnimatorSet.play(mAnimatorThird).after(mAnimatorSecond);
+        mAnimatorSet.play(mAnimatorThird).before(mAnimatorThirdBack);
+        mAnimatorSet.play(mAnimatorThirdBack)
                 .after(getResources().getInteger(R.integer.dur_third_to_back));
 
-        mAnimatorSet.play(animatorForth).after(animatorThird);
-        mAnimatorSet.play(animatorForth).before(animatorForthBack);
-        mAnimatorSet.play(animatorForthBack)
+        mAnimatorSet.play(mAnimatorForth).after(mAnimatorThird);
+        mAnimatorSet.play(mAnimatorForth).before(mAnimatorForthBack);
+        mAnimatorSet.play(mAnimatorForthBack)
                 .after(getResources().getInteger(R.integer.dur_forth_to_back));
         mAnimatorSet.addListener(new Animator.AnimatorListener() {
             @Override
@@ -640,8 +649,22 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         mAnimatorSet.start();
     }
 
-    private void hideAnimationMicroWaves(){
-        mAnimatorSet.cancel();
+    @Override
+    public void stopAnimationMicroWaves(){
+        mAnimatorSet.removeAllListeners();
+        mAnimatorSet.end();
+
+        mAnimatorSecond.end();
+        mAnimatorSecondBack.end();
+        mAnimatorThird.end();
+        mAnimatorThirdBack.end();
+        mAnimatorForth.end();
+        mAnimatorForthBack.end();
+
+        mCircleFirst.setAlpha(0f);
+        mCircleSecond.setAlpha(0f);
+        mCircleThird.setAlpha(0f);
+        mCircleForth.setAlpha(0f);
     }
 
     private void showHintOnInput(){

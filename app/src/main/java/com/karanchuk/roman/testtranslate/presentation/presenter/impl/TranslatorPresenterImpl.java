@@ -424,6 +424,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     @Override
     public void onRecognitionDone(Recognizer recognizer, Recognition recognition) {
         mView.mCustomEditText.setText(recognition.getBestResultText());
+        mView.stopAnimationMicroWaves();
     }
 
     @Override
@@ -433,5 +434,6 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
         mView.hideLoadingSourceVoice();
         mView.showIconTargetVoice();
         mView.showIconSourceVoice();
+        mView.stopAnimationMicroWaves();
     }
 }

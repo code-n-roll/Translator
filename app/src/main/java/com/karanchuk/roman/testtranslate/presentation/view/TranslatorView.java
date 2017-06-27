@@ -29,4 +29,5 @@ public interface TranslatorView extends BaseView<TranslatorPresenter> {
     void hideIconSourceVoice();
     void activateVoiceRecognizer();
     void desactivateVoiceRecognizer();
+    void stopAnimationMicroWaves();
 }

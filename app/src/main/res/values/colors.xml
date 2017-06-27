@@ -10,4 +10,8 @@
     <color name="colorCustomDark">#666666</color>
     <color name="white">#ffffff</color>
     <color name="colorSelectedItem">#82dcdcdc</color>
+    <color name="firstCircle">#ff9f22</color>
+    <color name="secondCircle">#ffb348</color>
+    <color name="thirdCircle">#ffcf4b</color>
+    <color name="forthCircle">#fcdf97</color>
 </resources>

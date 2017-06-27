@@ -39,15 +39,19 @@
             android:layout_height="38dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/get_audio_spelling"
+            android:layout_below="@id/get_audio_spelling_container"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/cancel_dark512"
             android:background="@android:color/transparent"
             android:adjustViewBounds="true"
             />
+
+        <include android:id="@+id/include_content_micro_waves"
+                 layout="@layout/content_micro_waves"/>
+
         <ImageButton
-            android:id="@+id/get_source_voice"
+            android:id="@+id/get_audio_spelling"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_height="38dp"
@@ -58,19 +62,28 @@
             android:src="@drawable/tool_dark512"
             android:background="@android:color/transparent"
             />
-        <ImageButton
-            android:id="@+id/get_audio_spelling"
-            android:layout_height="38dp"
+        <FrameLayout
+            android:id="@+id/get_source_voice_container"
             android:layout_width="38dp"
-            android:adjustViewBounds="true"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/camera_dark512"
-            android:background="@android:color/transparent"
+            android:layout_height="38dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/get_source_voice"
-            />
+            android:layout_marginTop="40dp">
+            <ImageButton
+                android:id="@+id/get_source_voice"
+                android:layout_height="38dp"
+                android:layout_width="38dp"
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/camera_dark512"
+                android:background="@android:color/transparent"
+                />
+            <ProgressBar
+                android:id="@+id/get_source_voice_progress"
+                android:layout_width="38dp"
+                android:layout_height="38dp"/>
+        </FrameLayout>
     </RelativeLayout>
 
     <FrameLayout

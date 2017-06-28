@@ -29,4 +29,10 @@ public class Constants {
     public static final int UNIQUE_FAVORITES_FRAGMENT_ID = 2;
     public static final int UNIQUE_HISTORY_FRAGMENT_ID = 1;
     public static final int RECOGNIZING_REQUEST_PERMISSION_CODE = 1;
+    public static final String HISTORY_TITLE = " History";
+    public static final String FAVORITES_TITLE = " Favorites";
+    public static final String LANGS_FILE_NAME = "langs.json";
+    public static final String RESULT = "result";
+    public static final String CLEAR_HISTORY_DIALOG = "CLEAR_HISTORY_DIALOG";
+    public static final String CLEAR_HISTORY_FAVORITES = "CLEAR_HISTORY_FAVORITES";
 }

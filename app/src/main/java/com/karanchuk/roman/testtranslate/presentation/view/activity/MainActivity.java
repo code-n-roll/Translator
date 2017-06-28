@@ -23,6 +23,8 @@ import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import java.util.List;
 
 import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_FRAGMENT_TAG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.FAVORITES_TITLE;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.HISTORY_TITLE;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.SETTINGS_FRAGMENT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.STORED_FRAGMENT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSLATOR_FRAGMENT;
@@ -49,37 +51,32 @@ public class MainActivity extends AppCompatActivity implements
     private boolean clickOnItemNavigation(@NonNull final MenuItem item){
         switch (item.getItemId()) {
             case R.id.navigation_translate:
-                if (!mCurFragmentTag.equals(TRANSLATOR_FRAGMENT)) {
+                if (!mCurFragmentTag.equals(TRANSLATOR_FRAGMENT)){
                     setCurFragmentTag(TRANSLATOR_FRAGMENT);
-                    getSupportFragmentManager().
-                            beginTransaction().
-                            replace(R.id.main_activity_container,
-                                    new TranslatorFragment(), TRANSLATOR_FRAGMENT).
-                            commit();
+                    navigateToFragment(new TranslatorFragment(), TRANSLATOR_FRAGMENT);
                 }
                 return true;
             case R.id.navigation_favorites:
                 if (!mCurFragmentTag.equals(STORED_FRAGMENT)){
                     setCurFragmentTag(STORED_FRAGMENT);
-                    getSupportFragmentManager().
-                            beginTransaction().
-                            replace(R.id.main_activity_container,
-                                    new StoredFragment(), STORED_FRAGMENT).
-                            commit();
+                    navigateToFragment(new StoredFragment(), STORED_FRAGMENT);
                 }
                 return true;
             case R.id.navigation_settings:
-                if (!mCurFragmentTag.equals(SETTINGS_FRAGMENT)) {
+                if (!mCurFragmentTag.equals(SETTINGS_FRAGMENT)){
                     setCurFragmentTag(SETTINGS_FRAGMENT);
-                    getSupportFragmentManager().
-                            beginTransaction().
-                            replace(R.id.main_activity_container,
-                                    new SettingsFragment(), SETTINGS_FRAGMENT).
-                            commit();
+                    navigateToFragment(new SettingsFragment(), SETTINGS_FRAGMENT);
                 }
                 return true;
         }
         return false;
+    }
+
+    private void navigateToFragment(Fragment fragment, String fragmentTag){
+        getSupportFragmentManager().
+                beginTransaction().
+                replace(R.id.main_activity_container, fragment, fragmentTag).
+                commit();
     }
 
 
@@ -93,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements
         mContentManager = ContentManager.getInstance();
 
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener((item)->clickOnItemNavigation(item));
+        navigation.setOnNavigationItemSelectedListener(this::clickOnItemNavigation);
 
 
         if (savedInstanceState != null) {
@@ -131,27 +128,25 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(
-                outState,
-                mCurFragmentTag,
-                getSupportFragmentManager().findFragmentByTag(mCurFragmentTag));
+        getSupportFragmentManager().
+                putFragment(outState, mCurFragmentTag,
+                        getSupportFragmentManager().findFragmentByTag(mCurFragmentTag));
         outState.putString(CUR_FRAGMENT_TAG, mCurFragmentTag);
     }
 
 
     @Override
     public void onDialogPositiveClick(ClearStoredDialogFragment dialog) {
-//        UIUtils.showToast(this, "yes was clicked");
         String curTitle = dialog.getArguments().getString("title");
         if (curTitle != null) {
             switch (curTitle) {
-                case " History":
+                case HISTORY_TITLE:
                     if (!mHistoryTranslatedItems.isEmpty()) {
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
 //                        mContentManager.notifyTranslatedItemChanged();
                     }
                     break;
-                case " Favorites":
+                case FAVORITES_TITLE:
                     if (!mFavoritesTranslatedItems.isEmpty()) {
                         mRepository.updateIsFavoriteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY, false);
                         mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);

@@ -14,7 +14,7 @@ public interface DictionaryYandexAPI {
     String API_BASE_URL_DICTIONARY = "https://dictionary.yandex.net/";
 
     @GET("api/v1/dicservice.json/lookup?")
-    Observable<DictDefinition> getDictDefinition(@Query("key") String key,
-                                                 @Query("text") String text,
-                                                 @Query("lang") String lang);
+    Observable<DictDefinition> fetchDictDefinition(@Query("key") String key,
+                                                   @Query("text") String text,
+                                                   @Query("lang") String lang);
 }

@@ -73,7 +73,7 @@ public class TranslatorAPIUtils {
 //                            TranslatedItem newItem = historyTranslatedItems.get(historyTranslatedItems.indexOf(item));
 //                            tvTranslateResult.setTextTextView(newItem.getTrgMeaning());
 
-//                            List<Translation> newData = newItem.getDictDefinitionFromStringRepr(newItem.getDictDefinition()).getTranslations();
+//                            List<Translation> newData = newItem.getDictDefinitionFromStringRepr(newItem.fetchDictDefinition()).getTranslations();
 //                            ((TranslatorRecyclerAdapter)rvTranslate.getAdapter()).updateData(newData);
 
 
@@ -89,7 +89,7 @@ public class TranslatorAPIUtils {
 //                editor.putString(SRC_LANG, item.getSrcLanguageForUser());
 //                editor.putString(TRG_LANG, item.getTrgLanguageForUser());
 //                editor.putString(TRANSL_RESULT, item.getTrgMeaning());
-//                editor.putString(TRANSL_CONTENT, item.getDictDefinition());
+//                editor.putString(TRANSL_CONTENT, item.fetchDictDefinition());
 //                editor.apply();
 //            }
 

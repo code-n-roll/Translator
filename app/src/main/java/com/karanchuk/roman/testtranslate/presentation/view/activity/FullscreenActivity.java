@@ -15,21 +15,18 @@ import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSLATE
  */
 
 public class FullscreenActivity extends AppCompatActivity{
-    private ImageButton mCloseFullscreen;
-    private TextView mFullscreenText;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen);
 
-        mFullscreenText = (TextView) findViewById(R.id.textview_fullscreen_text);
-        mCloseFullscreen = (ImageButton) findViewById(R.id.button_close_fullscreen);
+        TextView fullscreenText = (TextView) findViewById(R.id.textview_fullscreen_text);
+        ImageButton closeFullscreen = (ImageButton) findViewById(R.id.button_close_fullscreen);
 
         if (getIntent() != null) {
-            mFullscreenText.setText(getIntent().getStringExtra(TRANSLATED_RESULT));
+            fullscreenText.setText(getIntent().getStringExtra(TRANSLATED_RESULT));
         }
 
-        mCloseFullscreen.setOnClickListener(v -> finish());
+        closeFullscreen.setOnClickListener(v -> finish());
     }
 }

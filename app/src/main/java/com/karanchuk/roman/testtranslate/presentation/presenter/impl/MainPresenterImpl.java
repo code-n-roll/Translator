@@ -1,12 +1,12 @@
 package com.karanchuk.roman.testtranslate.presentation.presenter.impl;
 
-import com.karanchuk.roman.testtranslate.presentation.presenter.FavoritesPresenter;
+import com.karanchuk.roman.testtranslate.presentation.presenter.MainPresenter;
 
 /**
- * Created by roman on 16.6.17.
+ * Created by roman on 28.6.17.
  */
 
-public class FavoritesPresenterImpl implements FavoritesPresenter {
+public class MainPresenterImpl implements MainPresenter {
     @Override
     public void subscribe() {
 

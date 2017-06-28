@@ -4,7 +4,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/general_container"
                 android:orientation="vertical">
-    <RelativeLayout
+    <com.karanchuk.roman.testtranslate.presentation.view.custom.EditTextLayout
         android:id="@+id/container_edittext"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -80,7 +80,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"/>
         </FrameLayout>
-    </RelativeLayout>
+    </com.karanchuk.roman.testtranslate.presentation.view.custom.EditTextLayout>
 
     <FrameLayout
         android:id="@+id/translate_result_container"

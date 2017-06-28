@@ -18,12 +18,12 @@ import com.karanchuk.roman.testtranslate.presentation.view.adapter.SourceLangRec
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.karanchuk.roman.testtranslate.presentation.Constants.CUR_SELECTED_ITEM_SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.LANGS_FILE_NAME;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
 
 /**
@@ -32,10 +32,9 @@ import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAM
 
 public class SourceLangActivity extends AppCompatActivity {
     private RecyclerView mSrcLangRecycler;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private RecyclerView.ItemDecoration mDividerItemDecoration;
+
     private List<Language> mItems;
-    private JsonObject mLangs;
+    private JsonObject mLangsJson;
     private Language mCurSelectedItem;
     private SharedPreferences mSettings;
 
@@ -44,27 +43,20 @@ public class SourceLangActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source_lang);
+        initToolbar();
+
+        mSrcLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_src_lang);
+        mSrcLangRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mSrcLangRecycler.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
 
         mSettings = getSharedPreferences(PREFS_NAME, 0);
+        mLangsJson = JsonUtils.getJsonObjectFromAssetsFile(this, LANGS_FILE_NAME);
 
-
-        initToolbar();
-        mLangs = JsonUtils.getJsonObjectFromAssetsFile(this, "langs.json");
-
-        mLayoutManager = new LinearLayoutManager(this);
-        mSrcLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_src_lang);
-        mSrcLangRecycler.setLayoutManager(mLayoutManager);
-
-        mDividerItemDecoration = new DividerItemDecoration(this, RecyclerView.VERTICAL);
-        mSrcLangRecycler.addItemDecoration(mDividerItemDecoration);
-
-
-        mItems = getLangsFromJson();
+        mItems = JsonUtils.getLangsFromJson(mLangsJson);
         Collections.sort(mItems);
 
-        mSrcLangRecycler.setAdapter(new SourceLangRecyclerAdapter(
-                mItems,
-                (language) -> clickOnSourceLangItemRecycler(language),
+        mSrcLangRecycler.setAdapter(new SourceLangRecyclerAdapter(mItems,
+                this::clickOnSourceLangItemRecycler,
                 getApplicationContext()));
 
     }
@@ -84,7 +76,6 @@ public class SourceLangActivity extends AppCompatActivity {
             Intent returnIntent = new Intent();
             returnIntent.putExtra("result",language.getName());
             setResult(AppCompatActivity.RESULT_OK,returnIntent);
-//            Toast.makeText(getApplicationContext(),"selected "+language,Toast.LENGTH_SHORT).show();
             UIUtils.showToast(getApplicationContext(),"selected "+language);
         }
         finish();
@@ -96,16 +87,20 @@ public class SourceLangActivity extends AppCompatActivity {
         restoreFromSharedPreferences();
     }
 
-    private void restoreFromSharedPreferences() {
+    private void restoreCurSelectedItem(){
         String abbr = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG, "");
         String langName = null;
-        for (Map.Entry<String, JsonElement> pair : mLangs.entrySet()) {
+        for (Map.Entry<String, JsonElement> pair : mLangsJson.entrySet()) {
             if (abbr.equals(pair.getValue().getAsString())) {
                 langName = pair.getKey();
                 break;
             }
         }
         mCurSelectedItem = new Language(langName, abbr, true);
+    }
+
+    private void restoreFromSharedPreferences() {
+        restoreCurSelectedItem();
         int id = mItems.indexOf(mCurSelectedItem);
         if (id != -1) {
             mCurSelectedItem = mItems.get(id);
@@ -126,21 +121,12 @@ public class SourceLangActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private List<Language> getLangsFromJson() {
-        List<Language> items = new ArrayList<>();
-        for (Map.Entry<String,JsonElement> o : mLangs.entrySet()){
-            String lang = o.getKey();
-            String abbr = o.getValue().getAsString();
-            String firstCapitalize = lang.substring(0,1).toUpperCase().concat(lang.substring(1));
-            items.add(new Language(firstCapitalize,abbr,false));
-        }
-        return items;
-    }
+
 
     private void initToolbar(){
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle("Source Language");
+            actionBar.setTitle(getResources().getString(R.string.title_source_lang));
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -150,6 +136,7 @@ public class SourceLangActivity extends AppCompatActivity {
         switch (menuItem.getItemId()) {
             case android.R.id.home:
                 finish();
+                break;
             default:
                 break;
         }

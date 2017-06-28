@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.presentation.model.TranslatedItem;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -117,7 +116,7 @@ public class StoredRecyclerAdapter extends
                     R.string.menu_item_delete_option);
         }
     }
-    public void setFilter(ArrayList<TranslatedItem> items){
+    public void setFilter(List<TranslatedItem> items){
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();

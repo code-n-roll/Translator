@@ -91,24 +91,22 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     public TranslatorPresenterImpl(TranslatorView view, TextDataStorage textDataStorage) {
         mView = (TranslatorFragment) view;
-        mTextDataStorage = textDataStorage;
-
         SpeechKit.getInstance().configure(mView.getContext(), SPEECH_KIT_API_KEY);
 
+        mTextDataStorage = textDataStorage;
         mSaver = new TranslationSaver(mView.getContext());
         mGson = new Gson();
-        mSettings = mView.getActivity().getSharedPreferences(PREFS_NAME, 0);
+        mMainHandler = new Handler(mView.getContext().getMainLooper());
 
-        TranslatorDataSource localDataSource = TranslatorLocalDataSource.
-                getInstance(mView.getContext());
+        TranslatorDataSource localDataSource =
+                TranslatorLocalDataSource.getInstance(mView.getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
         mHistoryTranslatedItems = mRepository.getTranslatedItems(
                 TablesPersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
 
-        mMainHandler = new Handler(mView.getContext().getMainLooper());
 
-
-        final String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
+        mSettings = mView.getActivity().getSharedPreferences(PREFS_NAME, 0);
+        String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
         if (!dictDefString.equals("null")){
             mCurDictDefinition = mGson.fromJson(dictDefString, DictDefinition.class);
         }
@@ -125,18 +123,21 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     @Override
     public void unsubscribe() {
+        resetRecognizer();
+        saveToSharedPreferences();
+
         mCompositeDisposable = null;
         mRepository.removeHistoryContentObserver(this);
-        saveToSharedPreferences();
-    }
+        mRepository = null;
 
-    @Override
-    public void onStart() {
-    }
-
-    @Override
-    public void onStop() {
-
+        mGson = null;
+        mSaver = null;
+        mMainHandler = null;
+        mView = null;
+        mTextDataStorage = null;
+        mHistoryTranslatedItems = null;
+        mSettings = null;
+        mCurDictDefinition = null;
     }
 
     @Override
@@ -161,7 +162,7 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
 
     @Override
     public void requestDictionaryAPI() {
-        mCompositeDisposable.add(mDictionaryAPI.getDictDefinition(DICTIONARY_API_KEY,
+        mCompositeDisposable.add(mDictionaryAPI.fetchDictDefinition(DICTIONARY_API_KEY,
                 mRequestedText, mTranslationDirection)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -206,7 +207,6 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
         mView.hideLoadingDictionary();
         mView.hideRetry();
         mView.showSuccess();
-//        TranslatorStateHolder.getInstance().notifyTranslatorAPIResult(true);
     }
 
     private void saveToRepository(DictDefinition dictDefinition){
@@ -253,10 +253,13 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     }
 
     private boolean isOnline(){
-        ConnectivityManager cm = (ConnectivityManager)
-                mView.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
+        NetworkInfo networkInfo = null;
+        if (mView != null && mView.getActivity() != null) {
+            ConnectivityManager cm = (ConnectivityManager)
+                    mView.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            networkInfo = cm.getActiveNetworkInfo();
+        }
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 
     @Override
@@ -403,7 +406,9 @@ public class TranslatorPresenterImpl implements TranslatorPresenter,
     @Override
     public void onRecordingDone(Recognizer recognizer) {
         Log.d("myLogs", " onRecordingDone");
-        mView.desactivateVoiceRecognizer();
+        if (mView != null && mView.isAdded()) {
+            mView.desactivateVoiceRecognizer();
+        }
     }
 
     @Override

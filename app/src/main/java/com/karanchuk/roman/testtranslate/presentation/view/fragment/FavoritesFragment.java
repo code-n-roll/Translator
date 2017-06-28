@@ -89,12 +89,6 @@ public class FavoritesFragment extends Fragment implements
 
         mContentManager = ContentManager.getInstance();
 
-//        mFavoritesTranslatedItems = new ArrayList<>();
-//        for (int i = 0; i < 10; i++) {
-//            mFavoritesTranslatedItems.add(i, new TranslatedItem("RU", "FR", "привет", "bonjour", "false", null));
-//        }
-
-
         TranslatorDataSource localDataSource = TranslatorLocalDataSource.getInstance(getContext());
         mRepository = TranslatorRepository.getInstance(localDataSource);
         mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);

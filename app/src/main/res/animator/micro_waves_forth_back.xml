@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<set xmlns:android="http://schemas.android.com/apk/res/android">
-    <set xmlns:android="http://schemas.android.com/apk/res/android"
-         android:ordering="together">
-        <objectAnimator android:duration="@integer/dur_switch_circles"
-                        android:propertyName="alpha"
-                        android:valueTo="0f"
-                        android:valueFrom="1f"/>
-        <objectAnimator android:duration="@integer/dur_switch_circles"
-                        android:propertyName="scaleY"
-                        android:valueTo="0f"
-                        android:valueFrom="@dimen/coeff_scale_forth"/>
-        <objectAnimator android:duration="@integer/dur_switch_circles"
-                        android:propertyName="scaleX"
-                        android:valueTo="0f"
-                        android:valueFrom="@dimen/coeff_scale_forth"/>
-    </set>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+     android:ordering="together">
+    <objectAnimator android:duration="@integer/dur_switch_circles"
+                    android:propertyName="alpha"
+                    android:valueTo="0f"
+                    android:valueFrom="1f"/>
+    <objectAnimator android:duration="@integer/dur_switch_circles"
+                    android:propertyName="scaleY"
+                    android:valueTo="0f"
+                    android:valueFrom="@dimen/coeff_scale_forth"/>
+    <objectAnimator android:duration="@integer/dur_switch_circles"
+                    android:propertyName="scaleX"
+                    android:valueTo="0f"
+                    android:valueFrom="@dimen/coeff_scale_forth"/>
 </set>

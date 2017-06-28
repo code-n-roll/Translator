@@ -20,4 +20,11 @@
     <string name="set_favorite_message">Feature is implemented, but available in history/favorites tabs, more in the next release.</string>
     <string name="share_subject">Result of TestTranslator</string>
     <string name="chooser_title">Share to&#8230;</string>
+    <string name="title_source_lang">Source Language</string>
+    <string name="title_target_lang">Target Language</string>
+    <string name="record_audio_not_granted">Record audio permission was not granted</string>
+    <string name="title_choose_lang">Choose Language</string>
+    <string name="title_history">History</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_settings">Settings</string>
 </resources>

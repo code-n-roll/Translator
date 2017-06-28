@@ -20,10 +20,12 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -55,6 +57,7 @@ import com.karanchuk.roman.testtranslate.presentation.view.activity.SourceLangAc
 import com.karanchuk.roman.testtranslate.presentation.view.activity.TargetLangActivity;
 import com.karanchuk.roman.testtranslate.presentation.view.adapter.TranslatorRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.presentation.view.custom.CustomEditText;
+import com.karanchuk.roman.testtranslate.presentation.view.custom.EditTextLayout;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -75,7 +78,9 @@ import static com.karanchuk.roman.testtranslate.presentation.Constants.IS_FAVORI
 import static com.karanchuk.roman.testtranslate.presentation.Constants.PREFS_NAME;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.PROGRESS_BAR_VISIBILITY;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.RECOGNIZING_REQUEST_PERMISSION_CODE;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.RESULT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSLATED_RESULT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_CONTENT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRANSL_RESULT;
 import static com.karanchuk.roman.testtranslate.presentation.Constants.TRG_LANG;
@@ -109,13 +114,14 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
     private View mView;
     private ActionBar mActionBar;
     private BottomNavigationView mNavigation;
+
     public RecyclerView mTranslateRecyclerView;
     public CustomEditText mCustomEditText;
     public Button mButtonSrcLang;
     public Button mButtonTrgLang;
     public TextView mTranslatedResult;
 
-    private RelativeLayout mContainerEdittext;
+    private EditTextLayout mContainerEditText;
     private RelativeLayout mContainerSuccess;
     private RelativeLayout mContainerError;
     private FrameLayout mMainActivityContainer;
@@ -126,7 +132,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
     private TranslatorRepository mRepository;
 
     private SharedPreferences mSettings;
-//    private TranslationSaver mSaver;
     private int mBottomPadding;
 
     private AnimatorSet mAnimatorSet;
@@ -142,7 +147,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
     private Animator mAnimatorForth;
     private Animator mAnimatorForthBack;
 
-    private TranslatorPresenter mPresenter;
+    private TranslatorPresenterImpl mPresenter;
+    private GestureDetector mGestureDetector;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -156,7 +162,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
 
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
         mView = view;
-//        mSaver = new TranslationSaver(getContext());
 
         TextDataStorage textDataStorage = new TextDataStorageImpl(this.getContext());
         setPresenter(new TranslatorPresenterImpl(this, textDataStorage));
@@ -191,9 +196,19 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         UIUtils.changeSoftInputModeWithOrientation(getActivity());
         initCustomEditText();
         initEventListenerKeyboardVisibility();
-
         initListeners();
+
+//        mGestureDetector = new GestureDetector(getContext(), mContainerEditText);
+//        mCustomEditText.setOnTouchListener(mViewOnTouchListener);
     }
+
+//    private View.OnTouchListener mViewOnTouchListener = new View.OnTouchListener() {
+//        @Override
+//        public boolean onTouch(View view, MotionEvent motionEvent) {
+//            mGestureDetector.onTouchEvent(motionEvent);
+//            return false;
+//        }
+//    };
 
     private void initListeners(){
         mGeneralContainer.setOnTouchListener(this::clickOnGeneralContainer);
@@ -221,7 +236,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         mClearEditText = mView.findViewById(R.id.clear_edittext);
         mButtonRetry = mView.findViewById(R.id.button_connection_error_retry);
         mTranslatedResult = mView.findViewById(R.id.textview_translate_result);
-        mContainerEdittext = mView.findViewById(R.id.container_edittext);
+        mContainerEditText = mView.findViewById(R.id.container_edittext);
         mContainerSuccess = mView.findViewById(R.id.connection_succesful_content);
         mContainerError = mView.findViewById(R.id.connection_error_content);
         mTranslateRecyclerView = mView.findViewById(R.id.container_dict_defin);
@@ -246,9 +261,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         mButtonSwitchLang = mActionBarView.findViewById(R.id.center_actionbar_button);
         mButtonSrcLang = mActionBarView.findViewById(R.id.left_actionbar_button);
         mButtonTrgLang = mActionBarView.findViewById(R.id.right_actionbar_button);
-        mButtonSrcLang.setText(mSettings.getString(SRC_LANG, "Choose language"));
-        mButtonTrgLang.setText(mSettings.getString(TRG_LANG, "Choose language"));
+        String title = getResources().getString(R.string.title_choose_lang);
+        mButtonSrcLang.setText(mSettings.getString(SRC_LANG, title));
+        mButtonTrgLang.setText(mSettings.getString(TRG_LANG, title));
     }
+
 
 
     private boolean clickOnGeneralContainer(View view, MotionEvent event) {
@@ -293,12 +310,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         showLoadingDictionary();
         hideSuccess();
         mPresenter.requestTranslatorAPI();
-        //        UIUtils.showToast(getContext(), "retry was clicked");
     }
 
     private void clickOnFullscreenButton(View view) {
         final Intent intent = new Intent(getActivity(), FullscreenActivity.class);
-        intent.putExtra("translated_result", mTranslatedResult.getText().toString());
+        intent.putExtra(TRANSLATED_RESULT, mTranslatedResult.getText().toString());
         startActivity(intent);
     }
 
@@ -327,9 +343,10 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         }
 
         if (grantResults.length == 1 && grantResults[0] == PERMISSION_GRANTED) {
-            mPresenter.recognizeSourceText();
+//            mPresenter.recognizeSourceText();
         } else {
-//            updateStatus("Record audio permission was not granted");
+            UIUtils.showToast(getContext(),
+                    getResources().getString(R.string.record_audio_not_granted));
         }
     }
 
@@ -380,28 +397,11 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         DictDefinition dictDefinition = null;
         if (!dictDefString.isEmpty()) {
             dictDefinition = new Gson().fromJson(dictDefString, DictDefinition.class);
-            //        DictDefinition dictDefinition = JsonUtils.getDictDefinitionFromJson(
-            //                JsonUtils.getJsonObjectFromFile(
-            //                        getActivity().getAssets(),"translator_response.json"));
             if (dictDefinition != null) {
                 for (PartOfSpeech POS : dictDefinition.getPartsOfSpeech()) {
                     mTranslations.addAll(POS.getTranslations());
                 }
             }
-//        List<Synonym> synonyms = new ArrayList<>();
-//        synonyms.add(new Synonym("время","ср"));
-//        synonyms.add(new Synonym("раз","м"));
-//        synonyms.add(new Synonym("момент","м"));
-//        synonyms.add(new Synonym("срок","м"));
-//        synonyms.add(new Synonym("пора","ж"));
-//        synonyms.add(new Synonym("период","м"));
-//
-//        for (int i = 1; i <= 10; i++){
-//            mTranslations.add(new Translation(String.valueOf(i),
-//                    synonyms,"(period, time, moment, pore)",
-//                    "dayling saving time \u2014 летнее время\ntake some time \u2014 занять некоторое время",
-//                    synonyms.toString()));
-//        }
         }
         if (dictDefinition != null){
             mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(
@@ -429,7 +429,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null){
-            restoreVisibility(savedInstanceState,mContainerError,CONT_ERROR_VISIBILITY);
+            restoreVisibility(savedInstanceState, mContainerError,CONT_ERROR_VISIBILITY);
             restoreVisibility(savedInstanceState, mContainerSuccess,CONT_SUCCESS_VISIBILITY);
             restoreVisibility(savedInstanceState, mProgressDictionary,PROGRESS_BAR_VISIBILITY);
         }
@@ -447,7 +447,9 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         super.onStop();
     }
 
-    public void restoreVisibility(final Bundle savedInstanceState, final View view, final String key){
+    public void restoreVisibility(final Bundle savedInstanceState,
+                                  final View view,
+                                  final String key){
         switch (Integer.parseInt(savedInstanceState.getString(key))){
             case View.GONE:
                 view.setVisibility(View.GONE);
@@ -491,7 +493,6 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         KeyboardVisibilityEvent.setEventListener(
                 getActivity(),
                 isOpen -> {
-                    // some code depending on keyboard visiblity status
                     if (isOpen && isAdded()){
                         showActiveInput();
                     } else if (!isOpen && isAdded()){
@@ -646,6 +647,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
             }
         });
 
+        mAnimatorSet.setInterpolator(new LinearInterpolator());
         mAnimatorSet.start();
     }
 
@@ -677,7 +679,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
 
     private void showActiveBorderInput() {
         try {
-            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
+            mContainerEditText.setBackground(Drawable.createFromXml(getResources(),
                     getResources().getLayout(R.layout.edittext_border_active)));
         } catch (XmlPullParserException | IOException e){
             e.printStackTrace();
@@ -686,7 +688,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
 
     private void hideActiveBorderInput() {
         try {
-            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
+            mContainerEditText.setBackground(Drawable.createFromXml(getResources(),
                     getResources().getLayout(R.layout.edittext_border)));
         } catch (XmlPullParserException | IOException e){
             e.printStackTrace();
@@ -695,7 +697,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
 
     private void showActiveRecognizerInput() {
         try {
-            mContainerEdittext.setBackground(Drawable.createFromXml(getResources(),
+            mContainerEditText.setBackground(Drawable.createFromXml(getResources(),
                     getResources().getLayout(R.layout.edittext_recognizer_active)));
         } catch (XmlPullParserException | IOException e){
             e.printStackTrace();
@@ -719,7 +721,8 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         mCustomEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
 
         mCustomEditText.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE && mCustomEditText.getText().length() != 0) {
+            String curEditTextContent = mCustomEditText.getText().toString().trim();
+            if (actionId == EditorInfo.IME_ACTION_DONE && !curEditTextContent.isEmpty()) {
                 showLoadingDictionary();
                 hideSuccess();
                 mPresenter.requestTranslatorAPI();
@@ -769,7 +772,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
 
     @Override
     public void setPresenter(TranslatorPresenter presenter) {
-        mPresenter = presenter;
+        mPresenter = (TranslatorPresenterImpl) presenter;
     }
 
     @Override
@@ -832,7 +835,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
         switch(requestCode){
             case SRC_LANG_ACTIVITY_REQUEST_CODE:
                 if (resultCode == AppCompatActivity.RESULT_OK){
-                    String result = data.getStringExtra("result");
+                    String result = data.getStringExtra(RESULT);
 
 //                    if (!mButtonSrcLang.getText().equals(result) &&
 //                            !mTranslatedResult.getText().toString().isEmpty()) {
@@ -864,7 +867,7 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
                 break;
             case TRG_LANG_ACTIVITY_REQUEST_CODE:
                 if (resultCode == AppCompatActivity.RESULT_OK){
-                    String result = data.getStringExtra("result");
+                    String result = data.getStringExtra(RESULT);
 //                    if (mButtonTrgLang.getText().equals(result)) {
 //                        mButtonSrcLang.setText(mButtonTrgLang.getText());
 //                        mCustomEditText.setText(mTranslatedResult.getText());
@@ -881,32 +884,4 @@ public class TranslatorFragment extends Fragment implements TranslatorView {
                 break;
         }
     }
-
 }
-
-
-//        View.OnClickListener editTextClickListener = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (v.getId() == mCustomEditText.getId()){
-//                    mCustomEditText.setCursorVisible(true);
-//                }
-//            }
-//        };
-//        mCustomEditText.setOnClickListener(editTextClickListener);
-
-
-//        View.OnClickListener lostFocusEditTextClickListener = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (v.getId() == mTranslateResultContainer.getId()){
-//                    InputMethodManager in = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    if (in.isAcceptingText()) {
-//                        in.hideSoftInputFromWindow(mCustomEditText.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-//                        mCustomEditText.setCursorVisible(false);
-////                        Log.d("keyboard state", "lostFocusEditText");
-//                    }
-//                }
-//            }
-//        };
-//        mTranslateResultContainer.setOnClickListener(lostFocusEditTextClickListener);

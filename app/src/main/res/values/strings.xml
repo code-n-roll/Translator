@@ -27,4 +27,7 @@
     <string name="title_history">History</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_settings">Settings</string>
+    <string name="recognizer_hint">Say something</string>
+    <string name="try_vocalize_empty_result">Translate something for vocalizing result</string>
+    <string name="try_to_get_photo">Feature to get photo is not implemented</string>
 </resources>

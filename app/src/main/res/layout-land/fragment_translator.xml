@@ -7,7 +7,7 @@
 
     >
 
-    <com.karanchuk.roman.testtranslate.presentation.view.custom.EditTextLayout
+    <com.karanchuk.roman.testtranslate.common.view.EditTextLayout
         android:id="@+id/container_edittext"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -15,7 +15,7 @@
         android:layout_margin="10dp"
         android:background="@layout/edittext_border"
         >
-    <com.karanchuk.roman.testtranslate.presentation.view.custom.CustomEditText
+    <com.karanchuk.roman.testtranslate.common.view.CustomEditText
         android:id="@+id/edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -39,7 +39,7 @@
             android:layout_height="38dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/get_audio_spelling_container"
+            android:layout_below="@+id/get_source_voice_container"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/cancel_dark512"
@@ -84,7 +84,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"/>
         </FrameLayout>
-    </com.karanchuk.roman.testtranslate.presentation.view.custom.EditTextLayout>
+    </com.karanchuk.roman.testtranslate.common.view.EditTextLayout>
 
     <FrameLayout
         android:layout_width="0dp"
@@ -95,7 +95,7 @@
         android:layout_marginRight="10dp"
         >
         <include
-            android:id="@+id/connection_succesful_content"
+            android:id="@+id/connection_successful_content"
             layout="@layout/content_connection_succesful"/>
 
         <include

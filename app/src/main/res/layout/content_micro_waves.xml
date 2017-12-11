@@ -15,8 +15,7 @@
         android:layout_height="68dp"
         android:src="@drawable/circle_forth"
         android:alpha="0"
-        android:layout_gravity="center"
-        android:adjustViewBounds="false"/>
+        android:layout_gravity="center"/>
     <ImageView
         android:id="@+id/circle_third"
         android:layout_width="58dp"

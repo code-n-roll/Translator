@@ -23,6 +23,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/data/database/room/dao/TranslationHistoryDao.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/data/database/room/table/TranslationFavorite.java">
           <value>
             <set />

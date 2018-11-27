@@ -2,6 +2,7 @@ package com.karanchuk.roman.testtranslate.presentation.ui.main;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -34,18 +35,20 @@ public class MainActivity extends AppCompatActivity implements
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver{
 
+    private static final String sHandlerName = "MAIN_HANDLER_THREAD";
+
     private String mCurFragmentTag = "TRANSLATOR_FRAGMENT";
     private List<TranslatedItem> mHistoryTranslatedItems;
     private List<TranslatedItem> mFavoritesTranslatedItems;
     private TranslatorRepositoryImpl mRepository;
     private Handler mMainHandler;
+    private HandlerThread mMainHandlerThread;
     private ContentManager mContentManager;
     private Fragment mCurFragment;
 
     public void setCurFragmentTag(final String curFragmentTag){
         mCurFragmentTag = curFragmentTag;
     }
-
 
     private boolean clickOnItemNavigation(@NonNull final MenuItem item){
         switch (item.getItemId()) {
@@ -83,7 +86,10 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mMainHandler = new Handler(getMainLooper());
+        mMainHandlerThread = new HandlerThread(sHandlerName);
+        mMainHandlerThread.start();
+        mMainHandler = new Handler(mMainHandlerThread.getLooper());
+
         mContentManager = ContentManager.getInstance();
 
         final BottomNavigationView navigation = findViewById(R.id.navigation);
@@ -120,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements
         super.onStop();
         mRepository.removeHistoryContentObserver(this);
         mRepository.removeFavoritesContentObserver(this);
+        mMainHandlerThread.quit();
+        mMainHandlerThread = null;
+        mMainHandler = null;
     }
 
     @Override
@@ -131,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements
         outState.putString(CUR_FRAGMENT_TAG, mCurFragmentTag);
     }
 
-
     @Override
     public void onDialogPositiveClick(ClearStoredDialogFragment dialog) {
         String curTitle = dialog.getArguments().getString("title");
@@ -139,14 +147,18 @@ public class MainActivity extends AppCompatActivity implements
             switch (curTitle) {
                 case HISTORY_TITLE:
                     if (!mHistoryTranslatedItems.isEmpty()) {
-                        mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+                        mMainHandler.post(() ->
+                            mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY)
+                        );
 //                        mContentManager.notifyTranslatedItemChanged();
                     }
                     break;
                 case FAVORITES_TITLE:
                     if (!mFavoritesTranslatedItems.isEmpty()) {
-                        mRepository.updateIsFavoriteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY, false);
-                        mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+                        mMainHandler.post(() -> {
+                            mRepository.updateIsFavoriteTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY, false);
+                            mRepository.deleteTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+                        });
 //                        mContentManager.notifyTranslatedItemChanged();
                     }
                     break;
@@ -155,8 +167,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     }
-
-
 
     @Override
     public void onDialogNegativeClick(ClearStoredDialogFragment dialog) {

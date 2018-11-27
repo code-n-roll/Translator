@@ -56,9 +56,7 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
     }
 
     public void removeHistoryContentObserver(final HistoryTranslatedItemsRepositoryObserver observer){
-        if (mHistoryObservers.contains(observer)){
-            mHistoryObservers.remove(observer);
-        }
+        mHistoryObservers.remove(observer);
     }
 
     private void notifyHistoryTranslatedItemsChanged(){
@@ -104,8 +102,7 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
             mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
 
-            if (mHistoryCachedTranslatedItems != null
-                    && mHistoryCachedTranslatedItems.containsKey(translatedItem.getId())) {
+            if (mHistoryCachedTranslatedItems != null) {
                 mHistoryCachedTranslatedItems.remove(translatedItem.getId());
             }
 
@@ -113,8 +110,7 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
             mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
 
-            if (mFavoritesCachedTranslatedItems != null
-                    && mFavoritesCachedTranslatedItems.containsKey(translatedItem.getId())){
+            if (mFavoritesCachedTranslatedItems != null){
                 mFavoritesCachedTranslatedItems.remove(translatedItem.getId());
             }
 
@@ -204,18 +200,14 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
     }
 
 
-    public void addFavoritesContentObserver(
-            final FavoritesTranslatedItemsRepositoryObserver observer){
+    public void addFavoritesContentObserver(final FavoritesTranslatedItemsRepositoryObserver observer){
         if (!mFavoritesObservers.contains(observer)){
             mFavoritesObservers.add(observer);
         }
     }
 
-    public void removeFavoritesContentObserver(
-            final FavoritesTranslatedItemsRepositoryObserver observer){
-        if (mFavoritesObservers.contains(observer)){
-            mFavoritesObservers.remove(observer);
-        }
+    public void removeFavoritesContentObserver(final FavoritesTranslatedItemsRepositoryObserver observer){
+        mFavoritesObservers.remove(observer);
     }
 
     private void notifyFavoritesTranslatedItemsChanged(){

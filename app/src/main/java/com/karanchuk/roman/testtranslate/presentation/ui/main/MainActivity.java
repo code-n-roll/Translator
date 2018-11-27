@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver{
 
-
     private String mCurFragmentTag = "TRANSLATOR_FRAGMENT";
     private List<TranslatedItem> mHistoryTranslatedItems;
     private List<TranslatedItem> mFavoritesTranslatedItems;
@@ -79,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements
                 commit();
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         mMainHandler = new Handler(getMainLooper());
         mContentManager = ContentManager.getInstance();
 
-        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        final BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this::clickOnItemNavigation);
 
 

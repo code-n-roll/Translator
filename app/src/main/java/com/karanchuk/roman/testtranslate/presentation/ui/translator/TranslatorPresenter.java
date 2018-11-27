@@ -1,38 +1,31 @@
 package com.karanchuk.roman.testtranslate.presentation.ui.translator;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.ImageButton;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
-import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
-import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository;
-import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl;
 import com.karanchuk.roman.testtranslate.data.database.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.data.database.model.PartOfSpeech;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.database.model.Translation;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslationResponse;
+import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
+import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository;
+import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl;
 import com.karanchuk.roman.testtranslate.data.database.storage.TextDataStorage;
 import com.karanchuk.roman.testtranslate.data.database.storage.TextDataStorageImpl;
 import com.karanchuk.roman.testtranslate.data.database.storage.TranslationSaver;
-import com.karanchuk.roman.testtranslate.data.network.DictionaryService;
-import com.karanchuk.roman.testtranslate.data.network.TranslatorService;
-import com.karanchuk.roman.testtranslate.presentation.ui.fullscreen.FullscreenActivity;
-import com.karanchuk.roman.testtranslate.presentation.ui.sourcelang.SourceLangActivity;
-import com.karanchuk.roman.testtranslate.presentation.ui.targetlang.TargetLangActivity;
+import com.karanchuk.roman.testtranslate.presentation.TestTranslatorApp;
+import com.karanchuk.roman.testtranslate.repository.YandexDictionaryRepository;
+import com.karanchuk.roman.testtranslate.repository.YandexTranslateRepository;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
@@ -41,11 +34,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import ru.yandex.speechkit.Error;
 import ru.yandex.speechkit.Recognition;
 import ru.yandex.speechkit.Recognizer;
@@ -66,15 +59,10 @@ import static com.karanchuk.roman.testtranslate.common.Constants.PREFS_NAME;
 import static com.karanchuk.roman.testtranslate.common.Constants.RECOGNIZING_REQUEST_PERMISSION_CODE;
 import static com.karanchuk.roman.testtranslate.common.Constants.SPEECH_KIT_API_KEY;
 import static com.karanchuk.roman.testtranslate.common.Constants.SRC_LANG;
-import static com.karanchuk.roman.testtranslate.common.Constants.TRANSLATED_RESULT;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSLATOR_API_KEY;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSL_CONTENT;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSL_RESULT;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
-import static com.karanchuk.roman.testtranslate.data.network.DictionaryService.API_BASE_URL_DICTIONARY;
-import static com.karanchuk.roman.testtranslate.data.network.TranslatorService.API_BASE_URL_TRANSLATOR;
-import static com.karanchuk.roman.testtranslate.presentation.ui.translator.TranslatorFragment.SRC_LANG_ACTIVITY_REQUEST_CODE;
-import static com.karanchuk.roman.testtranslate.presentation.ui.translator.TranslatorFragment.TRG_LANG_ACTIVITY_REQUEST_CODE;
 
 /**
  * Created by roman on 16.6.17.
@@ -82,7 +70,9 @@ import static com.karanchuk.roman.testtranslate.presentation.ui.translator.Trans
 
 public class TranslatorPresenter implements TranslatorContract.Presenter,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
-        VocalizerListener, RecognizerListener {
+        VocalizerListener,
+        RecognizerListener {
+
     private SharedPreferences mSettings;
     private TranslatorRepositoryImpl mRepository;
     private Handler mMainHandler;
@@ -91,17 +81,20 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     private DictDefinition mCurDictDefinition;
     private TranslationSaver mSaver;
 
-    private CompositeDisposable mCompositeDisposable;
-    private TranslatorService mTranslatorAPI;
-    private DictionaryService mDictionaryAPI;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private String mRequestedText;
     private String mTranslationDirection;
     private Gson mGson;
+
     private Vocalizer mVocalizer;
     private Recognizer mRecognizer;
     private TextDataStorage mTextDataStorage;
 
-    private Context mContext;
+    @Inject
+    YandexTranslateRepository mYandexTranslateRepository;
+
+    @Inject
+    YandexDictionaryRepository mYandexDictionaryRepository;
 
     public TranslatorPresenter(TranslatorContract.View view, Context context) {
         mView = (TranslatorFragment) view;
@@ -125,15 +118,12 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
             mCurDictDefinition = mGson.fromJson(dictDefString, DictDefinition.class);
         }
 
-        initTranslatorYandexAPI();
-        initDictionaryYandexAPI();
+        TestTranslatorApp.appComponent.inject(this);
     }
 
     @Override
     public void attachView(Context context) {
-        mCompositeDisposable = new CompositeDisposable();
         mRepository.addHistoryContentObserver(this);
-        mContext = context;
     }
 
     @Override
@@ -154,10 +144,6 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         mCurDictDefinition = null;
     }
 
-    public Recognizer getRecognizer() {
-        return mRecognizer;
-    }
-
     @Override
     public boolean requestTranslatorAPI() {
         JsonObject langs = JsonUtils.getJsonObjectFromAssetsFile(mView.getContext(), "langs.json");
@@ -174,8 +160,10 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         if ((mSaver.getCurTranslatedItem() != null &&
                 !mSaver.getCurTranslatedItem().getSrcMeaning().equals(mRequestedText)) ||
                 mSaver.getCurTranslatedItem() == null) {
-            mCompositeDisposable.add(mTranslatorAPI.fetchTranslation(TRANSLATOR_API_KEY,
-                    mRequestedText, mTranslationDirection)
+            mCompositeDisposable.add(mYandexTranslateRepository.getTranslation(
+                    TRANSLATOR_API_KEY,
+                    mRequestedText,
+                    mTranslationDirection)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(this::handleTranslatingResponse, this::handleTranslatingError));
@@ -187,27 +175,13 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
 
     @Override
     public void requestDictionaryAPI() {
-        mCompositeDisposable.add(mDictionaryAPI.fetchDictDefinition(DICTIONARY_API_KEY,
-                mRequestedText, mTranslationDirection)
+        mCompositeDisposable.add(mYandexDictionaryRepository.getValueFromDictionary(
+                DICTIONARY_API_KEY,
+                mRequestedText,
+                mTranslationDirection)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::handleDictionaryResponse, this::handleDictionaryError));
-    }
-
-    private void initTranslatorYandexAPI(){
-        mTranslatorAPI = new Retrofit.Builder()
-                .baseUrl(API_BASE_URL_TRANSLATOR)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build().create(TranslatorService.class);
-    }
-
-    private void initDictionaryYandexAPI(){
-        mDictionaryAPI = new Retrofit.Builder()
-                .baseUrl(API_BASE_URL_DICTIONARY)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build().create(DictionaryService.class);
     }
 
     @Override
@@ -484,157 +458,9 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     public void onError(Recognizer recognizer, Error error) {
         Log.d("myLogs", " onError");
         if (mView != null) {
-            mView.hideLoadingTargetVoice();
-            mView.hideLoadingSourceVoice();
-            mView.showIconTargetVoice();
-            mView.showIconSourceVoice();
-            mView.stopAnimationMicroWaves();
-            mView.setHintOnInput();
-            mView.showActiveInput();
-            mView.setRecognizingSourceText(false);
+            mView.showError();
             UIUtils.showToast(mView.getContext(),
                     mView.getContext().getResources().getString(R.string.connection_error_content));
-        }
-    }
-
-    @Override
-    public boolean clickOnGeneralContainer(View view, MotionEvent event) {
-        mView.hideKeyboard();
-//        UIUtils.showToast(getContext(), "clicked outside keyboard, keyboard hided");
-        return true;
-    }
-
-    @Override
-    public void clickOnSrcLangButton(View view) {
-        final Intent intent = new Intent(mContext, SourceLangActivity.class);
-        mView.startActivityForResult(intent, SRC_LANG_ACTIVITY_REQUEST_CODE);
-    }
-
-    @Override
-    public void clickOnSwitchLangButton(View view) {
-        String oldSrcLang = mView.getTextButtonSrcLang();
-        String oldTrgLang = mView.getTextButtonTrgLang();
-        mView.setTextButtonSrcLang(oldTrgLang);
-        mView.setTextButtonTrgLang(oldSrcLang);
-
-        String srcLangAPI = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG,"");
-        String trgLangAPI = mSettings.getString(CUR_SELECTED_ITEM_TRG_LANG,"");
-
-        SharedPreferences.Editor editor = mSettings.edit();
-        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, trgLangAPI);
-        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, srcLangAPI);
-        editor.apply();
-
-        mView.setTextCustomEditText(mView.getTextTranslatedResultView());
-        if (!mView.isEmptyCustomEditText() && requestTranslatorAPI()) {
-            mView.showLoadingDictionary();
-            mView.hideSuccess();
-        } else {
-            mView.getTranslatedItemFromCache(mView.createPredictedTranslatedItem());
-        }
-    }
-
-    @Override
-    public void clickOnTrgLangButton(View view) {
-        final Intent intent = new Intent(mContext, TargetLangActivity.class);
-        mView.startActivityForResult(intent, TRG_LANG_ACTIVITY_REQUEST_CODE);
-    }
-
-    @Override
-    public void clickOnRetryButton(View view) {
-        mView.showLoadingDictionary();
-        mView.hideSuccess();
-        requestTranslatorAPI();
-    }
-
-    @Override
-    public void clickOnFullscreenButton(View view) {
-        final Intent intent = new Intent(mContext, FullscreenActivity.class);
-        intent.putExtra(TRANSLATED_RESULT, mView.getTextTranslatedResultView());
-        mContext.startActivity(intent);
-    }
-
-    @Override
-    public void clickOnClearEditText(View view){
-        mView.clearCustomEditText();
-    }
-
-    @Override
-    public void clickOnRecognizePhotoOrVocalizeSourceText(View view){
-        if (!mView.isEmptyCustomEditText()) {
-            mView.showLoadingSourceVoice();
-            mView.hideIconSourceVoice();
-            vocalizeSourceText();
-        } else {
-            UIUtils.showToast(mContext, mContext.getResources()
-                                                .getString(R.string.try_to_get_photo));
-        }
-    }
-
-    @Override
-    public void clickOnRecognizeSourceText(View view){
-        if (!mView.isRecordAudioGranted()){
-            mView.requestRecordAudioPermissions();
-        }
-        if (!mView.isRecognizingSourceText() && mView.isRecordAudioGranted()) {
-            mView.setRecognizingSourceText(true);
-            mView.showAnimationMicroWaves();
-            recognizeSourceText();
-        } else {
-            mView.setRecognizingSourceText(false);
-            resetRecognizer();
-        }
-    }
-
-    @Override
-    public void clickOnSetFavoriteButton(final ImageButton view) {
-//         final TranslatedItem item = mSaver.getCurTranslatedItem();
-//         if (!item.isFavorite()) {
-//             item.isFavoriteUp(true);
-//             mSaver.setCurTranslatedItem(item);
-//             mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
-//             view.setImageResource(R.drawable.bookmark_black_shape_gold512);
-//         } else {
-//             item.isFavoriteUp(false);
-//             mSaver.setCurTranslatedItem(item);
-//             mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
-//             view.setImageResource(R.drawable.bookmark_black_shape_dark512);
-//         }
-//        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
-//        UIUtils.showToast(mContext, "set favorite was clicked");
-        UIUtils.showToast(mContext, mContext.getResources().getString(R.string.set_favorite_message));
-    }
-
-
-    @Override
-    public void clickOnShareButton(View view){
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_SUBJECT, mContext.getResources().getString(R.string.share_subject));
-        intent.putExtra(Intent.EXTRA_TEXT, mView.getTextTranslatedResultView());
-        mContext.startActivity(Intent.createChooser(intent, mContext.getResources().getString(R.string.chooser_title)));
-    }
-
-    @Override
-    public void clickOnSynonymItem(View view, String text){
-        if (!text.isEmpty()) {
-            mView.clickOnButtonSwitchLang();
-            mView.setTextCustomEditText(text);
-            mView.showLoadingDictionary();
-            mView.hideSuccess();
-            requestTranslatorAPI();
-        }
-    }
-
-    @Override
-    public void clickOnVocalizeTargetText(View view) {
-        if (!mView.isEmptyTranslatedResultView()) {
-            mView.showLoadingTargetVoice();
-            mView.hideIconTargetVoice();
-            vocalizeTargetText();
-        } else {
-            UIUtils.showToast(mContext, mContext.getResources()
-                                                .getString(R.string.try_vocalize_empty_result));
         }
     }
 }

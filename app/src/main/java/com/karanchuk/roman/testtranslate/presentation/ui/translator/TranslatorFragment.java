@@ -25,6 +25,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -51,6 +52,9 @@ import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.database.model.Translation;
 import com.karanchuk.roman.testtranslate.common.view.CustomEditText;
 import com.karanchuk.roman.testtranslate.common.view.EditTextLayout;
+import com.karanchuk.roman.testtranslate.presentation.ui.fullscreen.FullscreenActivity;
+import com.karanchuk.roman.testtranslate.presentation.ui.sourcelang.SourceLangActivity;
+import com.karanchuk.roman.testtranslate.presentation.ui.targetlang.TargetLangActivity;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
@@ -77,6 +81,7 @@ import static com.karanchuk.roman.testtranslate.common.Constants.PROGRESS_BAR_VI
 import static com.karanchuk.roman.testtranslate.common.Constants.RECOGNIZING_REQUEST_PERMISSION_CODE;
 import static com.karanchuk.roman.testtranslate.common.Constants.RESULT;
 import static com.karanchuk.roman.testtranslate.common.Constants.SRC_LANG;
+import static com.karanchuk.roman.testtranslate.common.Constants.TRANSLATED_RESULT;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSL_CONTENT;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSL_RESULT;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
@@ -87,100 +92,58 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
 
 
 public class TranslatorFragment extends Fragment implements TranslatorContract.View {
-    public final static int SRC_LANG_ACTIVITY_REQUEST_CODE = 1;
 
+    public final static int SRC_LANG_ACTIVITY_REQUEST_CODE = 1;
     public final static int TRG_LANG_ACTIVITY_REQUEST_CODE = 2;
 
     @BindView(R.id.get_source_voice) ImageButton mButtonGetPhotoOrSourceVoice;
-
     @BindView(R.id.get_audio_spelling) ImageButton mButtonGetAudioSpelling;
-
     @BindView(R.id.get_target_voice) ImageButton mButtonGetTargetVoice;
-
     @BindView(R.id.set_favorite) ImageButton mButtonSetFavorite;
-
     @BindView(R.id.share_translated_word) ImageButton mButtonShare;
-
     @BindView(R.id.fullscreen_translated_word) ImageButton mButtonFullscreen;
-
     @BindView(R.id.clear_edittext) ImageButton mClearEditText;
-
     @BindView(R.id.button_connection_error_retry) Button mButtonRetry;
-
     @BindView(R.id.general_container) LinearLayout mGeneralContainer;
-
     @BindView(R.id.fragment_translator_progressbar) ProgressBar mProgressDictionary;
-
     @BindView(R.id.get_target_voice_progress) ProgressBar mProgressTargetVoice;
-
     @BindView(R.id.get_source_voice_progress) ProgressBar mProgressSourceVoice;
-
     @BindView(R.id.container_dict_defin) RecyclerView mTranslateRecyclerView;
-
     @BindView(R.id.edittext) CustomEditText mCustomEditText;
-
     @BindView(R.id.textview_translate_result) TextView mTranslatedResult;
-
     @BindView(R.id.container_edittext) EditTextLayout mContainerEditText;
-
     @BindView(R.id.connection_successful_content) RelativeLayout mContainerSuccess;
-
     @BindView(R.id.connection_error_content) RelativeLayout mContainerError;
-
     @BindView(R.id.circle_first) ImageView mCircleFirst;
-
     @BindView(R.id.circle_second) ImageView mCircleSecond;
-
     @BindView(R.id.circle_third) ImageView mCircleThird;
-
     @BindView(R.id.circle_forth) ImageView mCircleForth;
 
     private ImageButton mButtonSwitchLang;
-
     private View mView;
-
     private ActionBar mActionBar;
-
     private BottomNavigationView mNavigation;
-
     public Button mButtonSrcLang;
-
     public Button mButtonTrgLang;
-
     private FrameLayout mMainActivityContainer;
-
     private RecyclerView.LayoutManager mLayoutManager;
-
     private List<TranslatedItem> mHistoryTranslatedItems;
-
     private ArrayList<Translation> mTranslations;
-
     private TranslatorRepositoryImpl mRepository;
-
     private SharedPreferences mSettings;
-
     private int mBottomPadding;
 
     private AnimatorSet mAnimatorSet;
-
     private Animator mAnimatorSecond;
-
     private Animator mAnimatorSecondBack;
-
     private Animator mAnimatorThird;
-
     private Animator mAnimatorThirdBack;
-
     private Animator mAnimatorForth;
-
     private Animator mAnimatorForthBack;
 
     private TranslatorContract.Presenter mPresenter;
-
     private GestureDetector mGestureDetector;
-
     private boolean isRecognizingSourceText;
-
     private Unbinder mUnbinder;
 
     @Override
@@ -194,7 +157,8 @@ public class TranslatorFragment extends Fragment implements TranslatorContract.V
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull final LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_translator, container, false);
         mUnbinder = ButterKnife.bind(this, view);
@@ -299,18 +263,18 @@ public class TranslatorFragment extends Fragment implements TranslatorContract.V
 //    };
 
     private void initListeners(){
-        mGeneralContainer.setOnTouchListener(mPresenter::clickOnGeneralContainer);
-        mButtonSrcLang.setOnClickListener(mPresenter::clickOnSrcLangButton);
-        mButtonSwitchLang.setOnClickListener(mPresenter::clickOnSwitchLangButton);
-        mButtonTrgLang.setOnClickListener(mPresenter::clickOnTrgLangButton);
-        mButtonRetry.setOnClickListener(mPresenter::clickOnRetryButton);
-        mButtonFullscreen.setOnClickListener(mPresenter::clickOnFullscreenButton);
-        mClearEditText.setOnClickListener(mPresenter::clickOnClearEditText);
-        mButtonGetPhotoOrSourceVoice.setOnClickListener(mPresenter::clickOnRecognizePhotoOrVocalizeSourceText);
-        mButtonGetAudioSpelling.setOnClickListener(mPresenter::clickOnRecognizeSourceText);
-        mButtonGetTargetVoice.setOnClickListener(mPresenter::clickOnVocalizeTargetText);
-        mButtonSetFavorite.setOnClickListener((empty) -> mPresenter.clickOnSetFavoriteButton(mButtonSetFavorite));
-        mButtonShare.setOnClickListener(mPresenter::clickOnShareButton);
+        mGeneralContainer.setOnTouchListener(this::clickOnGeneralContainer);
+        mButtonSrcLang.setOnClickListener(this::clickOnSrcLangButton);
+        mButtonSwitchLang.setOnClickListener(this::clickOnSwitchLangButton);
+        mButtonTrgLang.setOnClickListener(this::clickOnTrgLangButton);
+        mButtonRetry.setOnClickListener(this::clickOnRetryButton);
+        mButtonFullscreen.setOnClickListener(this::clickOnFullscreenButton);
+        mClearEditText.setOnClickListener(this::clickOnClearEditText);
+        mButtonGetPhotoOrSourceVoice.setOnClickListener(this::clickOnRecognizePhotoOrVocalizeSourceText);
+        mButtonGetAudioSpelling.setOnClickListener(this::clickOnRecognizeSourceText);
+        mButtonGetTargetVoice.setOnClickListener(this::clickOnVocalizeTargetText);
+        mButtonSetFavorite.setOnClickListener((empty) -> clickOnSetFavoriteButton(mButtonSetFavorite));
+        mButtonShare.setOnClickListener(this::clickOnShareButton);
     }
 
     private void findViewsOnActivity(){
@@ -718,6 +682,18 @@ public class TranslatorFragment extends Fragment implements TranslatorContract.V
         mCustomEditText.setHint(getResources().getString(R.string.translate_hint));
     }
 
+    @Override
+    public void showError() {
+        hideLoadingTargetVoice();
+        hideLoadingSourceVoice();
+        showIconTargetVoice();
+        showIconSourceVoice();
+        stopAnimationMicroWaves();
+        setHintOnInput();
+        showActiveInput();
+        setRecognizingSourceText(false);
+    }
+
     private void initCustomEditText(){
         mCustomEditText.setText(mSettings.getString(EDITTEXT_DATA, ""));
         if (!mCustomEditText.getText().toString().isEmpty()){
@@ -903,12 +879,138 @@ public class TranslatorFragment extends Fragment implements TranslatorContract.V
             mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(
                     mTranslations,
                     dictDefinition.getPartsOfSpeech(),
-                    mPresenter::clickOnSynonymItem));
+                    this::clickOnSynonymItem));
         } else {
             mTranslateRecyclerView.setAdapter(new TranslatorRecyclerAdapter(
                     mTranslations,
                     null,
-                    mPresenter::clickOnSynonymItem));
+                    this::clickOnSynonymItem));
+        }
+    }
+
+    private boolean clickOnGeneralContainer(View view, MotionEvent event) {
+        hideKeyboard();
+//        UIUtils.showToast(getContext(), "clicked outside keyboard, keyboard hided");
+        return true;
+    }
+
+    private void clickOnSrcLangButton(View view) {
+        final Intent intent = new Intent(getContext(), SourceLangActivity.class);
+        startActivityForResult(intent, SRC_LANG_ACTIVITY_REQUEST_CODE);
+    }
+
+    private void clickOnSwitchLangButton(View view) {
+        String oldSrcLang = getTextButtonSrcLang();
+        String oldTrgLang = getTextButtonTrgLang();
+        setTextButtonSrcLang(oldTrgLang);
+        setTextButtonTrgLang(oldSrcLang);
+
+        String srcLangAPI = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG,"");
+        String trgLangAPI = mSettings.getString(CUR_SELECTED_ITEM_TRG_LANG,"");
+
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putString(CUR_SELECTED_ITEM_SRC_LANG, trgLangAPI);
+        editor.putString(CUR_SELECTED_ITEM_TRG_LANG, srcLangAPI);
+        editor.apply();
+
+        setTextCustomEditText(getTextTranslatedResultView());
+        if (!isEmptyCustomEditText() && mPresenter.requestTranslatorAPI()) {
+            showLoadingDictionary();
+            hideSuccess();
+        } else {
+            getTranslatedItemFromCache(createPredictedTranslatedItem());
+        }
+    }
+
+    private void clickOnTrgLangButton(View view) {
+        final Intent intent = new Intent(getContext(), TargetLangActivity.class);
+        startActivityForResult(intent, TRG_LANG_ACTIVITY_REQUEST_CODE);
+    }
+
+    private void clickOnRetryButton(View view) {
+        showLoadingDictionary();
+        hideSuccess();
+        mPresenter.requestTranslatorAPI();
+    }
+
+    private void clickOnFullscreenButton(View view) {
+        final Intent intent = new Intent(getContext(), FullscreenActivity.class);
+        intent.putExtra(TRANSLATED_RESULT, getTextTranslatedResultView());
+        startActivity(intent);
+    }
+
+    private void clickOnClearEditText(View view){
+        clearCustomEditText();
+    }
+
+    private void clickOnRecognizePhotoOrVocalizeSourceText(View view){
+        if (!isEmptyCustomEditText()) {
+            showLoadingSourceVoice();
+            hideIconSourceVoice();
+            mPresenter.vocalizeSourceText();
+        } else {
+            UIUtils.showToast(getContext(), getContext().getResources()
+                    .getString(R.string.try_to_get_photo));
+        }
+    }
+
+    private void clickOnRecognizeSourceText(View view){
+        if (!isRecordAudioGranted()){
+            requestRecordAudioPermissions();
+        }
+        if (!isRecognizingSourceText() && isRecordAudioGranted()) {
+            setRecognizingSourceText(true);
+            showAnimationMicroWaves();
+            mPresenter.recognizeSourceText();
+        } else {
+            setRecognizingSourceText(false);
+            mPresenter.resetRecognizer();
+        }
+    }
+
+    private void clickOnSetFavoriteButton(final ImageButton view) {
+//         final TranslatedItem item = mSaver.getCurTranslatedItem();
+//         if (!item.isFavorite()) {
+//             item.isFavoriteUp(true);
+//             mSaver.setCurTranslatedItem(item);
+//             mRepository.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+//             view.setImageResource(R.drawable.bookmark_black_shape_gold512);
+//         } else {
+//             item.isFavoriteUp(false);
+//             mSaver.setCurTranslatedItem(item);
+//             mRepository.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item);
+//             view.setImageResource(R.drawable.bookmark_black_shape_dark512);
+//         }
+//        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
+//        UIUtils.showToast(mContext, "set favorite was clicked");
+        UIUtils.showToast(getContext(), getContext().getResources().getString(R.string.set_favorite_message));
+    }
+
+
+    private void clickOnShareButton(View view){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_SUBJECT, getContext().getResources().getString(R.string.share_subject));
+        intent.putExtra(Intent.EXTRA_TEXT, getTextTranslatedResultView());
+        startActivity(Intent.createChooser(intent, getContext().getResources().getString(R.string.chooser_title)));
+    }
+
+    private void clickOnSynonymItem(View view, String text){
+        if (!text.isEmpty()) {
+            showLoadingDictionary();
+            hideSuccess();
+            mPresenter.requestTranslatorAPI();
+        }
+    }
+
+    private void clickOnVocalizeTargetText(View view) {
+        if (!isEmptyTranslatedResultView()) {
+            showLoadingTargetVoice();
+            hideIconTargetVoice();
+            mPresenter.vocalizeTargetText();
+        } else {
+            UIUtils.showToast(getContext(),
+                    getContext().getResources().getString(R.string.try_vocalize_empty_result));
         }
     }
 }

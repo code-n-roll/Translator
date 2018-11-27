@@ -1,8 +1,6 @@
 package com.karanchuk.roman.testtranslate.presentation.ui.translator;
 
 import android.content.Context;
-import android.view.MotionEvent;
-import android.widget.ImageButton;
 
 import com.karanchuk.roman.testtranslate.common.BaseView;
 import com.karanchuk.roman.testtranslate.data.database.model.DictDefinition;
@@ -17,55 +15,25 @@ public interface TranslatorContract {
     interface Presenter {
 
         void attachView(Context context);
-
         void detachView();
 
-        void handleDictionaryResponse(DictDefinition dictDefinition);
-
         boolean requestTranslatorAPI();
-
         void requestDictionaryAPI();
 
-        void saveToSharedPreferences();
-
-        void clearContainerSuccess();
-
         void vocalizeSourceText();
-
         void vocalizeTargetText();
 
         void recognizeSourceText();
-
         void resetRecognizer();
 
-        boolean clickOnGeneralContainer(android.view.View view, MotionEvent event);
-
-        void clickOnSrcLangButton(android.view.View view);
-
-        void clickOnSwitchLangButton(android.view.View view);
-
-        void clickOnTrgLangButton(android.view.View view);
-
-        void clickOnRetryButton(android.view.View view);
-
-        void clickOnFullscreenButton(android.view.View view);
-
-        void clickOnClearEditText(android.view.View view);
-
-        void clickOnRecognizePhotoOrVocalizeSourceText(android.view.View view);
-
-        void clickOnRecognizeSourceText(android.view.View view);
-
-        void clickOnSetFavoriteButton(final ImageButton view);
-
-        void clickOnShareButton(android.view.View view);
-
-        void clickOnSynonymItem(android.view.View view, String text);
-
-        void clickOnVocalizeTargetText(android.view.View view);
+        void saveToSharedPreferences();
+        void handleDictionaryResponse(DictDefinition dictDefinition);
+        void clearContainerSuccess();
     }
 
     interface View extends BaseView<Presenter> {
+
+        void showError();
 
         void setHintOnInput();
 

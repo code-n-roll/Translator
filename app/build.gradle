@@ -1,5 +1,9 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
@@ -53,11 +57,14 @@ dependencies {
 
     // dagger
     implementation "com.google.dagger:dagger:$daggerVer"
-    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVer"
+    implementation "com.google.dagger:dagger-android:$daggerVer"
+    implementation "com.google.dagger:dagger-android-support:$daggerVer"
+    kapt "com.google.dagger:dagger-compiler:$daggerVer"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVer"
 
     // butterknife
     implementation "com.jakewharton:butterknife:$butterknifeVer"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknifeVer"
+    kapt "com.jakewharton:butterknife-compiler:$butterknifeVer"
 
     // 3rd party
     implementation "org.apmem.tools:layouts:1.10@aar"
@@ -76,4 +83,9 @@ dependencies {
 
     // junit
     testImplementation "junit:junit:$junitVer"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+repositories {
+    mavenCentral()
 }

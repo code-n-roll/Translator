@@ -3,6 +3,8 @@ package com.karanchuk.roman.testtranslate.presentation.ui.stored.favorites;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -19,11 +21,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.karanchuk.roman.testtranslate.R;
+import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract.TranslatedItemEntry;
+import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
+import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl;
-import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract.TranslatedItemEntry;
-import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
-import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.presentation.ui.stored.StoredRecyclerAdapter;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
@@ -75,15 +77,14 @@ public class FavoritesFragment extends Fragment implements
     private ContentManager mContentManager;
     private SharedPreferences mSettings;
 
-
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mMainHandler = new Handler(getContext().getMainLooper());
-
-
         mSettings = getActivity().getSharedPreferences(PREFS_NAME, 0);
 
+        mView = view;
         View parentView = getParentFragment().getView();
         if (parentView != null) {
             mClearStored = parentView.findViewById(R.id.imagebutton_clear_stored);
@@ -100,7 +101,6 @@ public class FavoritesFragment extends Fragment implements
         Collections.reverse(mCopyFavoritesTranslatedItems);
         Collections.reverse(mHistoryTranslatedItems);
 
-        mView = inflater.inflate(R.layout.content_favorites, container, false);
         findViewsOnFragment();
 
         mEmptySearchView.setVisibility(View.INVISIBLE);
@@ -135,8 +135,12 @@ public class FavoritesFragment extends Fragment implements
         registerForContextMenu(mFavoritesRecycler);
 
         chooseCurView();
+    }
 
-        return mView;
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.content_favorites, container, false);
     }
 
     private void clickOnSetFavoriteItem(TranslatedItem item){

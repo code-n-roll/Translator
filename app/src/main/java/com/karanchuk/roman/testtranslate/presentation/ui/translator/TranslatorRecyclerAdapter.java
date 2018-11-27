@@ -21,8 +21,7 @@ import java.util.List;
  * Created by roman on 11.4.17.
  */
 
-public class TranslatorRecyclerAdapter extends
-        RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>{
+public class TranslatorRecyclerAdapter extends RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>{
     private final ArrayList<Translation> mItems;
     private List<PartOfSpeech> mPartsOfSpeech;
     private OnItemClickListener mOnItemClickListener;

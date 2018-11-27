@@ -148,14 +148,14 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     public boolean requestTranslatorAPI() {
         JsonObject langs = JsonUtils.getJsonObjectFromAssetsFile(mView.getContext(), "langs.json");
 
-        String srcLang = mView.mButtonSrcLang.getText().toString().toLowerCase();
-        String trgLang = mView.mButtonTrgLang.getText().toString().toLowerCase();
+        String srcLang = mView.getMButtonSrcLang().getText().toString().toLowerCase();
+        String trgLang = mView.getMButtonTrgLang().getText().toString().toLowerCase();
 
         String srcLangAPI = langs.get(srcLang).getAsString();
         String trgLangAPI = langs.get(trgLang).getAsString();
         mTranslationDirection = srcLangAPI.concat("-").concat(trgLangAPI);
 
-        mRequestedText = mView.mCustomEditText.getText().toString();
+        mRequestedText = mView.getMCustomEditText().getText().toString();
 
         if ((mSaver.getCurTranslatedItem() != null &&
                 !mSaver.getCurTranslatedItem().getSrcMeaning().equals(mRequestedText)) ||
@@ -199,10 +199,10 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         }
 
         TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)
-                mView.mTranslateRecyclerView.getAdapter();
+                mView.getMTranslateRecyclerView().getAdapter();
         adapter.updateData(translations, dictDefinition.getPartsOfSpeech());
 
-        String curEditTextContent = mView.mCustomEditText.getText().toString().trim();
+        String curEditTextContent = mView.getMCustomEditText().getText().toString().trim();
         String srcLangAPI = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG,"");
         String trgLangAPI = mSettings.getString(CUR_SELECTED_ITEM_TRG_LANG,"");
 
@@ -223,10 +223,10 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     private void saveToRepository(DictDefinition dictDefinition){
         mCurDictDefinition = dictDefinition;
         Map<String, Object> savedData = new HashMap<>();
-        savedData.put(SRC_LANG, mView.mButtonSrcLang.getText().toString());
-        savedData.put(TRG_LANG, mView.mButtonTrgLang.getText().toString());
-        savedData.put(EDITTEXT_DATA, mView.mCustomEditText.getText().toString());
-        savedData.put(TRANSL_RESULT, mView.mTranslatedResult.getText().toString());
+        savedData.put(SRC_LANG, mView.getMButtonSrcLang().getText().toString());
+        savedData.put(TRG_LANG, mView.getMButtonTrgLang().getText().toString());
+        savedData.put(EDITTEXT_DATA, mView.getMCustomEditText().getText().toString());
+        savedData.put(TRANSL_RESULT, mView.getMTranslatedResult().getText().toString());
         savedData.put(TRANSL_CONTENT, dictDefinition);
         mSaver.setSavedData(savedData);
         new Thread(mSaver).start();
@@ -249,7 +249,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     private void handleTranslatingResponse(TranslationResponse translation){
         Log.d("myLogs", translation.getText().toString());
         if (mView != null) {
-            mView.mTranslatedResult.setText(translation.getText().get(0));
+            mView.getMTranslatedResult().setText(translation.getText().get(0));
         }
         requestDictionaryAPI();
     }
@@ -282,10 +282,10 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     public void saveToSharedPreferences(){
         HashMap<String, Object> data = new HashMap<>();
 
-        data.put(EDITTEXT_DATA, mView.mCustomEditText.getText().toString());
-        data.put(SRC_LANG, mView.mButtonSrcLang.getText().toString());
-        data.put(TRG_LANG, mView.mButtonTrgLang.getText().toString());
-        data.put(TRANSL_RESULT, mView.mTranslatedResult.getText().toString());
+        data.put(EDITTEXT_DATA, mView.getMCustomEditText().getText().toString());
+        data.put(SRC_LANG, mView.getMButtonSrcLang().getText().toString());
+        data.put(TRG_LANG, mView.getMButtonTrgLang().getText().toString());
+        data.put(TRANSL_RESULT, mView.getMTranslatedResult().getText().toString());
         data.put(TRANSL_CONTENT, mCurDictDefinition);
         if (mSaver.getCurTranslatedItem() != null) {
             data.put(CUR_TRANSLATED_ITEM, mSaver.getCurTranslatedItem().toString());
@@ -295,19 +295,16 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
 
     @Override
     public void clearContainerSuccess() {
-        mView.mTranslateRecyclerView.getAdapter().notifyDataSetChanged();
+        mView.getMTranslateRecyclerView().getAdapter().notifyDataSetChanged();
         mCurDictDefinition = null;
     }
 
     @Override
     public void vocalizeSourceText() {
-        String text = mView.mCustomEditText.getText().toString();
-        if (text.isEmpty()){
-
-        } else {
+        String text = mView.getMCustomEditText().getText().toString();
+        if (!text.isEmpty()){
             resetVocalizer();
-            mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.ENGLISH, text, true,
-                    Vocalizer.Voice.OMAZH);
+            mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.ENGLISH, text, true, Vocalizer.Voice.OMAZH);
             mVocalizer.setListener(TranslatorPresenter.this);
             mVocalizer.start();
         }
@@ -315,13 +312,10 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
 
     @Override
     public void vocalizeTargetText() {
-        String text = mView.mTranslatedResult.getText().toString();
-        if (text.isEmpty()){
-
-        } else {
+        String text = mView.getMTranslatedResult().getText().toString();
+        if (!text.isEmpty()){
             resetVocalizer();
-            mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true,
-                    Vocalizer.Voice.OMAZH);
+            mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, Vocalizer.Voice.OMAZH);
             mVocalizer.setListener(TranslatorPresenter.this);
             mVocalizer.start();
         }
@@ -427,7 +421,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     public void onRecordingDone(Recognizer recognizer) {
         Log.d("myLogs", " onRecordingDone");
         if (mView != null && mView.isAdded()) {
-            mView.desactivateVoiceRecognizer();
+            mView.deactivateVoiceRecognizer();
         }
     }
 
@@ -449,7 +443,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     @Override
     public void onRecognitionDone(Recognizer recognizer, Recognition recognition) {
         if (mView != null) {
-            mView.mCustomEditText.setText(recognition.getBestResultText());
+            mView.getMCustomEditText().setText(recognition.getBestResultText());
             mView.stopAnimationMicroWaves();
         }
     }

@@ -13,12 +13,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.2.71/ff62b6a76e3200cac3d7df0859d7665fe6d54955/kotlin-stdlib-common-1.2.71-sources.jar!/kotlin/text/Strings.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/build.gradle">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/di/AppComponent.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/presentation/ui/translator/TranslatorFragment.java">
           <value>
             <set />
           </value>
@@ -143,6 +153,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/stored/StoredRecyclerAdapter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/stored/favorites/FavoritesFragment.java">
           <value>
             <set />
@@ -163,12 +178,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/targetlang/TargetLangRecyclerAdapter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/translator/TranslatorContract.java">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/translator/TranslatorFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/translator/TranslatorFragment.kt">
           <value>
             <set />
           </value>

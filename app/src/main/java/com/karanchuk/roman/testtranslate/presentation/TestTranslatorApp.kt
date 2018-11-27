@@ -10,12 +10,14 @@ class TestTranslatorApp : Application() {
 
     companion object {
         lateinit var appComponent: AppComponent
+        lateinit var instance: TestTranslatorApp
     }
 
     override fun onCreate() {
         super.onCreate()
 
         initDagger()
+        instance = this
     }
 
     private fun initDagger() {

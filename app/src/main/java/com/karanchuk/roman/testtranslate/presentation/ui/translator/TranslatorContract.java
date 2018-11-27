@@ -33,86 +33,64 @@ public interface TranslatorContract {
 
     interface View extends BaseView<Presenter> {
 
-        void showError();
-
         void setHintOnInput();
 
-        void clickOnButtonSwitchLang();
-
         TranslatedItem createPredictedTranslatedItem();
+        void getTranslatedItemFromCache(TranslatedItem maybeExistedItem);
 
         String getTextButtonSrcLang();
-
         String getTextButtonTrgLang();
 
         void setTextButtonSrcLang(final String text);
-
         void setTextButtonTrgLang(final String text);
 
         boolean isEmptyTranslatedResultView();
-
         String getTextTranslatedResultView();
 
         void setTextCustomEditText(final String text);
-
         boolean isEmptyCustomEditText();
-
         void clearCustomEditText();
 
         boolean isRecognizingSourceText();
 
         void requestRecordAudioPermissions();
-
-        void showAnimationMicroWaves();
-
         boolean isRecordAudioGranted();
 
-        void getTranslatedItemFromCache(TranslatedItem maybeExistedItem);
-
         void showLoadingDictionary();
-
         void hideLoadingDictionary();
 
         void showRetry();
-
         void hideRetry();
 
         void showSuccess();
-
         void hideSuccess();
+        void showError();
 
         void showActiveInput();
-
         void hideActiveInput();
 
         void showKeyboard();
-
         void hideKeyboard();
 
         void showClear();
-
         void hideClear();
 
         void showLoadingTargetVoice();
-
         void hideLoadingTargetVoice();
 
         void showIconTargetVoice();
-
         void hideIconTargetVoice();
 
         void showLoadingSourceVoice();
-
         void hideLoadingSourceVoice();
 
         void showIconSourceVoice();
-
         void hideIconSourceVoice();
 
         void activateVoiceRecognizer();
-
-        void desactivateVoiceRecognizer();
+        void deactivateVoiceRecognizer();
 
         void stopAnimationMicroWaves();
+        void showAnimationMicroWaves();
     }
 }

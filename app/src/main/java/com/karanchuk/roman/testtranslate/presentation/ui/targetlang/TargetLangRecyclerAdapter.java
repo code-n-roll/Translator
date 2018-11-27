@@ -17,8 +17,7 @@ import java.util.List;
  * Created by roman on 17.4.17.
  */
 
-public class TargetLangRecyclerAdapter extends
-        RecyclerView.Adapter<TargetLangRecyclerAdapter.ViewHolder>{
+public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRecyclerAdapter.ViewHolder>{
     public interface OnItemClickListener {
         void onItemClick(final Language item);
     }

@@ -17,8 +17,7 @@ import java.util.List;
  * Created by roman on 9.4.17.
  */
 
-public class StoredRecyclerAdapter extends
-        RecyclerView.Adapter<StoredRecyclerAdapter.ViewHolder>{
+public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAdapter.ViewHolder>{
     private List<TranslatedItem> mItems;
     private final OnItemClickListener mItemClickListener, mIsFavoriteListener;
     private int mPosition;

@@ -12,9 +12,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.karanchuk.roman.testtranslate.R;
-import com.karanchuk.roman.testtranslate.common.model.Synonym;
-import com.karanchuk.roman.testtranslate.common.model.Translation;
-import com.karanchuk.roman.testtranslate.translator.TranslatorRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.data.database.model.Synonym;
+import com.karanchuk.roman.testtranslate.data.database.model.Translation;
+import com.karanchuk.roman.testtranslate.presentation.ui.translator.TranslatorRecyclerAdapter;
 
 /**
  * need to add gen to string before setSpan!!!

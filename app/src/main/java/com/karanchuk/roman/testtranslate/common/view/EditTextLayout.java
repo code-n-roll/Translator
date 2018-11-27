@@ -13,7 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
-import com.karanchuk.roman.testtranslate.edittextnavigator.EditTextLayoutPresenterImpl;
+import com.karanchuk.roman.testtranslate.presentation.ui.edittextnavigator.EditTextLayoutPresenterImpl;
 
 /**
  * Created by roman on 28.6.17.

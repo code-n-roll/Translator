@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.karanchuk.roman.testtranslate.R;
-import com.karanchuk.roman.testtranslate.translator.TranslatorRecyclerAdapter;
+import com.karanchuk.roman.testtranslate.presentation.ui.translator.TranslatorRecyclerAdapter;
 
 /**
  * Created by roman on 23.6.17.

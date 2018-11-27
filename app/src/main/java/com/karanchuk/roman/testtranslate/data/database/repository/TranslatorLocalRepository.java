@@ -21,9 +21,7 @@ import java.util.List;
 public class TranslatorLocalRepository implements TranslatorRepository {
 
     private static TranslatorLocalRepository INSTANCE;
-
     private static final String LOG_TAG = "MY_DB_LOG";
-
     private final TranslatorDatabaseHelper mDatabaseHelper;
 
     private TranslatorLocalRepository(@NonNull final Context context){
@@ -42,7 +40,7 @@ public class TranslatorLocalRepository implements TranslatorRepository {
                                  final String fieldName,
                                  final String entryId){
         Cursor c = null;
-        try{
+        try {
             final String query = "SELECT COUNT(*) FROM " + tableName + " WHERE " + fieldName + " = ?";
             c = db.rawQuery(query, new String[] {entryId});
             return c.moveToFirst() && c.getInt(0) != 0;
@@ -81,7 +79,6 @@ public class TranslatorLocalRepository implements TranslatorRepository {
 
         return true;
     }
-
 
     public void deleteTranslatedItem(@NonNull final String tableName,
                                      @NonNull final TranslatedItem translatedItem) {
@@ -221,7 +218,6 @@ public class TranslatorLocalRepository implements TranslatorRepository {
 
         db.close();
     }
-
 
     private void logCursor(final Cursor c){
         if (c != null){

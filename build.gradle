@@ -14,6 +14,7 @@ buildscript {
         mockitoVer = '2.16.0'
         junitVer = '4.12'
         espressoVer = '2.2.2'
+        roomVer = '1.1.1'
     }
 
     repositories {

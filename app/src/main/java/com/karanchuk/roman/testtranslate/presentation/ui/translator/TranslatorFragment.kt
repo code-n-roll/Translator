@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -82,10 +83,10 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     private val mContainerSuccess: RelativeLayout by bind(R.id.connection_successful_content)
     private val mContainerError: RelativeLayout by bind(R.id.connection_error_content)
 
-    private val mCircleFirst: ImageButton by bind(R.id.circle_first)
-    private val mCircleSecond: ImageButton by bind(R.id.circle_first)
-    private val mCircleThird: ImageButton by bind(R.id.circle_first)
-    private val mCircleForth: ImageButton by bind(R.id.circle_first)
+    private val mCircleFirst: AppCompatImageView by bind(R.id.circle_first)
+    private val mCircleSecond: AppCompatImageView by bind(R.id.circle_first)
+    private val mCircleThird: AppCompatImageView by bind(R.id.circle_first)
+    private val mCircleForth: AppCompatImageView by bind(R.id.circle_first)
 
     private var mButtonSwitchLang: ImageButton? = null
     private var mView: View? = null

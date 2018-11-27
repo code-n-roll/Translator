@@ -77,6 +77,11 @@ dependencies {
     // junit
     testImplementation "junit:junit:$junitVer"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // room
+    implementation "android.arch.persistence.room:runtime:$roomVer"
+    implementation "android.arch.persistence.room:rxjava2:$roomVer"
+    kapt "android.arch.persistence.room:compiler:$roomVer"
 }
 
 repositories {

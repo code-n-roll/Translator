@@ -28,7 +28,7 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
  * Created by roman on 22.6.17.
  */
 
-public class TranslationSaver implements Runnable{
+public class TranslationSaver implements Runnable {
     private TranslatedItem mCurTranslatedItem;
     private Gson mGson;
     private Map<String, Object> mSavedData;
@@ -41,9 +41,7 @@ public class TranslationSaver implements Runnable{
         mLanguagesMap = JsonUtils.getJsonObjectFromAssetsFile(context, LANGS_FILE_NAME);
 
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
-        mCurTranslatedItem = mGson.fromJson(settings.getString(CUR_TRANSLATED_ITEM, ""),
-                TranslatedItem.class);
-
+        mCurTranslatedItem = mGson.fromJson(settings.getString(CUR_TRANSLATED_ITEM, ""), TranslatedItem.class);
 
         TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(context);
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
@@ -76,14 +74,19 @@ public class TranslationSaver implements Runnable{
                 "false",
                 mGson.toJson(mSavedData.get(TRANSL_CONTENT)));
         if (!mHistoryTranslatedItems.contains(mCurTranslatedItem)) {
-            mRepository.saveTranslatedItem(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
+            mRepository.saveTranslatedItem(
+                    TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
         } else {
             final int index = mHistoryTranslatedItems.indexOf(mCurTranslatedItem);
             mCurTranslatedItem.setIsFavorite(mHistoryTranslatedItems.get(index).getIsFavorite());
-            mRepository.saveTranslatedItem(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
+            mRepository.saveTranslatedItem(
+                    TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY, mCurTranslatedItem);
             if (mCurTranslatedItem.isFavorite()){
-                mRepository.deleteTranslatedItem(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES, mHistoryTranslatedItems.get(index));
-                mRepository.saveTranslatedItem(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES, mCurTranslatedItem);
+                mRepository.deleteTranslatedItem(
+                        TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES,
+                        mHistoryTranslatedItems.get(index));
+                mRepository.saveTranslatedItem(
+                        TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES, mCurTranslatedItem);
             }
         }
     }

@@ -11,13 +11,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class TranslatorDatabaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
-
     private static final String DATABASE_NAME = "translator.db";
-
     private static final String TEXT_TYPE = " TEXT";
-
     private static final String INTEGER_TYPE = " INTEGER";
-
     private static final String COMMA_SEP = ",";
 
     private static final String SQL_CREATE_TABLE_HISTORY_TRANSLATED_ITEMS =

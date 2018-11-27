@@ -24,11 +24,11 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
     private final List<HistoryTranslatedItemsRepositoryObserver> mHistoryObservers = new ArrayList<>();
     private final List<FavoritesTranslatedItemsRepositoryObserver> mFavoritesObservers = new ArrayList<>();
 
-    private Map<String, TranslatedItem> mHistoryCachedTranslatedItems,
-                                        mFavoritesCachedTranslatedItems;
+    private Map<String, TranslatedItem> mHistoryCachedTranslatedItems;
+    private Map<String, TranslatedItem> mFavoritesCachedTranslatedItems;
 
-    private boolean mHistoryCacheTranslatedItemsIsDirty = true,
-                    mFavoritesCacheTranslatedItemsIdDirty = true;
+    private boolean mHistoryCacheTranslatedItemsIsDirty = true;
+    private boolean mFavoritesCacheTranslatedItemsIdDirty = true;
 
     public static TranslatorRepositoryImpl getInstance(final TranslatorRepository translatorLocalDataSource){
         if (INSTANCE == null){
@@ -41,8 +41,6 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         mTranslatorLocalDataSource = checkNotNull(translatorLocalDataSource);
     }
 
-
-
     private List<TranslatedItem> getHistoryCachedTranslatedItems(){
         if (mHistoryCachedTranslatedItems == null ) {
             return new ArrayList<>();
@@ -50,7 +48,6 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
             return new ArrayList<>(mHistoryCachedTranslatedItems.values());
         }
     }
-
 
     public void addHistoryContentObserver(final HistoryTranslatedItemsRepositoryObserver observer){
         if (!mHistoryObservers.contains(observer)){
@@ -101,15 +98,14 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         return true;
     }
 
-
-
     @Override
     public void deleteTranslatedItem(@NonNull final String tableName,
                                      @NonNull final TranslatedItem translatedItem) {
         if (tableName.equals(TranslatedItemEntry.TABLE_NAME_HISTORY)) {
             mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
 
-            if (mHistoryCachedTranslatedItems != null && mHistoryCachedTranslatedItems.containsKey(translatedItem.getId())) {
+            if (mHistoryCachedTranslatedItems != null
+                    && mHistoryCachedTranslatedItems.containsKey(translatedItem.getId())) {
                 mHistoryCachedTranslatedItems.remove(translatedItem.getId());
             }
 
@@ -117,7 +113,8 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         } else if (tableName.equals(TranslatedItemEntry.TABLE_NAME_FAVORITES)){
             mTranslatorLocalDataSource.deleteTranslatedItem(tableName, translatedItem);
 
-            if (mFavoritesCachedTranslatedItems != null && mFavoritesCachedTranslatedItems.containsKey(translatedItem.getId())){
+            if (mFavoritesCachedTranslatedItems != null
+                    && mFavoritesCachedTranslatedItems.containsKey(translatedItem.getId())){
                 mFavoritesCachedTranslatedItems.remove(translatedItem.getId());
             }
 

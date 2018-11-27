@@ -23,6 +23,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/data/database/room/table/TranslationFavorite.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/data/database/room/table/TranslationHistory.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/build/tmp/kapt3/stubs/debug/com/karanchuk/roman/testtranslate/di/AppComponent.java">
           <value>
             <set />
@@ -49,6 +59,56 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/common/view/CustomSynonyms.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/TablePersistenceContract.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/TestTranslatorDatabase.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/TranslatorDatabaseHelper.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/repository/TranslatorLocalRepository.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/repository/TranslatorRepositoryImpl.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/room/TestTranslatorDatabase.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/room/dao/TranslationFavoriteDao.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/room/dao/TranslationHistoryDao.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/room/table/TranslationFavorite.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/data/database/room/table/TranslationHistory.kt">
           <value>
             <set />
           </value>
@@ -98,7 +158,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/di/DatabaseModule.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/di/NetworkModule.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/di/SpeechKitModule.kt">
           <value>
             <set />
           </value>
@@ -159,6 +229,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/stored/favorites/FavoritesFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/com/karanchuk/roman/testtranslate/presentation/ui/stored/favorites/FavoritesFragment.kt">
           <value>
             <set />
           </value>
@@ -254,6 +329,26 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../chev-exm_android/chevronandroidmaster/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../umbrella-android/app/src/main/java/com/epam/garage/smartumbrella/common/database/SmartUmbrellaDatabase.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../umbrella-android/app/src/main/java/com/epam/garage/smartumbrella/common/database/SmartUmbrellaDatabase.kt">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../umbrella-android/app/src/main/java/com/epam/garage/smartumbrella/dagger/module/DatabaseModule.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../umbrella-android/app/src/main/java/com/epam/garage/smartumbrella/dagger/module/DatabaseModule.kt">
           <value>
             <set />
           </value>

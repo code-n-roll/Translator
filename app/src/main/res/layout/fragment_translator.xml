@@ -6,6 +6,17 @@
     android:orientation="vertical"
     android:id="@+id/general_container">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/translator_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary">
+
+        <include
+            layout="@layout/actionbar_translator"/>
+    </android.support.v7.widget.Toolbar>
+
     <include
         android:id="@+id/container_edittext"
         layout="@layout/content_input_translation"/>

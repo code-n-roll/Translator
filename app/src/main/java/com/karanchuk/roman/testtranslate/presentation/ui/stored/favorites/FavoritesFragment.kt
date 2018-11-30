@@ -116,7 +116,7 @@ class FavoritesFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.content_favorites, container, false)
+        return inflater.inflate(R.layout.fragment_favorites, container, false)
     }
 
     private fun clickOnSetFavoriteItem(item: TranslatedItem) {

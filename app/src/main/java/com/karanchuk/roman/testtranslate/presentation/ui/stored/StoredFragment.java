@@ -4,12 +4,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +17,10 @@ import android.widget.ImageButton;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
+import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl;
-import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.presentation.ui.stored.favorites.FavoritesFragment;
 import com.karanchuk.roman.testtranslate.presentation.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
@@ -29,7 +28,6 @@ import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,7 +35,6 @@ import java.util.List;
  */
 
 public class StoredFragment extends Fragment implements
-        ViewPager.OnPageChangeListener,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver {
     private static final int HISTORY_FRAGMENT = 0;
@@ -64,8 +61,43 @@ public class StoredFragment extends Fragment implements
     private int mBottomPadding;
     private Bundle mBundle;
 
+    private ViewPager.OnPageChangeListener mStorePageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageScrolled(int position,
+                                   float positionOffset,
+                                   int positionOffsetPixels) {
+//        Log.d("viewpager log",
+//                "onPageScrellod, position="+String.valueOf(position)+
+//                        ",positionOffset="+String.valueOf(positionOffset)+
+//                        ",positionOffsetPixels="+String.valueOf(positionOffsetPixels)
+//        );
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (position == 0 && mHistoryItems.isEmpty() ||
+                    position == 1 && mFavoritesItems.isEmpty()){
+                mClearStored.setVisibility(View.INVISIBLE);
+            } else {
+                mClearStored.setVisibility(View.VISIBLE);
+            }
+
+            if (mCurPosition != position){
+                mContentManager.notifyTranslatedItemChanged();
+            }
+            mCurPosition = position;
+//        Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+//        Log.d("viewpager log", "onPageScrollStateChanged, state="+String.valueOf(state));
+        }
+    };
+
     @Override
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_stored, container, false);
@@ -76,23 +108,21 @@ public class StoredFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         findViewsOnFragment(view);
-        findViewsOnActivity();
-
+        // findViewsOnActivity();
+        //
         mContentManager = ContentManager.getInstance();
         TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(getContext());
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
         mRepository.addHistoryContentObserver(this);
         mRepository.addFavoritesContentObserver(this);
-
-        mClearHistoryDialog = new ClearStoredDialogFragment();
-        mBundle = new Bundle();
-        mTabLayout.setupWithViewPager(mViewPager);
-
-        UIUtils.changeSoftInputModeWithOrientation(getActivity());
-        handleKeyboardVisibility();
-
+        //
+        // mClearHistoryDialog = new ClearStoredDialogFragment();
+        // mBundle = new Bundle();
+        //
+        // UIUtils.changeSoftInputModeWithOrientation(getActivity());
+        // handleKeyboardVisibility();
+        //
         initViewPager();
-        initActionBar();
     }
 
     private void initClearStored(){
@@ -163,57 +193,14 @@ public class StoredFragment extends Fragment implements
         mUIHandler = null;
     }
 
-
-    private void initActionBar(){
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setShowHideAnimationEnabled(false);
-            actionBar.hide();
-        }
-    }
-
     private void initViewPager(){
-        mFavoritesAdapter = new StoredPagerAdapter(getChildFragmentManager(),
-                new ArrayList<>(), new ArrayList<>());
-        mFavoritesAdapter.addFragment(new HistoryFragment(),
-                getResources().getString(R.string.title_history));
-        mFavoritesAdapter.addFragment(new FavoritesFragment(),
-                getResources().getString(R.string.title_favorites));
+        mFavoritesAdapter = new StoredPagerAdapter(getChildFragmentManager());
+        mFavoritesAdapter.addFragment(new HistoryFragment(), getResources().getString(R.string.title_history));
+        mFavoritesAdapter.addFragment(new FavoritesFragment(), getResources().getString(R.string.title_favorites));
         mViewPager.setAdapter(mFavoritesAdapter);
-        mViewPager.addOnPageChangeListener(this);
-    }
-
-
-    @Override
-    public void onPageScrolled(int position,
-                               float positionOffset,
-                               int positionOffsetPixels) {
-//        Log.d("viewpager log",
-//                "onPageScrellod, position="+String.valueOf(position)+
-//                        ",positionOffset="+String.valueOf(positionOffset)+
-//                        ",positionOffsetPixels="+String.valueOf(positionOffsetPixels)
-//        );
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        if (position == 0 && mHistoryItems.isEmpty() ||
-                position == 1 && mFavoritesItems.isEmpty()){
-            mClearStored.setVisibility(View.INVISIBLE);
-        } else {
-            mClearStored.setVisibility(View.VISIBLE);
-        }
-
-        if (mCurPosition != position){
-            mContentManager.notifyTranslatedItemChanged();
-        }
-        mCurPosition = position;
-//        Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-//        Log.d("viewpager log", "onPageScrollStateChanged, state="+String.valueOf(state));
+        mViewPager.addOnPageChangeListener(mStorePageChangeListener);
+        mViewPager.setOffscreenPageLimit(2);
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation.ui.stored.history;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -29,8 +30,7 @@ import static com.karanchuk.roman.testtranslate.common.Constants.UNIQUE_HISTORY_
  * Created by roman on 9.4.17.
  */
 
-public class HistoryFragment extends Fragment implements HistoryView,
-        SearchView.OnQueryTextListener {
+public class HistoryFragment extends Fragment implements HistoryView, SearchView.OnQueryTextListener {
     private View mEmptyView;
     private View mContentView;
     private View mEmptySearchView;
@@ -44,14 +44,14 @@ public class HistoryFragment extends Fragment implements HistoryView,
 
     private HistoryPresenterImpl mPresenter;
 
-    public View onCreateView(LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.content_history, container, false);
+        return inflater.inflate(R.layout.fragment_history, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         setPresenter(new HistoryPresenterImpl(this, getContext()));
@@ -90,8 +90,9 @@ public class HistoryFragment extends Fragment implements HistoryView,
         View translatorNavView = navigation.findViewById(R.id.navigation_translate);
 
         mHistoryRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        mHistoryRecycler.addItemDecoration(new DividerItemDecoration(
-                mHistoryRecycler.getContext(), RecyclerView.VERTICAL));
+        RecyclerView.ItemDecoration verticalItemDecoration =
+                new DividerItemDecoration(mHistoryRecycler.getContext(), RecyclerView.VERTICAL);
+        mHistoryRecycler.addItemDecoration(verticalItemDecoration);
         mHistoryRecycler.setAdapter(new StoredRecyclerAdapter(
                 mPresenter.getHistoryTranslatedItems(),
                 (item)->clickOnItemStoredRecycler(item, translatorNavView),

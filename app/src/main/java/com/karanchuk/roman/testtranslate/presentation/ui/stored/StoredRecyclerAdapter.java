@@ -1,5 +1,6 @@
 package com.karanchuk.roman.testtranslate.presentation.ui.stored;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -44,8 +45,9 @@ public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAd
         mUniqueFragmentId = uniqueFragmentId;
     }
 
+    @NonNull
     @Override
-    public StoredRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+    public StoredRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType){
         View view = LayoutInflater.from(parent.getContext()).inflate(
                 R.layout.content_favorite_item, parent, false);
         return new ViewHolder(view);
@@ -53,13 +55,13 @@ public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAd
 
 
     @Override
-    public void onViewRecycled(ViewHolder holder) {
+    public void onViewRecycled(@NonNull ViewHolder holder) {
         holder.itemView.setOnLongClickListener(null);
         super.onViewRecycled(holder);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.bind(mItems.get(position), mItemClickListener, mIsFavoriteListener);
 
         holder.itemView.setOnLongClickListener(v -> {

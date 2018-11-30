@@ -13,11 +13,11 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -85,12 +85,13 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     private val mCircleSecond: AppCompatImageView by bind(R.id.circle_first)
     private val mCircleThird: AppCompatImageView by bind(R.id.circle_first)
     private val mCircleForth: AppCompatImageView by bind(R.id.circle_first)
+    private val translatorToolbar: Toolbar by bind(R.id.translator_toolbar)
 
-    private var mButtonSwitchLang: ImageButton? = null
-    private var mView: View? = null
-    private var mActionBar: ActionBar? = null
+    var mButtonSwitchLang: ImageButton? = null
     var mButtonSrcLang: Button? = null
     var mButtonTrgLang: Button? = null
+
+    private var mView: View? = null
     private var mMainActivityContainer: FrameLayout? = null
     private var mLayoutManager: RecyclerView.LayoutManager? = null
     private var mTranslations: ArrayList<Translation>? = null
@@ -114,11 +115,11 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     private lateinit var customEditText: CustomEditText
 
     override fun setTextButtonSrcLang(text: String) {
-        mButtonSrcLang!!.text = text
+        mButtonSrcLang?.text = text
     }
 
     override fun setTextButtonTrgLang(text: String) {
-        mButtonTrgLang!!.text = text
+        mButtonTrgLang?.text = text
     }
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -133,18 +134,19 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         mView = view
         setPresenter(TranslatorPresenter(this))
         mPresenter.attachView(context)
-//
+
+
+        findViewsOnActionBar()
 //        mSettings = activity!!.getSharedPreferences(PREFS_NAME, 0)
 //
-        initActionBar()
 //        findViewsOnActivity()
-        findViewsOnActionBar()
+//        findViewsOnActionBar()
 //        findViewsOnContainerEditText()
 //
 //        initTranslateRecyclerView()
 //        initCustomEditText()
 //        initEventListenerKeyboardVisibility()
-//        initListeners()
+        initListeners()
 //
         hideLoadingDictionary()
         hideLoadingTargetVoice()
@@ -286,18 +288,18 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     //    };
 
     private fun initListeners() {
-        mGeneralContainer.setOnTouchListener { view, event -> this.clickOnGeneralContainer() }
         mButtonSrcLang!!.setOnClickListener { this.clickOnSrcLangButton() }
-        mButtonSwitchLang!!.setOnClickListener { this.clickOnSwitchLangButton() }
+//        mButtonSwitchLang!!.setOnClickListener { this.clickOnSwitchLangButton() }
         mButtonTrgLang!!.setOnClickListener{ this.clickOnTrgLangButton() }
-        mButtonRetry.setOnClickListener{ this.clickOnRetryButton() }
-        mButtonFullscreen.setOnClickListener{ this.clickOnFullscreenButton() }
-        mClearEditText.setOnClickListener{ this.clickOnClearEditText() }
-        mButtonGetPhotoOrSourceVoice.setOnClickListener{ this.clickOnRecognizePhotoOrVocalizeSourceText() }
-        mButtonGetAudioSpelling.setOnClickListener{ this.clickOnRecognizeSourceText() }
-        mButtonGetTargetVoice.setOnClickListener{ this.clickOnVocalizeTargetText() }
-        mButtonSetFavorite.setOnClickListener{ clickOnSetFavoriteButton() }
-        mButtonShare.setOnClickListener{ this.clickOnShareButton() }
+//        mGeneralContainer.setOnTouchListener { view, event -> this.clickOnGeneralContainer() }
+//        mButtonRetry.setOnClickListener{ this.clickOnRetryButton() }
+//        mButtonFullscreen.setOnClickListener{ this.clickOnFullscreenButton() }
+//        mClearEditText.setOnClickListener{ this.clickOnClearEditText() }
+//        mButtonGetPhotoOrSourceVoice.setOnClickListener{ this.clickOnRecognizePhotoOrVocalizeSourceText() }
+//        mButtonGetAudioSpelling.setOnClickListener{ this.clickOnRecognizeSourceText() }
+//        mButtonGetTargetVoice.setOnClickListener{ this.clickOnVocalizeTargetText() }
+//        mButtonSetFavorite.setOnClickListener{ clickOnSetFavoriteButton() }
+//        mButtonShare.setOnClickListener{ this.clickOnShareButton() }
     }
 
     private fun findViewsOnActivity() {
@@ -306,10 +308,9 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     private fun findViewsOnActionBar() {
-        val mActionBarView = mActionBar!!.customView
-        mButtonSwitchLang = mActionBarView.findViewById(R.id.center_actionbar_button)
-        mButtonSrcLang = mActionBarView.findViewById(R.id.left_actionbar_button)
-        mButtonTrgLang = mActionBarView.findViewById(R.id.right_actionbar_button)
+        mButtonSwitchLang = translatorToolbar.findViewById(R.id.center_actionbar_button)
+        mButtonSrcLang = translatorToolbar.findViewById(R.id.left_actionbar_button)
+        mButtonTrgLang = translatorToolbar.findViewById(R.id.right_actionbar_button)
         val title = resources.getString(R.string.title_choose_lang)
         mSettings?.let {
             mButtonSrcLang!!.text = it.getString(SRC_LANG, title)
@@ -750,19 +751,6 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         mTranslatedResult.text = ""
         mTranslations!!.clear()
         mPresenter.clearContainerSuccess()
-    }
-
-    private fun initActionBar() {
-        mActionBar = (activity as AppCompatActivity).supportActionBar
-        mActionBar?.let {
-            it.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-            it.setDisplayShowCustomEnabled(true)
-            it.setCustomView(R.layout.actionbar_translator)
-            it.setShowHideAnimationEnabled(false)
-            it.elevation = 0f
-            it.title = ""
-            it.show()
-        }
     }
 
     private fun initEventListenerKeyboardVisibility() {

@@ -24,7 +24,7 @@
         android:layout_toStartOf="@id/center_actionbar_button"
         android:textAppearance="@style/firstCapitalizeTabTextTheme"
         android:text="Русский"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:background="?attr/selectableItemBackgroundBorderless"/>
 
     <Button
@@ -35,6 +35,6 @@
         android:layout_toEndOf="@id/center_actionbar_button"
         android:text="Английский"
         android:textAppearance="@style/firstCapitalizeTabTextTheme"
-        android:textColor="@android:color/black"
+        android:textColor="@android:color/white"
         android:background="?attr/selectableItemBackgroundBorderless"/>
 </RelativeLayout>

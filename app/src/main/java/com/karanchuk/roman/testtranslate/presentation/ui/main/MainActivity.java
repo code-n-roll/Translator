@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements
         mMainPagerAdapter.addFragment(new StoredFragment());
         mMainPagerAdapter.addFragment(new SettingsFragment());
         mMainViewPager.setAdapter(mMainPagerAdapter);
+        mMainViewPager.setOffscreenPageLimit(3);
 
         final AHBottomNavigation bottomNavigation = findViewById(R.id.navigation);
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("", R.drawable.translation_black_back_dark512);
@@ -64,8 +65,9 @@ public class MainActivity extends AppCompatActivity implements
         bottomNavigation.setOnTabSelectedListener((position, wasSelected) -> {
             if (!wasSelected) {
                 mMainViewPager.setCurrentItem(position);
+                return true;
             }
-            return true;
+            return false;
         });
     }
 

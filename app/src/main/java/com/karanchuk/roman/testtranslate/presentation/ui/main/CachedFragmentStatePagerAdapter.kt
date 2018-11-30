@@ -7,7 +7,9 @@ import android.util.SparseArray
 import android.view.ViewGroup
 
 
-abstract class CachedFragmentStatePagerAdapter(fragmentManager: FragmentManager) : FragmentStatePagerAdapter(fragmentManager) {
+abstract class CachedFragmentStatePagerAdapter(
+        fragmentManager: FragmentManager
+) : FragmentStatePagerAdapter(fragmentManager) {
     // Sparse array to keep track of registered fragments in memory
     private val registeredFragments = SparseArray<Fragment>()
 

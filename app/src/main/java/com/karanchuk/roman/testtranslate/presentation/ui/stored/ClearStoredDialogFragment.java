@@ -22,7 +22,6 @@ public class ClearStoredDialogFragment extends DialogFragment {
         void onDialogNegativeClick(final ClearStoredDialogFragment dialog);
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

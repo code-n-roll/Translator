@@ -3,6 +3,7 @@ package com.karanchuk.roman.testtranslate.presentation.ui.stored.history;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.os.HandlerThread;
 
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
@@ -32,10 +33,13 @@ public class HistoryPresenterImpl implements HistoryPresenter,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver,
         ContentManager.TranslatedItemChanged {
+    private static final String MAIN_HANDLER_THREAD = HistoryPresenterImpl.class.getName() + ".MAIN_HANDLER_THREAD";
+
     private TranslatorRepositoryImpl mRepository;
-    private List<TranslatedItem> mHistoryTranslatedItems;
-    private List<TranslatedItem> mFavoritesTranslatedItems;
+    private List<TranslatedItem> mHistoryTranslatedItems = new ArrayList<>();
+    private List<TranslatedItem> mFavoritesTranslatedItems = new ArrayList<>();
     private Handler mMainHandler;
+    private HandlerThread mMainHandlerThread;
     private SharedPreferences mSettings;
     private ContentManager mContentManager;
 
@@ -45,11 +49,7 @@ public class HistoryPresenterImpl implements HistoryPresenter,
         mView = (HistoryFragment) view;
         TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(context);
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
-        mHistoryTranslatedItems = mRepository.getTranslatedItems(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
-        mFavoritesTranslatedItems = mRepository.getTranslatedItems(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES);
-        Collections.reverse(mHistoryTranslatedItems);
 
-        mMainHandler = new Handler(context.getMainLooper());
         mSettings = context.getSharedPreferences(PREFS_NAME, 0);
         mContentManager = ContentManager.getInstance();
     }
@@ -59,6 +59,16 @@ public class HistoryPresenterImpl implements HistoryPresenter,
         mRepository.addHistoryContentObserver(this);
         mRepository.addFavoritesContentObserver(this);
         mContentManager.addContentObserver(this);
+
+        mMainHandlerThread = new HandlerThread(MAIN_HANDLER_THREAD);
+        mMainHandlerThread.start();
+        mMainHandler = new Handler(mMainHandlerThread.getLooper());
+
+        mMainHandler.post(() -> {
+            mHistoryTranslatedItems = mRepository.getTranslatedItems(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
+            mFavoritesTranslatedItems = mRepository.getTranslatedItems(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_FAVORITES);
+            Collections.reverse(mHistoryTranslatedItems);
+        });
     }
 
     @Override
@@ -69,10 +79,13 @@ public class HistoryPresenterImpl implements HistoryPresenter,
         mRepository = null;
         mHistoryTranslatedItems = null;
         mFavoritesTranslatedItems = null;
-        mMainHandler = null;
         mSettings = null;
         mContentManager = null;
         mView = null;
+
+        mMainHandlerThread.quit();
+        mMainHandlerThread = null;
+        mMainHandler = null;
     }
 
     public List<TranslatedItem> getHistoryTranslatedItems() {

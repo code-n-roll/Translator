@@ -1,58 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    >
     <TextView
         android:id="@+id/textview_translate_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
-        android:layout_toLeftOf="@+id/get_target_voice_container"
-        android:layout_toStartOf="@+id/get_target_voice_container"
         android:text="время"
         android:textSize="20sp"
         android:textColor="@android:color/black"
-        />
+        android:layout_toLeftOf="@id/get_target_voice"
+        android:layout_toStartOf="@id/get_target_voice"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/container_dict_defin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/textview_translate_result"
+        android:layout_below="@id/textview_translate_result"
+        android:layout_toLeftOf="@id/get_target_voice"
+        android:layout_toStartOf="@id/get_target_voice"
         android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="20dp"
-        android:layout_toLeftOf="@+id/set_favorite"
-        android:layout_toStartOf="@+id/set_favorite"
-        android:scrollbars="vertical"
-        />
+        android:scrollbars="vertical"/>
 
-    <FrameLayout
-        android:id="@+id/get_target_voice_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/get_target_voice"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/volume_up_indicator_dark512"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:background="@android:color/transparent"
+        android:layout_marginRight="5dp"
+        android:layout_marginEnd="5dp"/>
+
+    <ProgressBar
+        android:id="@+id/get_target_voice_progress"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp">
-        <ImageButton
-            android:id="@+id/get_target_voice"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:src="@drawable/volume_up_indicator_dark512"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:background="@android:color/transparent"/>
-        <ProgressBar
-            android:id="@+id/get_target_voice_progress"
-            android:layout_width="38dp"
-            android:layout_height="38dp"/>
-    </FrameLayout>
+        android:layout_marginEnd="5dp"/>
 
     <ImageButton
         android:id="@+id/set_favorite"
@@ -60,43 +57,42 @@
         android:layout_height="38dp"
         android:src="@drawable/bookmark_black_shape_dark512"
         android:padding="8dp"
-        android:layout_alignParentRight="true"
+        android:layout_below="@id/get_target_voice"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/get_target_voice_container"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
         android:background="@android:color/transparent"
         android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp"
-        />
+        android:layout_marginEnd="5dp"/>
+
     <ImageButton
         android:id="@+id/share_translated_word"
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:src="@drawable/share_arrow_dark512"
         android:padding="8dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/set_favorite"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
         android:background="@android:color/transparent"
         android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp"
-        />
+        android:layout_marginEnd="5dp"/>
+
     <ImageButton
         android:id="@+id/fullscreen_translated_word"
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:src="@drawable/fullscreen_dark512"
         android:padding="8dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/share_translated_word"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
         android:background="@android:color/transparent"
         android:layout_marginRight="5dp"
-        android:layout_marginEnd="5dp"
-        />
+        android:layout_marginEnd="5dp"/>
 </RelativeLayout>

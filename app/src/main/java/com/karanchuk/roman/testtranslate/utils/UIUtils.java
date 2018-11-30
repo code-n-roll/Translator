@@ -3,7 +3,6 @@ package com.karanchuk.roman.testtranslate.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -11,6 +10,8 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Toast;
+
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 
 /**
  * Created by roman on 17.4.17.
@@ -42,11 +43,10 @@ public class UIUtils {
     public static int hideBottomNavViewGetBottomPadding(
             final Activity curActivity,
             final View container,
-            final BottomNavigationView navView){
+            final AHBottomNavigation navView){
         hideBottomNavView(navView);
         int bottomPadding = 0;
-        if (curActivity.getResources().getConfiguration().orientation ==
-                Configuration.ORIENTATION_LANDSCAPE) {
+        if (curActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             bottomPadding = container.getPaddingBottom();
             container.setPadding(0,0,0,0);
         }
@@ -56,7 +56,7 @@ public class UIUtils {
     public static void showBottomNavViewSetBottomPadding(
             final Activity curActivity,
             final View container,
-            final BottomNavigationView navView,
+            final AHBottomNavigation navView,
             final int bottomPadding){
         showBottomNavView(navView);
         if (curActivity.getResources().getConfiguration().orientation ==
@@ -65,11 +65,11 @@ public class UIUtils {
         }
     }
 
-    private static void showBottomNavView(final BottomNavigationView navView){
+    private static void showBottomNavView(final AHBottomNavigation navView){
         navView.setVisibility(View.VISIBLE);
     }
 
-    private static void hideBottomNavView(final BottomNavigationView navView){
+    private static void hideBottomNavView(final AHBottomNavigation navView){
         Animation anim = new TranslateAnimation(0,0,0,200);
         anim.setDuration(500);
         navView.startAnimation(anim);

@@ -2,7 +2,6 @@ package com.karanchuk.roman.testtranslate.presentation.ui.stored.history;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.presentation.ui.stored.StoredRecyclerAdapter;
@@ -86,7 +86,7 @@ public class HistoryFragment extends Fragment implements HistoryView,
     }
 
     private void initHistoryRecycler(){
-        BottomNavigationView navigation = getActivity().findViewById(R.id.navigation);
+        AHBottomNavigation navigation = getActivity().findViewById(R.id.navigation);
         View translatorNavView = navigation.findViewById(R.id.navigation_translate);
 
         mHistoryRecycler.setLayoutManager(new LinearLayoutManager(getContext()));

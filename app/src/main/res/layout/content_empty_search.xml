@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <ImageView
         android:id="@+id/imageview_empty_search"
         android:layout_width="40dp"
@@ -10,10 +12,7 @@
         android:scaleType="fitCenter"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-
-        />
-    <!--android:src="@drawable/bookmark_black_shape_light512"-->
+        android:layout_marginTop="50dp"/>
 
     <TextView
         android:id="@+id/textview_empty_search"
@@ -23,9 +22,5 @@
         android:layout_below="@id/imageview_empty_search"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:textSize="18sp"
-
-        />
-    <!--android:textTextView="@string/empty_favorites"-->
-
+        android:textSize="18sp"/>
 </RelativeLayout>

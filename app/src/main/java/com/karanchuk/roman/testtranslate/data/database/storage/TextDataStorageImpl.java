@@ -22,13 +22,13 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
 
 public class TextDataStorageImpl implements TextDataStorage {
     private SharedPreferences mSettings;
-    private Gson mGson;
     private TranslationSaver mSaver;
+    private Gson mGson;
 
-    public TextDataStorageImpl(Context context) {
+    public TextDataStorageImpl(Context context, Gson gson) {
         mSettings = context.getSharedPreferences(PREFS_NAME, 0);
-        mGson = new Gson();
-        mSaver = new TranslationSaver(context);
+        mGson = gson;
+        mSaver = new TranslationSaver(context, mGson);
     }
 
     @Override

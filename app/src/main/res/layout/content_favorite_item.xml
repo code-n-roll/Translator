@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="wrap_content"
-                android:layout_height="70dp"
-    >
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="70dp">
+
     <ImageButton
         android:id="@+id/imagebutton_isfavorite_favorite_item"
         android:layout_height="50dp"
@@ -11,8 +12,7 @@
         android:padding="15dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
-        android:layout_centerVertical="true"
-        />
+        android:layout_centerVertical="true"/>
 
     <TextView
         android:id="@+id/src_trg_languages"
@@ -25,8 +25,8 @@
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        />
+        android:layout_marginStart="10dp"/>
+
     <LinearLayout
         android:layout_toRightOf="@id/imagebutton_isfavorite_favorite_item"
         android:layout_toEndOf="@+id/imagebutton_isfavorite_favorite_item"
@@ -35,25 +35,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_centerVertical="true"
-        >
+        android:layout_centerVertical="true">
+
         <TextView
             android:id="@+id/src_meaning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
-            android:text="source sdlf jlsdj lsjdlf jsdj flsjdlf jlsdj lsdjfltext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdf"
-            />
+            android:text="source sdlf jlsdj lsjdlf jsdj flsjdlf jlsdj lsdjfltext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdf"/>
+
         <TextView
             android:id="@+id/trg_meaning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end"
-            android:text="synonyms sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdf"
-            />
+            android:text="synonyms sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdftext trg lang sjdlfk jsld jlsdf"/>
     </LinearLayout>
-
-
 </RelativeLayout>

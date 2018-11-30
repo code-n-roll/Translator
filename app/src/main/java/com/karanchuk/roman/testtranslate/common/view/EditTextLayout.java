@@ -73,8 +73,10 @@ public class EditTextLayout extends RelativeLayout implements GestureDetector.On
     }
 
     @Override
-    public boolean onScroll(MotionEvent motionEvent1, MotionEvent motionEvent2,
-                            float velocityX, float velocityY) {
+    public boolean onScroll(MotionEvent motionEvent1,
+                            MotionEvent motionEvent2,
+                            float velocityX,
+                            float velocityY) {
 
         offsetLeftAndRight(Math.min((int)(motionEvent2.getX() - motionEvent1.getX()),
                                     (int)(motionEvent2.getX() % 1000)));

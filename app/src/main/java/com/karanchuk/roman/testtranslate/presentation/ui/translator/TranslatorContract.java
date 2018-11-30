@@ -6,6 +6,8 @@ import com.karanchuk.roman.testtranslate.common.BaseView;
 import com.karanchuk.roman.testtranslate.data.database.model.DictDefinition;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 
+import java.util.List;
+
 /**
  * Created by roman on 11.12.17.
  */
@@ -29,6 +31,8 @@ public interface TranslatorContract {
         void saveToSharedPreferences();
         void handleDictionaryResponse(DictDefinition dictDefinition);
         void clearContainerSuccess();
+
+        List<TranslatedItem> getHistoryTranslatedItems();
     }
 
     interface View extends BaseView<Presenter> {

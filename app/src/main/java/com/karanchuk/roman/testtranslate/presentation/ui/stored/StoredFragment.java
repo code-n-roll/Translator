@@ -2,9 +2,9 @@ package com.karanchuk.roman.testtranslate.presentation.ui.stored;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
@@ -41,13 +42,14 @@ public class StoredFragment extends Fragment implements
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver {
     private static final int HISTORY_FRAGMENT = 0;
     private static final int FAVORITES_FRAGMENT = 1;
+    private static final String MAIN_HANDLER_THREAD = StoredFragment.class.getName() + "MAIN_HANDLER_THREAD";
 
     private StoredPagerAdapter mFavoritesAdapter;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
     private ImageButton mClearStored;
     private View mMainActivityContainer;
-    private BottomNavigationView mNavigation;
+    private AHBottomNavigation mBottomNavigation;
     private ClearStoredDialogFragment mClearHistoryDialog;
 
     private List<TranslatedItem> mFavoritesItems;
@@ -56,6 +58,8 @@ public class StoredFragment extends Fragment implements
     private TranslatorRepositoryImpl mRepository;
     private ContentManager mContentManager;
     private Handler mMainHandler;
+    private HandlerThread mMainHandlerThread;
+    private Handler mUIHandler;
     private int mCurPosition = 0;
     private int mBottomPadding;
     private Bundle mBundle;
@@ -74,29 +78,19 @@ public class StoredFragment extends Fragment implements
         findViewsOnFragment(view);
         findViewsOnActivity();
 
-        mMainHandler = new Handler(Looper.getMainLooper());
-
         mContentManager = ContentManager.getInstance();
         TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(getContext());
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
         mRepository.addHistoryContentObserver(this);
         mRepository.addFavoritesContentObserver(this);
-        mFavoritesItems = mRepository.getTranslatedItems(TablePersistenceContract.
-                TranslatedItemEntry.TABLE_NAME_FAVORITES);
-        mHistoryItems = mRepository.getTranslatedItems(TablePersistenceContract.
-                TranslatedItemEntry.TABLE_NAME_HISTORY);
-
 
         mClearHistoryDialog = new ClearStoredDialogFragment();
         mBundle = new Bundle();
         mTabLayout.setupWithViewPager(mViewPager);
 
-
-
         UIUtils.changeSoftInputModeWithOrientation(getActivity());
         handleKeyboardVisibility();
 
-        initClearStored();
         initViewPager();
         initActionBar();
     }
@@ -117,8 +111,7 @@ public class StoredFragment extends Fragment implements
     }
 
     private void findViewsOnActivity(){
-        mMainActivityContainer = getActivity().findViewById(R.id.main_activity_container);
-        mNavigation = getActivity().findViewById(R.id.navigation);
+        mBottomNavigation = getActivity().findViewById(R.id.navigation);
     }
 
     private void clickOnClearStored(Bundle bundle){
@@ -140,10 +133,34 @@ public class StoredFragment extends Fragment implements
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        mMainHandlerThread = new HandlerThread(MAIN_HANDLER_THREAD);
+        mMainHandlerThread.start();
+        mMainHandler = new Handler(mMainHandlerThread.getLooper());
+        mUIHandler = new Handler(Looper.getMainLooper());
+
+        mMainHandler.post(() -> {
+            mFavoritesItems = mRepository.getTranslatedItems(TablePersistenceContract.
+                    TranslatedItemEntry.TABLE_NAME_FAVORITES);
+            mHistoryItems = mRepository.getTranslatedItems(TablePersistenceContract.
+                    TranslatedItemEntry.TABLE_NAME_HISTORY);
+        });
+        mMainHandler.post(() -> {
+            mUIHandler.post(this::initClearStored);
+        });
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         mRepository.removeFavoritesContentObserver(this);
         mRepository.removeHistoryContentObserver(this);
+        mMainHandlerThread.quit();
+        mMainHandlerThread = null;
+        mMainHandler = null;
+        mUIHandler = null;
     }
 
 
@@ -222,15 +239,15 @@ public class StoredFragment extends Fragment implements
                 getActivity(),
                 isOpen -> {
                     if (isOpen && isAdded()){
-                            mBottomPadding = UIUtils.hideBottomNavViewGetBottomPadding(
-                                    getActivity(),
-                                    mMainActivityContainer,
-                                    mNavigation);
+                            // mBottomPadding = UIUtils.hideBottomNavViewGetBottomPadding(
+                            //         getActivity(),
+                            //         mMainActivityContainer,
+                            //         mBottomNavigation);
                     } else if (!isOpen && isAdded()){
                             UIUtils.showBottomNavViewSetBottomPadding(
                                     getActivity(),
                                     mMainActivityContainer,
-                                    mNavigation,
+                                    mBottomNavigation,
                                     mBottomPadding);
                     }
                 });

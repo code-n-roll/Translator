@@ -20,11 +20,11 @@ import java.util.Map;
  */
 
 public class JsonUtils {
-    public static JsonObject getJsonObjectFromAssetsFile(Context context, String filename){
+    public static JsonObject getJsonObjectFromAssetsFile(Context context, Gson gson, String filename){
         try {
             InputStream is = context.getAssets().open(filename);
             JsonReader jsonReader = new JsonReader(new InputStreamReader(is));
-            return new Gson().fromJson(jsonReader, JsonObject.class);
+            return gson.fromJson(jsonReader, JsonObject.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

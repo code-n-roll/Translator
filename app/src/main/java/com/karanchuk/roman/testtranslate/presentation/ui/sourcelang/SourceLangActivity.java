@@ -10,16 +10,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.database.model.Language;
+import com.karanchuk.roman.testtranslate.presentation.TestTranslatorApp;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import static com.karanchuk.roman.testtranslate.common.Constants.CUR_SELECTED_ITEM_SRC_LANG;
 import static com.karanchuk.roman.testtranslate.common.Constants.LANGS_FILE_NAME;
@@ -37,11 +41,16 @@ public class SourceLangActivity extends AppCompatActivity {
     private Language mCurSelectedItem;
     private SharedPreferences mSettings;
 
+    @Inject
+    Gson mGson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source_lang);
+
+        TestTranslatorApp.appComponent.inject(this);
+
         initToolbar();
 
         mSrcLangRecycler = (RecyclerView) findViewById(R.id.recyclerview_src_lang);
@@ -49,7 +58,7 @@ public class SourceLangActivity extends AppCompatActivity {
         mSrcLangRecycler.addItemDecoration(new DividerItemDecoration(this, RecyclerView.VERTICAL));
 
         mSettings = getSharedPreferences(PREFS_NAME, 0);
-        mLangsJson = JsonUtils.getJsonObjectFromAssetsFile(this, LANGS_FILE_NAME);
+        mLangsJson = JsonUtils.getJsonObjectFromAssetsFile(this, mGson, LANGS_FILE_NAME);
 
         mItems = JsonUtils.getLangsFromJson(mLangsJson);
         Collections.sort(mItems);

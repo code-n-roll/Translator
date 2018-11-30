@@ -30,15 +30,15 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
 
 public class TranslationSaver implements Runnable {
     private TranslatedItem mCurTranslatedItem;
-    private Gson mGson;
     private Map<String, Object> mSavedData;
     private JsonObject mLanguagesMap;
     private TranslatorRepositoryImpl mRepository;
     private List<TranslatedItem> mHistoryTranslatedItems;
+    private Gson mGson;
 
-    public TranslationSaver(Context context) {
-        mGson = new Gson();
-        mLanguagesMap = JsonUtils.getJsonObjectFromAssetsFile(context, LANGS_FILE_NAME);
+    public TranslationSaver(Context context, Gson gson) {
+        mGson = gson;
+        mLanguagesMap = JsonUtils.getJsonObjectFromAssetsFile(context, mGson, LANGS_FILE_NAME);
 
         SharedPreferences settings = context.getSharedPreferences(PREFS_NAME, 0);
         mCurTranslatedItem = mGson.fromJson(settings.getString(CUR_TRANSLATED_ITEM, ""), TranslatedItem.class);

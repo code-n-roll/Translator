@@ -2,6 +2,7 @@ package com.karanchuk.roman.testtranslate;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
 
@@ -39,8 +40,7 @@ public class JsonUtilsUnitTest {
         } catch (IOException e){
             e.printStackTrace();
         }
-        JsonObject result = JsonUtils.getJsonObjectFromAssetsFile(
-                mMockContext, "test_yandex_api_response.json");
+        JsonObject result = JsonUtils.getJsonObjectFromAssetsFile(mMockContext, new Gson(), "test_yandex_api_response.json");
         JsonObject mustBeResult = new JsonObject();
 
         JsonObject weight = new JsonObject();

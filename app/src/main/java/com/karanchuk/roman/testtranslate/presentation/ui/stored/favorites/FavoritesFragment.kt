@@ -3,7 +3,6 @@ package com.karanchuk.roman.testtranslate.presentation.ui.stored.favorites
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
-import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -13,6 +12,7 @@ import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.karanchuk.roman.testtranslate.R
 import com.karanchuk.roman.testtranslate.common.Constants.*
 import com.karanchuk.roman.testtranslate.common.extensions.bind
@@ -99,7 +99,7 @@ class FavoritesFragment : Fragment(),
         mDividerItemDecoration = DividerItemDecoration(mFavoritesRecycler.context, RecyclerView.VERTICAL)
         mFavoritesRecycler.addItemDecoration(mDividerItemDecoration)
 
-        val navigation = activity!!.findViewById<BottomNavigationView>(R.id.navigation)
+        val navigation = activity!!.findViewById<AHBottomNavigation>(R.id.navigation)
         val translatorNavigationItem = navigation.findViewById<View>(R.id.navigation_translate)
 
         mFavoritesRecycler.adapter = StoredRecyclerAdapter(

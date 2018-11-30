@@ -3,31 +3,24 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <android.support.v7.widget.SearchView
         android:id="@+id/search_view_favorites"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        />
+        android:layout_height="50dp"/>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/favorites_items_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            >
-        </android.support.v7.widget.RecyclerView>
+            android:scrollbars="vertical"/>
 
         <include android:id="@+id/include_content_favorites_empty_search"
             layout="@layout/content_empty_search"/>
-
     </FrameLayout>
-
 </LinearLayout>

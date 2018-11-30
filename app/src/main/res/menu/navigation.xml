@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_translate"
         android:icon="@drawable/translation_dark512"
@@ -10,8 +8,7 @@
         android:adjustViewBounds="true"
         android:padding="0dp"
         android:scaleType="fitCenter"
-        android:title=""
-        />
+        android:title=""/>
 
     <item
         android:id="@+id/navigation_favorites"
@@ -21,8 +18,7 @@
         android:adjustViewBounds="true"
         android:padding="0dp"
         android:scaleType="fitCenter"
-        android:title=""
-        />
+        android:title=""/>
 
     <item
         android:id="@+id/navigation_settings"
@@ -33,5 +29,4 @@
         android:scaleType="fitCenter"
         android:icon="@drawable/gear_black_shape_light512"
         android:title=""/>
-
 </menu>

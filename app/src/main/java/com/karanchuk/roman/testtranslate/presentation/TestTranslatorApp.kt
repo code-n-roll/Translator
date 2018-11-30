@@ -1,10 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation
 
 import android.app.Application
-import com.karanchuk.roman.testtranslate.di.AppComponent
-import com.karanchuk.roman.testtranslate.di.DaggerAppComponent
-import com.karanchuk.roman.testtranslate.di.DatabaseModule
-import com.karanchuk.roman.testtranslate.di.NetworkModule
+import com.karanchuk.roman.testtranslate.di.*
 
 
 class TestTranslatorApp : Application() {
@@ -25,6 +22,7 @@ class TestTranslatorApp : Application() {
         appComponent = DaggerAppComponent.builder()
                 .networkModule(NetworkModule())
                 .databaseModule(DatabaseModule())
+                .utilModule(UtilModule())
                 .build()
     }
 }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -36,6 +37,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -73,9 +75,12 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         VocalizerListener,
         RecognizerListener {
 
+    private static final String MAIN_HANDLER_THREAD = TranslatorPresenter.class.getName() + ".MAIN_HANDLER_THREAD";
+
     private SharedPreferences mSettings;
     private TranslatorRepositoryImpl mRepository;
     private Handler mMainHandler;
+    private HandlerThread mMainHandlerThread;
     private TranslatorFragment mView;
     private List<TranslatedItem> mHistoryTranslatedItems;
     private DictDefinition mCurDictDefinition;
@@ -84,11 +89,13 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
     private String mRequestedText;
     private String mTranslationDirection;
-    private Gson mGson;
 
     private Vocalizer mVocalizer;
     private Recognizer mRecognizer;
     private TextDataStorage mTextDataStorage;
+
+    @Inject
+    Gson mGson;
 
     @Inject
     YandexTranslateRepository mYandexTranslateRepository;
@@ -96,34 +103,36 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     @Inject
     YandexDictionaryRepository mYandexDictionaryRepository;
 
-    public TranslatorPresenter(TranslatorContract.View view, Context context) {
+    public TranslatorPresenter(TranslatorContract.View view) {
+        TestTranslatorApp.appComponent.inject(this);
+
         mView = (TranslatorFragment) view;
         SpeechKit.getInstance().configure(mView.getContext(), SPEECH_KIT_API_KEY);
 
-        mTextDataStorage = new TextDataStorageImpl(context);
-        mSaver = new TranslationSaver(mView.getContext());
-        mGson = new Gson();
-        mMainHandler = new Handler(mView.getContext().getMainLooper());
+        mTextDataStorage = new TextDataStorageImpl(mView.getContext(), mGson);
+        mSaver = new TranslationSaver(mView.getContext(), mGson);
 
-        TranslatorRepository localDataSource =
-                TranslatorLocalRepository.getInstance(mView.getContext());
+        TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(mView.getContext());
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
-        mHistoryTranslatedItems = mRepository.getTranslatedItems(
-                TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
-
-
-        mSettings = mView.getActivity().getSharedPreferences(PREFS_NAME, 0);
-        String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
-        if (!dictDefString.equals("null")){
-            mCurDictDefinition = mGson.fromJson(dictDefString, DictDefinition.class);
-        }
-
-        TestTranslatorApp.appComponent.inject(this);
     }
 
     @Override
     public void attachView(Context context) {
         mRepository.addHistoryContentObserver(this);
+
+        mMainHandlerThread = new HandlerThread(MAIN_HANDLER_THREAD);
+        mMainHandlerThread.start();
+        mMainHandler = new Handler(mMainHandlerThread.getLooper());
+        mMainHandler.post(() -> {
+            mHistoryTranslatedItems = mRepository.getTranslatedItems(
+                    TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
+
+            mSettings = mView.getActivity().getSharedPreferences(PREFS_NAME, 0);
+            String dictDefString = mSettings.getString(TRANSL_CONTENT,"");
+            if (!dictDefString.equals("null")){
+                mCurDictDefinition = mGson.fromJson(dictDefString, DictDefinition.class);
+            }
+        });
     }
 
     @Override
@@ -135,38 +144,47 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         mRepository.removeHistoryContentObserver(this);
         mRepository = null;
 
-        mGson = null;
         mSaver = null;
-        mMainHandler = null;
         mTextDataStorage = null;
         mHistoryTranslatedItems = null;
         mSettings = null;
         mCurDictDefinition = null;
+
+        mMainHandler = null;
+        mMainHandlerThread.quit();
+        mMainHandlerThread = null;
     }
 
     @Override
     public boolean requestTranslatorAPI() {
-        JsonObject langs = JsonUtils.getJsonObjectFromAssetsFile(mView.getContext(), "langs.json");
+        Single<JsonObject> getTranslDirectFromJson = Single.create(emitter -> {
+            JsonObject langs = JsonUtils.getJsonObjectFromAssetsFile(mView.getContext(), mGson,"langs.json");
+
+            emitter.onSuccess(langs);
+        });
 
         String srcLang = mView.getMButtonSrcLang().getText().toString().toLowerCase();
         String trgLang = mView.getMButtonTrgLang().getText().toString().toLowerCase();
-
-        String srcLangAPI = langs.get(srcLang).getAsString();
-        String trgLangAPI = langs.get(trgLang).getAsString();
-        mTranslationDirection = srcLangAPI.concat("-").concat(trgLangAPI);
-
         mRequestedText = mView.getMCustomEditText().getText().toString();
 
         if ((mSaver.getCurTranslatedItem() != null &&
                 !mSaver.getCurTranslatedItem().getSrcMeaning().equals(mRequestedText)) ||
                 mSaver.getCurTranslatedItem() == null) {
-            mCompositeDisposable.add(mYandexTranslateRepository.getTranslation(
-                    TRANSLATOR_API_KEY,
-                    mRequestedText,
-                    mTranslationDirection)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(this::handleTranslatingResponse, this::handleTranslatingError));
+            mCompositeDisposable.add(
+                    getTranslDirectFromJson
+                            .flatMap(langs -> {
+                                String srcLangAPI = langs.get(srcLang).getAsString();
+                                String trgLangAPI = langs.get(trgLang).getAsString();
+                                mTranslationDirection = srcLangAPI.concat("-").concat(trgLangAPI);
+
+                                return mYandexTranslateRepository.getTranslation(
+                                        TRANSLATOR_API_KEY,
+                                        mRequestedText,
+                                        mTranslationDirection);
+                            })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(this::handleTranslatingResponse, this::handleTranslatingError));
             return true;
         } else {
             return false;
@@ -179,8 +197,8 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
                 DICTIONARY_API_KEY,
                 mRequestedText,
                 mTranslationDirection)
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleDictionaryResponse, this::handleDictionaryError));
     }
 
@@ -198,17 +216,21 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
             }
         }
 
-        TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter)
-                mView.getMTranslateRecyclerView().getAdapter();
+        TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter) mView.getMTranslateRecyclerView().getAdapter();
         adapter.updateData(translations, dictDefinition.getPartsOfSpeech());
 
         String curEditTextContent = mView.getMCustomEditText().getText().toString().trim();
         String srcLangAPI = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG,"");
         String trgLangAPI = mSettings.getString(CUR_SELECTED_ITEM_TRG_LANG,"");
 
-        TranslatedItem maybeExistedItem =
-                new TranslatedItem(srcLangAPI, trgLangAPI, null, null,
-                        curEditTextContent, null, null, null);
+        TranslatedItem maybeExistedItem = new TranslatedItem(srcLangAPI,
+                trgLangAPI,
+                null,
+                null,
+                        curEditTextContent,
+                null,
+                null,
+                null);
         if (!mHistoryTranslatedItems.contains(maybeExistedItem)) {
             saveToRepository(dictDefinition);
         }
@@ -218,6 +240,10 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
             mView.hideRetry();
             mView.showSuccess();
         }
+    }
+
+    public List<TranslatedItem> getHistoryTranslatedItems() {
+        return mHistoryTranslatedItems;
     }
 
     private void saveToRepository(DictDefinition dictDefinition){

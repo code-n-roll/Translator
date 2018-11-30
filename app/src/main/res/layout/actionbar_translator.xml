@@ -1,44 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:orientation="horizontal"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-    >
-        <ImageButton
-            android:id="@+id/center_actionbar_button"
-            android:layout_width="54dp"
-            android:layout_height="?attr/actionBarSize"
-            android:adjustViewBounds="true"
-            android:padding="15dp"
-            android:scaleType="fitCenter"
-            android:layout_centerInParent="true"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-            android:src="@drawable/double_arrow512"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
-        <Button
-            android:id="@+id/left_actionbar_button"
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_toLeftOf="@id/center_actionbar_button"
-            android:layout_toStartOf="@id/center_actionbar_button"
-            android:textAppearance="@style/firstCapitalizeTabTextTheme"
-            android:text="Русский"
-            android:textColor="@android:color/black"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
+    <ImageButton
+        android:id="@+id/center_actionbar_button"
+        android:layout_width="54dp"
+        android:layout_height="?attr/actionBarSize"
+        android:adjustViewBounds="true"
+        android:padding="15dp"
+        android:scaleType="fitCenter"
+        android:layout_centerInParent="true"
+        android:src="@drawable/double_arrow512"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
 
-        <Button
-            android:id="@+id/right_actionbar_button"
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_toRightOf="@id/center_actionbar_button"
-            android:layout_toEndOf="@id/center_actionbar_button"
-            android:text="Английский"
-            android:textAppearance="@style/firstCapitalizeTabTextTheme"
-            android:textColor="@android:color/black"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            />
+    <Button
+        android:id="@+id/left_actionbar_button"
+        android:layout_width="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_toLeftOf="@id/center_actionbar_button"
+        android:layout_toStartOf="@id/center_actionbar_button"
+        android:textAppearance="@style/firstCapitalizeTabTextTheme"
+        android:text="Русский"
+        android:textColor="@android:color/black"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
+
+    <Button
+        android:id="@+id/right_actionbar_button"
+        android:layout_width="wrap_content"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_toRightOf="@id/center_actionbar_button"
+        android:layout_toEndOf="@id/center_actionbar_button"
+        android:text="Английский"
+        android:textAppearance="@style/firstCapitalizeTabTextTheme"
+        android:textColor="@android:color/black"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
 </RelativeLayout>
-
-

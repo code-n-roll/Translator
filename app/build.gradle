@@ -62,6 +62,7 @@ dependencies {
     // 3rd party
     implementation "org.apmem.tools:layouts:1.10@aar"
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0"
+    implementation "com.aurelhubert:ahbottomnavigation:2.0.4"
 
     // yandex speech kit
     implementation "com.yandex.android:speechkit:$yandexSpeechKitVer"

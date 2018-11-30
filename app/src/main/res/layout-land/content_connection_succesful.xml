@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <TextView
         android:id="@+id/textview_translate_result"
         android:layout_width="match_parent"
@@ -13,8 +15,7 @@
         android:layout_toStartOf="@+id/get_target_voice_container"
         android:text="время"
         android:textSize="20sp"
-        android:textColor="@android:color/black"
-        />
+        android:textColor="@android:color/black"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/container_dict_defin"
@@ -27,8 +28,7 @@
         android:layout_marginBottom="10dp"
         android:layout_toLeftOf="@+id/set_favorite"
         android:layout_toStartOf="@+id/set_favorite"
-        android:scrollbars="vertical"
-        />
+        android:scrollbars="vertical"/>
 
     <FrameLayout
         android:id="@+id/get_target_voice_container"
@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true">
+
         <ImageButton
             android:id="@+id/get_target_voice"
             android:layout_width="38dp"
@@ -44,10 +45,11 @@
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:background="@android:color/transparent"/>
-            <ProgressBar
-                android:id="@+id/get_target_voice_progress"
-                android:layout_width="38dp"
-                android:layout_height="38dp"/>
+
+        <ProgressBar
+            android:id="@+id/get_target_voice_progress"
+            android:layout_width="38dp"
+            android:layout_height="38dp"/>
     </FrameLayout>
 
     <ImageButton
@@ -61,8 +63,8 @@
         android:layout_below="@id/get_target_voice_container"
         android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
-        android:background="@android:color/transparent"
-        />
+        android:background="@android:color/transparent"/>
+
     <ImageButton
         android:id="@+id/share_translated_word"
         android:layout_width="38dp"
@@ -74,8 +76,8 @@
         android:layout_below="@id/set_favorite"
         android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
-        android:background="@android:color/transparent"
-        />
+        android:background="@android:color/transparent"/>
+
     <ImageButton
         android:id="@+id/fullscreen_translated_word"
         android:layout_width="38dp"
@@ -87,6 +89,5 @@
         android:layout_below="@id/share_translated_word"
         android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
-        android:background="@android:color/transparent"
-        />
+        android:background="@android:color/transparent"/>
 </RelativeLayout>

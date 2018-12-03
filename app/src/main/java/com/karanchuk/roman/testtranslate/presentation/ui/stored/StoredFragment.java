@@ -104,7 +104,7 @@ public class StoredFragment extends Fragment implements
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         findViewsOnFragment(view);
@@ -195,8 +195,8 @@ public class StoredFragment extends Fragment implements
 
     private void initViewPager(){
         mFavoritesAdapter = new StoredPagerAdapter(getChildFragmentManager());
-        mFavoritesAdapter.addFragment(new HistoryFragment(), getResources().getString(R.string.title_history));
         mFavoritesAdapter.addFragment(new FavoritesFragment(), getResources().getString(R.string.title_favorites));
+        mFavoritesAdapter.addFragment(new HistoryFragment(), getResources().getString(R.string.title_history));
         mViewPager.setAdapter(mFavoritesAdapter);
         mViewPager.addOnPageChangeListener(mStorePageChangeListener);
         mViewPager.setOffscreenPageLimit(2);

@@ -137,17 +137,17 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
 
 
         findViewsOnActionBar()
-//        mSettings = activity!!.getSharedPreferences(PREFS_NAME, 0)
-//
-//        findViewsOnActivity()
-//        findViewsOnActionBar()
-//        findViewsOnContainerEditText()
-//
-//        initTranslateRecyclerView()
-//        initCustomEditText()
-//        initEventListenerKeyboardVisibility()
+        mSettings = activity!!.getSharedPreferences(PREFS_NAME, 0)
+
+        findViewsOnActivity()
+        findViewsOnActionBar()
+        findViewsOnContainerEditText()
+
+        initTranslateRecyclerView()
+        initCustomEditText()
+        initEventListenerKeyboardVisibility()
         initListeners()
-//
+
         hideLoadingDictionary()
         hideLoadingTargetVoice()
         hideLoadingSourceVoice()

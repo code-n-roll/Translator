@@ -71,9 +71,7 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
  */
 
 public class TranslatorPresenter implements TranslatorContract.Presenter,
-        TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
-        VocalizerListener,
-        RecognizerListener {
+        TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver {
 
     private static final String MAIN_HANDLER_THREAD = TranslatorPresenter.class.getName() + ".MAIN_HANDLER_THREAD";
 
@@ -102,6 +100,99 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
 
     @Inject
     YandexDictionaryRepository mYandexDictionaryRepository;
+
+    private VocalizerListener mVocalizerListener = new VocalizerListener() {
+        @Override
+        public void onSynthesisBegin(Vocalizer vocalizer) {
+            Log.d("myLogs", " onSynthesisBegin");
+        }
+
+        @Override
+        public void onSynthesisDone(Vocalizer vocalizer, Synthesis synthesis) {
+            Log.d("myLogs", " onSynthesisDone");
+        }
+
+        @Override
+        public void onPlayingBegin(Vocalizer vocalizer) {
+            Log.d("myLogs", " onPlayingBegin");
+        }
+
+        @Override
+        public void onPlayingDone(Vocalizer vocalizer) {
+            Log.d("myLogs", " onPlayingDone");
+            if (mView != null) {
+                mView.hideLoadingTargetVoice();
+                mView.hideLoadingSourceVoice();
+                mView.showIconTargetVoice();
+                mView.showIconSourceVoice();
+            }
+        }
+
+        @Override
+        public void onVocalizerError(Vocalizer vocalizer, Error error) {
+            resetVocalizer();
+            Log.d("myLogs", error.getString());
+            Log.d("myLogs", " onVocalizerError");
+        }
+    };
+
+    private RecognizerListener mRecognizerListener = new RecognizerListener() {
+        @Override
+        public void onRecordingBegin(Recognizer recognizer) {
+            Log.d("myLogs", " onRecordingBegin");
+        }
+
+        @Override
+        public void onSpeechDetected(Recognizer recognizer) {
+            Log.d("myLogs", " onSpeechDetected");
+        }
+
+        @Override
+        public void onSpeechEnds(Recognizer recognizer) {
+            Log.d("myLogs", " onSpeechEnds");
+        }
+
+        @Override
+        public void onRecordingDone(Recognizer recognizer) {
+            Log.d("myLogs", " onRecordingDone");
+            if (mView != null && mView.isAdded()) {
+                mView.deactivateVoiceRecognizer();
+            }
+        }
+
+        @Override
+        public void onSoundDataRecorded(Recognizer recognizer, byte[] bytes) {
+            Log.d("myLogs", " onSoundDataRecorded");
+        }
+
+        @Override
+        public void onPowerUpdated(Recognizer recognizer, float v) {
+            Log.d("myLogs", " onPowerUpdated");
+        }
+
+        @Override
+        public void onPartialResults(Recognizer recognizer, Recognition recognition, boolean b) {
+            Log.d("myLogs", " onPartialResults");
+        }
+
+        @Override
+        public void onRecognitionDone(Recognizer recognizer, Recognition recognition) {
+            if (mView != null) {
+                mView.getMCustomEditText().setText(recognition.getBestResultText());
+                mView.stopAnimationMicroWaves();
+            }
+        }
+
+        @Override
+        public void onError(Recognizer recognizer, Error error) {
+            Log.d("myLogs", " onError");
+            if (mView != null) {
+                mView.showError();
+                UIUtils.showToast(mView.getContext(),
+                        mView.getContext().getResources().getString(R.string.connection_error_content));
+            }
+        }
+    };
 
     public TranslatorPresenter(TranslatorContract.View view) {
         TestTranslatorApp.appComponent.inject(this);
@@ -331,7 +422,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         if (!text.isEmpty()){
             resetVocalizer();
             mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.ENGLISH, text, true, Vocalizer.Voice.OMAZH);
-            mVocalizer.setListener(TranslatorPresenter.this);
+            mVocalizer.setListener(mVocalizerListener);
             mVocalizer.start();
         }
     }
@@ -342,7 +433,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         if (!text.isEmpty()){
             resetVocalizer();
             mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, Vocalizer.Voice.OMAZH);
-            mVocalizer.setListener(TranslatorPresenter.this);
+            mVocalizer.setListener(mVocalizerListener);
             mVocalizer.start();
         }
     }
@@ -367,8 +458,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
             // To create a new recognizer, specify the language,
             // the model - a scope of recognition to get the most appropriate results,
             // set the listener to handle the recognition events.
-            mRecognizer = Recognizer.create(Recognizer.Language.RUSSIAN, Recognizer.Model.NOTES,
-                    TranslatorPresenter.this);
+            mRecognizer = Recognizer.create(Recognizer.Language.RUSSIAN, Recognizer.Model.NOTES, mRecognizerListener);
             // Don't forget to call start on the created object.
             mRecognizer.start();
         }
@@ -393,94 +483,5 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     public void onHistoryTranslatedItemsChanged() {
         mMainHandler.post(() -> mHistoryTranslatedItems = mRepository.getTranslatedItems(
                 TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY));
-    }
-
-    @Override
-    public void onSynthesisBegin(Vocalizer vocalizer) {
-        Log.d("myLogs", " onSynthesisBegin");
-    }
-
-    @Override
-    public void onSynthesisDone(Vocalizer vocalizer, Synthesis synthesis) {
-        Log.d("myLogs", " onSynthesisDone");
-    }
-
-    @Override
-    public void onPlayingBegin(Vocalizer vocalizer) {
-        Log.d("myLogs", " onPlayingBegin");
-    }
-
-    @Override
-    public void onPlayingDone(Vocalizer vocalizer) {
-        Log.d("myLogs", " onPlayingDone");
-        if (mView != null) {
-            mView.hideLoadingTargetVoice();
-            mView.hideLoadingSourceVoice();
-            mView.showIconTargetVoice();
-            mView.showIconSourceVoice();
-        }
-    }
-
-    @Override
-    public void onVocalizerError(Vocalizer vocalizer, Error error) {
-        resetVocalizer();
-        Log.d("myLogs", error.getString());
-        Log.d("myLogs", " onVocalizerError");
-    }
-
-    @Override
-    public void onRecordingBegin(Recognizer recognizer) {
-        Log.d("myLogs", " onRecordingBegin");
-    }
-
-    @Override
-    public void onSpeechDetected(Recognizer recognizer) {
-        Log.d("myLogs", " onSpeechDetected");
-    }
-
-    @Override
-    public void onSpeechEnds(Recognizer recognizer) {
-        Log.d("myLogs", " onSpeechEnds");
-    }
-
-    @Override
-    public void onRecordingDone(Recognizer recognizer) {
-        Log.d("myLogs", " onRecordingDone");
-        if (mView != null && mView.isAdded()) {
-            mView.deactivateVoiceRecognizer();
-        }
-    }
-
-    @Override
-    public void onSoundDataRecorded(Recognizer recognizer, byte[] bytes) {
-        Log.d("myLogs", " onSoundDataRecorded");
-    }
-
-    @Override
-    public void onPowerUpdated(Recognizer recognizer, float v) {
-        Log.d("myLogs", " onPowerUpdated");
-    }
-
-    @Override
-    public void onPartialResults(Recognizer recognizer, Recognition recognition, boolean b) {
-        Log.d("myLogs", " onPartialResults");
-    }
-
-    @Override
-    public void onRecognitionDone(Recognizer recognizer, Recognition recognition) {
-        if (mView != null) {
-            mView.getMCustomEditText().setText(recognition.getBestResultText());
-            mView.stopAnimationMicroWaves();
-        }
-    }
-
-    @Override
-    public void onError(Recognizer recognizer, Error error) {
-        Log.d("myLogs", " onError");
-        if (mView != null) {
-            mView.showError();
-            UIUtils.showToast(mView.getContext(),
-                    mView.getContext().getResources().getString(R.string.connection_error_content));
-        }
     }
 }

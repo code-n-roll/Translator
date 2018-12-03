@@ -35,6 +35,7 @@ public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAd
     public void setPosition(int position) {
         this.mPosition = position;
     }
+
     public StoredRecyclerAdapter(List<TranslatedItem> items,
                                  OnItemClickListener itemClickListener,
                                  OnItemClickListener isFavoriteListener,
@@ -75,8 +76,7 @@ public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAd
         return mItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnCreateContextMenuListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
         private ImageButton mIsFavoriteView;
         private TextView mSrcTrgLanguage, mSrcMeaning, mTrgMeaning;
         private View mView;

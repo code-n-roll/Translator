@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.presentation.ui.sourcelang;
+package com.karanchuk.roman.testtranslate.presentation.ui.translator.sourcelang;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

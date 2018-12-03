@@ -134,13 +134,15 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onHistoryTranslatedItemsChanged() {
-        mMainHandler.post(() -> mHistoryTranslatedItems =
-                mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY));
+        mMainHandler.post(() -> {
+            mHistoryTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY);
+        });
     }
 
     @Override
     public void onFavoritesTranslatedItemsChanged() {
-        mMainHandler.post(() -> mFavoritesTranslatedItems =
-                mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES));
+        mMainHandler.post(() -> {
+            mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
+        });
     }
 }

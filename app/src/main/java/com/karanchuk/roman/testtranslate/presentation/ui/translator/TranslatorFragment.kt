@@ -42,8 +42,8 @@ import com.karanchuk.roman.testtranslate.data.database.model.Translation
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl
 import com.karanchuk.roman.testtranslate.presentation.TestTranslatorApp
 import com.karanchuk.roman.testtranslate.presentation.ui.fullscreen.FullscreenActivity
-import com.karanchuk.roman.testtranslate.presentation.ui.sourcelang.SourceLangActivity
-import com.karanchuk.roman.testtranslate.presentation.ui.targetlang.TargetLangActivity
+import com.karanchuk.roman.testtranslate.presentation.ui.translator.sourcelang.SourceLangActivity
+import com.karanchuk.roman.testtranslate.presentation.ui.translator.targetlang.TargetLangActivity
 import com.karanchuk.roman.testtranslate.utils.UIUtils
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.xmlpull.v1.XmlPullParserException
@@ -420,20 +420,14 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     override fun showAnimationMicroWaves() {
         mCircleFirst.alpha = 1f
 
-        mAnimatorSecond = AnimatorInflater.loadAnimator(context,
-                R.animator.micro_waves_second)
-        mAnimatorSecondBack = AnimatorInflater.loadAnimator(context,
-                R.animator.micro_waves_second_back)
+        mAnimatorSecond = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_second)
+        mAnimatorSecondBack = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_second_back)
 
-        mAnimatorThird = AnimatorInflater.loadAnimator(context,
-                R.animator.micro_waves_third)
-        mAnimatorThirdBack = AnimatorInflater.loadAnimator(context,
-                R.animator.micro_waves_third_back)
+        mAnimatorThird = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_third)
+        mAnimatorThirdBack = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_third_back)
 
-        mAnimatorForth = AnimatorInflater.loadAnimator(context,
-                R.animator.micro_waves_forth)
-        mAnimatorForthBack = AnimatorInflater.loadAnimator(context,
-                R.animator.micro_waves_forth_back)
+        mAnimatorForth = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_forth)
+        mAnimatorForthBack = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_forth_back)
 
         mAnimatorSecond!!.setTarget(mCircleSecond)
         mAnimatorSecondBack!!.setTarget(mCircleSecond)

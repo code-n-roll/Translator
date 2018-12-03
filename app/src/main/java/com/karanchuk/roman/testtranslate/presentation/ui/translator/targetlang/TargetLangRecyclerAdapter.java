@@ -1,6 +1,5 @@
-package com.karanchuk.roman.testtranslate.presentation.ui.sourcelang;
+package com.karanchuk.roman.testtranslate.presentation.ui.translator.targetlang;
 
-import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,25 +14,21 @@ import com.karanchuk.roman.testtranslate.data.database.model.Language;
 import java.util.List;
 
 /**
- * Created by roman on 11.4.17.
+ * Created by roman on 17.4.17.
  */
 
-public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRecyclerAdapter.ViewHolder>{
+public class TargetLangRecyclerAdapter extends RecyclerView.Adapter<TargetLangRecyclerAdapter.ViewHolder>{
     public interface OnItemClickListener {
         void onItemClick(final Language item);
     }
 
     private final List<Language> mItems;
     private final OnItemClickListener mListener;
-    private final Context mContext;
 
-    public SourceLangRecyclerAdapter(final List<Language> items,
-                                     final OnItemClickListener listener,
-                                     final Context context){
+    public TargetLangRecyclerAdapter(final List<Language> items,
+                                     final OnItemClickListener listener){
         mItems = items;
         mListener = listener;
-        mContext = context;
-
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -60,25 +55,28 @@ public class SourceLangRecyclerAdapter extends RecyclerView.Adapter<SourceLangRe
         public ViewHolder(final View view){
             super(view);
             mView = view;
-            mLanguage = (TextView) mView.findViewById(R.id.choose_src_trg_lang);
-            mIsSelected = (ImageView) mView.findViewById(R.id.selected_choose_src_trg_lang);
+
+            mLanguage = mView.findViewById(R.id.choose_src_trg_lang);
+            mIsSelected = mView.findViewById(R.id.selected_choose_src_trg_lang);
         }
 
 
         public void bind(final Language item,
-                         final SourceLangRecyclerAdapter.OnItemClickListener listener){
+                         final OnItemClickListener listener){
 
             mLanguage.setText(item.getName());
             if (item.isSelected()){
                 mIsSelected.setVisibility(View.VISIBLE);
-                mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorSelectedItem));
+                mView.setBackgroundColor(ContextCompat.getColor(
+                        mView.getContext(),
+                        R.color.colorSelectedItem));
             } else {
                 mIsSelected.setVisibility(View.INVISIBLE);
-                mView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.white));
+                mView.setBackgroundColor(ContextCompat.getColor(
+                        mView.getContext(),
+                        R.color.white));
             }
-            mView.setOnClickListener(v -> listener.onItemClick(item));
+            mView.setOnClickListener(view -> listener.onItemClick(item));
         }
     }
 }
-
-

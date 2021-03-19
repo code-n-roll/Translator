@@ -1,6 +1,6 @@
 package com.karanchuk.roman.testtranslate.data.database.repository;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract.TranslatedItemEntry;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;

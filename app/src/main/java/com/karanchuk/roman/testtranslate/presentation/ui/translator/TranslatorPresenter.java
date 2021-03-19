@@ -6,8 +6,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -41,14 +43,20 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import ru.yandex.speechkit.Emotion;
 import ru.yandex.speechkit.Error;
+import ru.yandex.speechkit.Language;
+import ru.yandex.speechkit.OnlineModel;
+import ru.yandex.speechkit.OnlineRecognizer;
+import ru.yandex.speechkit.OnlineVocalizer;
 import ru.yandex.speechkit.Recognition;
 import ru.yandex.speechkit.Recognizer;
 import ru.yandex.speechkit.RecognizerListener;
-import ru.yandex.speechkit.SpeechKit;
 import ru.yandex.speechkit.Synthesis;
+import ru.yandex.speechkit.Track;
 import ru.yandex.speechkit.Vocalizer;
 import ru.yandex.speechkit.VocalizerListener;
+import ru.yandex.speechkit.Voice;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -59,7 +67,6 @@ import static com.karanchuk.roman.testtranslate.common.Constants.DICTIONARY_API_
 import static com.karanchuk.roman.testtranslate.common.Constants.EDITTEXT_DATA;
 import static com.karanchuk.roman.testtranslate.common.Constants.PREFS_NAME;
 import static com.karanchuk.roman.testtranslate.common.Constants.RECOGNIZING_REQUEST_PERMISSION_CODE;
-import static com.karanchuk.roman.testtranslate.common.Constants.SPEECH_KIT_API_KEY;
 import static com.karanchuk.roman.testtranslate.common.Constants.SRC_LANG;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSLATOR_API_KEY;
 import static com.karanchuk.roman.testtranslate.common.Constants.TRANSL_CONTENT;
@@ -103,13 +110,12 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
 
     private VocalizerListener mVocalizerListener = new VocalizerListener() {
         @Override
-        public void onSynthesisBegin(Vocalizer vocalizer) {
-            Log.d("myLogs", " onSynthesisBegin");
+        public void onSynthesisDone(@NonNull Vocalizer vocalizer) {
         }
 
         @Override
-        public void onSynthesisDone(Vocalizer vocalizer, Synthesis synthesis) {
-            Log.d("myLogs", " onSynthesisDone");
+        public void onPartialSynthesis(@NonNull Vocalizer vocalizer, @NonNull Synthesis synthesis) {
+
         }
 
         @Override
@@ -131,7 +137,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         @Override
         public void onVocalizerError(Vocalizer vocalizer, Error error) {
             resetVocalizer();
-            Log.d("myLogs", error.getString());
+            Log.d("myLogs", error.toString());
             Log.d("myLogs", " onVocalizerError");
         }
     };
@@ -161,30 +167,27 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         }
 
         @Override
-        public void onSoundDataRecorded(Recognizer recognizer, byte[] bytes) {
-            Log.d("myLogs", " onSoundDataRecorded");
-        }
-
-        @Override
         public void onPowerUpdated(Recognizer recognizer, float v) {
             Log.d("myLogs", " onPowerUpdated");
         }
 
         @Override
-        public void onPartialResults(Recognizer recognizer, Recognition recognition, boolean b) {
+        public void onPartialResults(Recognizer recognizer, Recognition recognition, boolean endOfUtterance) {
             Log.d("myLogs", " onPartialResults");
-        }
-
-        @Override
-        public void onRecognitionDone(Recognizer recognizer, Recognition recognition) {
-            if (mView != null) {
-                mView.getMCustomEditText().setText(recognition.getBestResultText());
-                mView.stopAnimationMicroWaves();
+            if (endOfUtterance) {
+                if (mView != null) {
+                    mView.getMCustomEditText().setText(recognition.getBestResultText());
+                    mView.stopAnimationMicroWaves();
+                }
             }
         }
 
         @Override
-        public void onError(Recognizer recognizer, Error error) {
+        public void onRecognitionDone(@NonNull Recognizer recognizer) {
+        }
+
+        @Override
+        public void onRecognizerError(@NonNull Recognizer recognizer, @NonNull Error error) {
             Log.d("myLogs", " onError");
             if (mView != null) {
                 mView.showError();
@@ -192,13 +195,18 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
                         mView.getContext().getResources().getString(R.string.connection_error_content));
             }
         }
+
+        @Override
+        public void onMusicResults(@NonNull Recognizer recognizer, @NonNull Track track) {
+
+        }
     };
 
     public TranslatorPresenter(TranslatorContract.View view) {
         TestTranslatorApp.appComponent.inject(this);
 
         mView = (TranslatorFragment) view;
-        SpeechKit.getInstance().configure(mView.getContext(), SPEECH_KIT_API_KEY);
+//        SpeechKit.getInstance().init(mView.requireContext(), SPEECH_KIT_API_KEY);
 
         mTextDataStorage = new TextDataStorageImpl(mView.getContext(), mGson);
         mSaver = new TranslationSaver(mView.getContext(), mGson);
@@ -421,9 +429,13 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         String text = mView.getMCustomEditText().getText().toString();
         if (!text.isEmpty()){
             resetVocalizer();
-            mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.ENGLISH, text, true, Vocalizer.Voice.OMAZH);
-            mVocalizer.setListener(mVocalizerListener);
-            mVocalizer.start();
+
+            OnlineVocalizer vocalizer = new OnlineVocalizer.Builder(Language.ENGLISH, mVocalizerListener)
+                    .setEmotion(Emotion.GOOD)
+                    .setVoice(Voice.OMAZH)
+                    .build();
+            vocalizer.prepare();
+            vocalizer.synthesize(text, Vocalizer.TextSynthesizingMode.APPEND);
         }
     }
 
@@ -432,9 +444,13 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         String text = mView.getMTranslatedResult().getText().toString();
         if (!text.isEmpty()){
             resetVocalizer();
-            mVocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, Vocalizer.Voice.OMAZH);
-            mVocalizer.setListener(mVocalizerListener);
-            mVocalizer.start();
+
+            OnlineVocalizer vocalizer = new OnlineVocalizer.Builder(Language.RUSSIAN, mVocalizerListener)
+                    .setEmotion(Emotion.GOOD)
+                    .setVoice(Voice.OMAZH)
+                    .build();
+            vocalizer.prepare();
+            vocalizer.synthesize(text, Vocalizer.TextSynthesizingMode.APPEND);
         }
     }
 
@@ -458,9 +474,12 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
             // To create a new recognizer, specify the language,
             // the model - a scope of recognition to get the most appropriate results,
             // set the listener to handle the recognition events.
-            mRecognizer = Recognizer.create(Recognizer.Language.RUSSIAN, Recognizer.Model.NOTES, mRecognizerListener);
-            // Don't forget to call start on the created object.
-            mRecognizer.start();
+            OnlineRecognizer recognizer = new OnlineRecognizer.Builder(Language.RUSSIAN, OnlineModel.NOTES, mRecognizerListener)
+                    .setDisableAntimat(false)
+                    .setEnablePunctuation(true)
+                    .build();
+            recognizer.prepare();
+            recognizer.startRecording();
         }
     }
 

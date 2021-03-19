@@ -1,6 +1,6 @@
 package com.karanchuk.roman.testtranslate.data.database.room.dao
 
-import android.arch.persistence.room.Dao
+import androidx.room.Dao
 
 @Dao
 interface TranslationFavoriteDao {

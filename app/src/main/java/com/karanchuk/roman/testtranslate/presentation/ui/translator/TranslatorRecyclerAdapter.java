@@ -1,7 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation.ui.translator;
 
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;

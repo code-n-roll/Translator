@@ -5,16 +5,17 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.3'
     defaultConfig {
         applicationId "com.karanchuk.roman.testtranslate"
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -30,13 +31,17 @@ android {
     }
 }
 
+def VERSION_ROOM = '2.2.6'
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
+    implementation "androidx.multidex:multidex:2.0.1"
+
     // android support
-    implementation "com.android.support:appcompat-v7:$supportVer"
-    implementation "com.android.support:design:$supportVer"
-    implementation "com.android.support:support-vector-drawable:$supportVer"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.vectordrawable:vectordrawable:1.0.0'
 
     // gson
     implementation "com.google.code.gson:gson:$gsonVer"
@@ -71,7 +76,7 @@ dependencies {
     implementation "org.mockito:mockito-core:$mockitoVer"
 
     // espresso
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$espressoVer", {
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
@@ -80,11 +85,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // room
-    implementation "android.arch.persistence.room:runtime:$roomVer"
-    implementation "android.arch.persistence.room:rxjava2:$roomVer"
-    kapt "android.arch.persistence.room:compiler:$roomVer"
-}
-
-repositories {
-    mavenCentral()
+    implementation "androidx.room:room-runtime:$VERSION_ROOM"
+    implementation "androidx.room:room-rxjava2:$VERSION_ROOM"
+    kapt "androidx.room:room-compiler:$VERSION_ROOM"
 }

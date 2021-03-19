@@ -1,7 +1,7 @@
 package com.karanchuk.roman.testtranslate.common.view;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.view.View;

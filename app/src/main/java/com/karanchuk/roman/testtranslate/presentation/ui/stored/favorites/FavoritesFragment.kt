@@ -3,11 +3,11 @@ package com.karanchuk.roman.testtranslate.presentation.ui.stored.favorites
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.app.Fragment
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.SearchView
 import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -46,7 +46,6 @@ class FavoritesFragment : Fragment(),
     private val mImageViewEmptySearch: ImageView by bind(R.id.imageview_empty_search)
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
-    private var mDividerItemDecoration: RecyclerView.ItemDecoration? = null
     private var mClearStored: ImageButton? = null
     private var mView: View? = null
     private var mRepository: TranslatorRepositoryImpl? = null
@@ -88,7 +87,8 @@ class FavoritesFragment : Fragment(),
         mTextViewEmptySearch.setText(R.string.empty_search)
         mImageViewEmptySearch.setImageResource(R.drawable.bookmark_black_shape_light512)
 
-        mLayoutManager = LinearLayoutManager(mView!!.context)
+        mLayoutManager =
+            LinearLayoutManager(mView!!.context)
         mFavoritesRecycler.layoutManager = mLayoutManager
 
         mSearchViewFavorites.setIconifiedByDefault(false)
@@ -96,7 +96,7 @@ class FavoritesFragment : Fragment(),
         mSearchViewFavorites.setOnQueryTextListener(this)
         mSearchViewFavorites.visibility = View.GONE
 
-        mDividerItemDecoration = DividerItemDecoration(mFavoritesRecycler.context, RecyclerView.VERTICAL)
+        val mDividerItemDecoration = DividerItemDecoration(mFavoritesRecycler.context, RecyclerView.VERTICAL)
         mFavoritesRecycler.addItemDecoration(mDividerItemDecoration)
 
         val navigation = activity!!.findViewById<AHBottomNavigation>(R.id.navigation)
@@ -123,11 +123,11 @@ class FavoritesFragment : Fragment(),
         if (item.isFavorite()) {
             item.isFavoriteUp(false)
             mRepository!!.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)
-            mFavoritesRecycler.adapter.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
+            mFavoritesRecycler.adapter?.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
         } else {
             item.isFavoriteUp(true)
             mRepository!!.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)
-            mFavoritesRecycler.adapter.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
+            mFavoritesRecycler.adapter?.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
         }
         mRepository!!.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item)
 
@@ -233,7 +233,7 @@ class FavoritesFragment : Fragment(),
             mFavoritesTranslatedItems!!.addAll(it)
         }
         chooseCurView()
-        mFavoritesRecycler.adapter.notifyDataSetChanged()
+        mFavoritesRecycler.adapter?.notifyDataSetChanged()
     }
 
     override fun onCreateContextMenu(menu: ContextMenu, v: View,
@@ -273,6 +273,6 @@ class FavoritesFragment : Fragment(),
         item.isFavoriteUp(false)
         mRepository!!.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item)
         mFavoritesTranslatedItems!!.removeAt(position)
-        mFavoritesRecycler.adapter.notifyItemRemoved(position)
+        mFavoritesRecycler.adapter?.notifyItemRemoved(position)
     }
 }

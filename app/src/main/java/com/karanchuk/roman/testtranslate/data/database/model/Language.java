@@ -1,6 +1,6 @@
 package com.karanchuk.roman.testtranslate.data.database.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Created by roman on 18.4.17.

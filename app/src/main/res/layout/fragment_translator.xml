@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:id="@+id/general_container">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/translator_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
 
         <include
             layout="@layout/actionbar_translator"/>
-    </android.support.v7.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
 
     <include
         android:id="@+id/container_edittext"

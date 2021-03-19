@@ -1,6 +1,6 @@
 package com.karanchuk.roman.testtranslate.di
 
-import android.arch.persistence.room.Room
+import androidx.room.Room
 import com.karanchuk.roman.testtranslate.data.database.room.TestTranslatorDatabase
 import com.karanchuk.roman.testtranslate.data.database.room.dao.TranslationFavoriteDao
 import com.karanchuk.roman.testtranslate.data.database.room.dao.TranslationHistoryDao

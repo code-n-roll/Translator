@@ -11,13 +11,13 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.AppCompatImageView
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.Toolbar
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -268,7 +268,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     override fun clearCustomEditText() {
-        mCustomEditText.text.clear()
+        mCustomEditText.text?.clear()
     }
 
     override fun isRecognizingSourceText(): Boolean {
@@ -675,10 +675,10 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
                 if (mContainerError.visibility == View.VISIBLE)
                     hideRetry()
-                if (mCustomEditText.text.isNotEmpty() && !mClearEditText.isShown) {
+                if (mCustomEditText.text?.isNotEmpty() == true && !mClearEditText.isShown) {
                     showClear()
                     mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.volume_up_indicator_dark512)
-                } else if (mCustomEditText.text.isEmpty() && mClearEditText.isShown) {
+                } else if (mCustomEditText.text?.isEmpty() == true && mClearEditText.isShown) {
                     hideClear()
                     hideSuccess()
                     clearContainerSuccess()
@@ -771,7 +771,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     private fun restoreVisibility(savedInstanceState: Bundle,
                                   view: View,
                                   key: String) {
-        when (savedInstanceState.getString(key).toInt()) {
+        when (savedInstanceState.getString(key)?.toInt()) {
             View.GONE -> view.visibility = View.GONE
             View.INVISIBLE -> view.visibility = View.INVISIBLE
             View.VISIBLE -> view.visibility = View.VISIBLE
@@ -781,7 +781,8 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     private fun initTranslateRecyclerView() {
-        mLayoutManager = LinearLayoutManager(activity)
+        mLayoutManager =
+            LinearLayoutManager(activity)
         mTranslateRecyclerView.layoutManager = mLayoutManager
 
         val dictDefString = mSettings!!.getString(TRANSL_CONTENT, "")

@@ -1,7 +1,7 @@
 package com.karanchuk.roman.testtranslate.presentation.ui.main
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
 
 class BottomBarAdapter(fragmentManager: FragmentManager) : CachedFragmentStatePagerAdapter(fragmentManager) {

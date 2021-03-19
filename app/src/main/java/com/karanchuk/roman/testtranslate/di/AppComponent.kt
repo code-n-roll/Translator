@@ -1,8 +1,8 @@
 package com.karanchuk.roman.testtranslate.di
 
-import com.karanchuk.roman.testtranslate.presentation.ui.translator.sourcelang.SourceLangActivity
-import com.karanchuk.roman.testtranslate.presentation.ui.translator.targetlang.TargetLangActivity
-import com.karanchuk.roman.testtranslate.presentation.ui.translator.TranslatorPresenter
+import com.karanchuk.roman.testtranslate.ui.translator.sourcelang.SourceLangActivity
+import com.karanchuk.roman.testtranslate.ui.translator.targetlang.TargetLangActivity
+import com.karanchuk.roman.testtranslate.ui.translator.TranslatorPresenter
 import dagger.Component
 import javax.inject.Singleton
 

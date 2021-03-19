@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/general_main_activity_container">
 
-    <com.karanchuk.roman.testtranslate.presentation.ui.main.NoSwipePager
+    <com.karanchuk.roman.testtranslate.ui.main.NoSwipePager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

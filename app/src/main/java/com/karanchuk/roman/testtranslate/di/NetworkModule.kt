@@ -3,10 +3,10 @@ package com.karanchuk.roman.testtranslate.di
 import com.karanchuk.roman.testtranslate.data.network.RetrofitCreator
 import com.karanchuk.roman.testtranslate.data.network.YandexDictionaryApi
 import com.karanchuk.roman.testtranslate.data.network.YandexTranslateApi
-import com.karanchuk.roman.testtranslate.repository.YandexDictionaryRepository
-import com.karanchuk.roman.testtranslate.repository.YandexDictionaryRepositoryImpl
-import com.karanchuk.roman.testtranslate.repository.YandexTranslateRepository
-import com.karanchuk.roman.testtranslate.repository.YandexTranslateRepositoryImpl
+import com.karanchuk.roman.testtranslate.data.repository.YandexDictionaryRepository
+import com.karanchuk.roman.testtranslate.data.repository.YandexDictionaryRepositoryImpl
+import com.karanchuk.roman.testtranslate.data.repository.YandexTranslateRepository
+import com.karanchuk.roman.testtranslate.data.repository.YandexTranslateRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient

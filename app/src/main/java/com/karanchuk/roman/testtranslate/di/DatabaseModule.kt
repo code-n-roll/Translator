@@ -4,7 +4,7 @@ import androidx.room.Room
 import com.karanchuk.roman.testtranslate.data.database.room.TestTranslatorDatabase
 import com.karanchuk.roman.testtranslate.data.database.room.dao.TranslationFavoriteDao
 import com.karanchuk.roman.testtranslate.data.database.room.dao.TranslationHistoryDao
-import com.karanchuk.roman.testtranslate.presentation.TestTranslatorApp
+import com.karanchuk.roman.testtranslate.TestTranslatorApplication
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -14,8 +14,8 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(app: TestTranslatorApp): TestTranslatorDatabase {
-        return Room.databaseBuilder(app, TestTranslatorDatabase::class.java, "testtranslatordb")
+    fun provideDatabase(application: TestTranslatorApplication): TestTranslatorDatabase {
+        return Room.databaseBuilder(application, TestTranslatorDatabase::class.java, "testtranslatordb")
                 .fallbackToDestructiveMigration()
                 .build()
     }

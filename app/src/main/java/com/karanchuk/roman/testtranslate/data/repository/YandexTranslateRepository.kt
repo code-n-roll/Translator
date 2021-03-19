@@ -1,0 +1,12 @@
+package com.karanchuk.roman.testtranslate.data.repository
+
+import com.karanchuk.roman.testtranslate.data.database.model.TranslationResponse
+import io.reactivex.Single
+
+
+interface YandexTranslateRepository {
+
+    fun getTranslation(key: String,
+                       text: String,
+                       lang: String): Single<TranslationResponse>
+}

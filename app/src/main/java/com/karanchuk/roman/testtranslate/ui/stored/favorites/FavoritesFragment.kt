@@ -236,26 +236,21 @@ class FavoritesFragment : Fragment(),
         mFavoritesRecycler.adapter?.notifyDataSetChanged()
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, v: View,
-                                     menuInfo: ContextMenu.ContextMenuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-    }
-
-    override fun onContextItemSelected(item: MenuItem?): Boolean {
-        if (item!!.groupId == UNIQUE_FAVORITES_FRAGMENT_ID) {
-            return when (item.itemId) {
-                R.id.menu_item_delete -> {
-                    performContextItemDeletion()
-                    chooseCurView()
-                    chooseClearStoredVisibility()
-                    UIUtils.showToast(context, "item was longclicked contextmenu in favorites")
-                    true
-                }
-                else -> super.onContextItemSelected(item)
-            }
-        }
-        return super.onContextItemSelected(item)
-    }
+//    override fun onContextItemSelected(item: MenuItem?): Boolean {
+//        if (item!!.groupId == UNIQUE_FAVORITES_FRAGMENT_ID) {
+//            return when (item.itemId) {
+//                R.id.menu_item_delete -> {
+//                    performContextItemDeletion()
+//                    chooseCurView()
+//                    chooseClearStoredVisibility()
+//                    UIUtils.showToast(context, "item was longclicked contextmenu in favorites")
+//                    true
+//                }
+//                else -> super.onContextItemSelected(item)
+//            }
+//        }
+//        return super.onContextItemSelected(item)
+//    }
 
     private fun chooseClearStoredVisibility() {
         if (!mFavoritesTranslatedItems!!.isEmpty()) {

@@ -39,7 +39,7 @@ dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
 
     // android support
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.vectordrawable:vectordrawable:1.0.0'
 

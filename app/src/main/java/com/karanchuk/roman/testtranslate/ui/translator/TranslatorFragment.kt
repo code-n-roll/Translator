@@ -30,7 +30,8 @@ import android.view.animation.LinearInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.karanchuk.roman.testtranslate.R
 import com.karanchuk.roman.testtranslate.common.Constants.*
@@ -41,20 +42,20 @@ import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem
 import com.karanchuk.roman.testtranslate.data.database.model.Translation
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl
 import com.karanchuk.roman.testtranslate.TestTranslatorApplication
+import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository
+import com.karanchuk.roman.testtranslate.data.database.storage.TextDataStorage
 import com.karanchuk.roman.testtranslate.ui.fullscreen.FullscreenActivity
-import com.karanchuk.roman.testtranslate.ui.translator.sourcelang.SourceLangActivity
-import com.karanchuk.roman.testtranslate.ui.translator.targetlang.TargetLangActivity
+import com.karanchuk.roman.testtranslate.ui.translator.selectlang.SelectLanguageActivity
 import com.karanchuk.roman.testtranslate.utils.UIUtils
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
-import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by roman on 8.4.17.
  */
 
-class TranslatorFragment : Fragment(), TranslatorContract.View {
+class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.View {
 
     companion object {
         const val SRC_LANG_ACTIVITY_REQUEST_CODE = 1
@@ -93,9 +94,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
 
     private var mView: View? = null
     private var mMainActivityContainer: FrameLayout? = null
-    private var mLayoutManager: RecyclerView.LayoutManager? = null
-    private var mTranslations: ArrayList<Translation>? = null
-    private var mSettings: SharedPreferences? = null
+    private var mTranslations: MutableList<Translation> = mutableListOf()
     private var mBottomPadding: Int = 0
 
     private var mAnimatorSet: AnimatorSet? = null
@@ -106,21 +105,21 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     private var mAnimatorForth: Animator? = null
     private var mAnimatorForthBack: Animator? = null
 
-    private val mGestureDetector: GestureDetector? = null
     private var isRecognizingSourceText: Boolean = false
+    private val mGestureDetector: GestureDetector? = null
+    private var adapter: TranslatorRecyclerAdapter? = null
 
-    private lateinit var mNavigation: AHBottomNavigation
+//    private lateinit var mNavigation: AHBottomNavigation
     private lateinit var mRepository: TranslatorRepositoryImpl
-    private lateinit var mPresenter: TranslatorContract.Presenter
     private lateinit var customEditText: CustomEditText
 
-    override fun setTextButtonSrcLang(text: String) {
-        mButtonSrcLang?.text = text
-    }
+    @Inject lateinit var mPresenter: TranslatorContract.Presenter
+    @Inject lateinit var textDataStorage: TextDataStorage
+    @Inject lateinit var translatorRepository: TranslatorRepository
+    @Inject lateinit var mSettings: SharedPreferences
 
-    override fun setTextButtonTrgLang(text: String) {
-        mButtonTrgLang?.text = text
-    }
+    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel by viewModels<TranslatorViewModel> { viewModelFactory }
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -132,18 +131,13 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         super.onViewCreated(view, savedInstanceState)
 
         mView = view
-        setPresenter(TranslatorPresenter(this))
-        mPresenter.attachView(context)
+        mPresenter.attachView(this)
 
-
-        findViewsOnActionBar()
-        mSettings = activity!!.getSharedPreferences(PREFS_NAME, 0)
-
-        findViewsOnActivity()
+//        findViewsOnActivity()
         findViewsOnActionBar()
         findViewsOnContainerEditText()
 
-        initTranslateRecyclerView()
+        setupRecycler()
         initCustomEditText()
         initEventListenerKeyboardVisibility()
         initListeners()
@@ -152,7 +146,10 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         hideLoadingTargetVoice()
         hideLoadingSourceVoice()
         hideRetry()
-//
+
+        bindViewModel()
+        viewModel.loadTranslations()
+
 //        val localDataSource = TranslatorLocalRepository.getInstance(context!!)
 //        mRepository = TranslatorRepositoryImpl.getInstance(localDataSource)
 //
@@ -173,35 +170,10 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         Log.d(TAG, "onActivityCreated")
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "onPause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop")
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         mPresenter.detachView()
         Log.d(TAG, "onDestroyView")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -215,14 +187,53 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         Log.d(TAG, "onSaveInstanceState")
     }
 
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
+    override fun setTextButtonSrcLang(text: String) {
+        mButtonSrcLang?.text = text
+    }
 
-        Log.d(TAG, "onViewStateRestored")
+    override fun getTextButtonSrcLang(): String {
+        return mButtonSrcLang!!.text.toString()
+    }
+
+    override fun setTextButtonTrgLang(text: String) {
+        mButtonTrgLang?.text = text
+    }
+
+    override fun getTextButtonTrgLang(): String {
+        return mButtonTrgLang!!.text.toString()
+    }
+
+    override fun isEmptyTranslatedResultView(): Boolean {
+        return mTranslatedResult.text.toString().isEmpty()
+    }
+
+    override fun getTextTranslatedResultView(): String {
+        return mTranslatedResult.text.toString()
+    }
+
+    override fun isEmptyCustomEditText(): Boolean {
+        return mCustomEditText.text.toString().isEmpty()
+    }
+
+    override fun isRecognizingSourceText(): Boolean {
+        return isRecognizingSourceText
+    }
+
+    override fun isRecordAudioGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(context!!,
+            Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun setTextCustomEditText(text: String) {
+        mCustomEditText.setText(text)
+    }
+
+    override fun clearCustomEditText() {
+        mCustomEditText.text?.clear()
     }
 
     private fun setupStartedUI() {
-        if (isRecordAudioGranted) {
+        if (isRecordAudioGranted()) {
             mButtonGetAudioSpelling.setImageResource(R.drawable.tool_dark512)
         } else {
             mButtonGetAudioSpelling.setImageResource(R.drawable.tool_light512)
@@ -247,34 +258,6 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         }
     }
 
-    override fun setPresenter(presenter: TranslatorContract.Presenter) {
-        mPresenter = presenter
-    }
-
-    override fun isEmptyTranslatedResultView(): Boolean {
-        return mTranslatedResult.text.toString().isEmpty()
-    }
-
-    override fun getTextTranslatedResultView(): String {
-        return mTranslatedResult.text.toString()
-    }
-
-    override fun setTextCustomEditText(text: String) {
-        mCustomEditText.setText(text)
-    }
-
-    override fun isEmptyCustomEditText(): Boolean {
-        return mCustomEditText.text.toString().isEmpty()
-    }
-
-    override fun clearCustomEditText() {
-        mCustomEditText.text?.clear()
-    }
-
-    override fun isRecognizingSourceText(): Boolean {
-        return isRecognizingSourceText
-    }
-
     private fun setRecognizingSourceText(recognizingSourceText: Boolean) {
         isRecognizingSourceText = recognizingSourceText
     }
@@ -288,9 +271,9 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     //    };
 
     private fun initListeners() {
-        mButtonSrcLang!!.setOnClickListener { this.clickOnSrcLangButton() }
+        mButtonSrcLang!!.setOnClickListener { this.onSelectLanguageButtonClick(true) }
 //        mButtonSwitchLang!!.setOnClickListener { this.clickOnSwitchLangButton() }
-        mButtonTrgLang!!.setOnClickListener{ this.clickOnTrgLangButton() }
+        mButtonTrgLang!!.setOnClickListener{ this.onSelectLanguageButtonClick(false) }
 //        mGeneralContainer.setOnTouchListener { view, event -> this.clickOnGeneralContainer() }
 //        mButtonRetry.setOnClickListener{ this.clickOnRetryButton() }
 //        mButtonFullscreen.setOnClickListener{ this.clickOnFullscreenButton() }
@@ -303,7 +286,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     private fun findViewsOnActivity() {
-        mNavigation = activity!!.findViewById(R.id.navigation)
+//        mNavigation = activity!!.findViewById(R.id.navigation)
 //        mMainActivityContainer = activity!!.findViewById(R.id.main_activity_container)
     }
 
@@ -320,11 +303,6 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
 
     private fun findViewsOnContainerEditText() {
         customEditText = mContainerEditText.findViewById(R.id.edittext)
-    }
-
-    override fun isRecordAudioGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(context!!,
-                Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun requestRecordAudioPermissions() {
@@ -351,7 +329,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     override fun hideKeyboard() {
-        val `in` = activity!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val `in` = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         `in`.hideSoftInputFromWindow(mView!!.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
@@ -493,14 +471,6 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     override fun showKeyboard() {
         val `in` = TestTranslatorApplication.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         `in`.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY)
-    }
-
-    override fun getTextButtonSrcLang(): String {
-        return mButtonSrcLang!!.text.toString()
-    }
-
-    override fun getTextButtonTrgLang(): String {
-        return mButtonTrgLang!!.text.toString()
     }
 
     fun clickOnButtonSwitchLang() {
@@ -743,29 +713,29 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
 
     fun clearContainerSuccess() {
         mTranslatedResult.text = ""
-        mTranslations!!.clear()
+        mTranslations.clear()
         mPresenter.clearContainerSuccess()
     }
 
     private fun initEventListenerKeyboardVisibility() {
-        KeyboardVisibilityEvent.setEventListener(
-                activity!!
-        ) { isOpen ->
-            if (isOpen && isAdded) {
-                showActiveInput()
-            } else if (!isOpen && isAdded) {
-                hideActiveInput()
-                //                        if (!mCustomEditText.getText().toString().isEmpty() &&
-                //                                mSaver != null &&
-                //                                mSaver.getCurTranslatedItem() != null &&
-                //                                !mSaver.getCurTranslatedItem()
-                //                                        .getSrcMeaning()
-                //                                        .equals(mCustomEditText.getText().toString())) {
-                //                            showLoadingDictionary();
-                //                            mPresenter.requestTranslatorAPI();
-                //                        }
-            }
-        }
+//        KeyboardVisibilityEvent.setEventListener(
+//                activity!!
+//        ) { isOpen ->
+//            if (isOpen && isAdded) {
+//                showActiveInput()
+//            } else if (!isOpen && isAdded) {
+//                hideActiveInput()
+//                //                        if (!mCustomEditText.getText().toString().isEmpty() &&
+//                //                                mSaver != null &&
+//                //                                mSaver.getCurTranslatedItem() != null &&
+//                //                                !mSaver.getCurTranslatedItem()
+//                //                                        .getSrcMeaning()
+//                //                                        .equals(mCustomEditText.getText().toString())) {
+//                //                            showLoadingDictionary();
+//                //                            mPresenter.requestTranslatorAPI();
+//                //                        }
+//            }
+//        }
     }
 
     private fun restoreVisibility(savedInstanceState: Bundle,
@@ -780,35 +750,12 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         }
     }
 
-    private fun initTranslateRecyclerView() {
-        mLayoutManager =
-            LinearLayoutManager(activity)
-        mTranslateRecyclerView.layoutManager = mLayoutManager
-
-        val dictDefString = mSettings!!.getString(TRANSL_CONTENT, "")
-
-
-        mTranslations = ArrayList()
-
-        var dictDefinition: DictDefinition? = null
-        if (!dictDefString!!.isEmpty()) {
-            dictDefinition = Gson().fromJson(dictDefString, DictDefinition::class.java)
-            if (dictDefinition != null) {
-                for (POS in dictDefinition.partsOfSpeech) {
-                    mTranslations!!.addAll(POS.translations)
-                }
-            }
-        }
-        if (dictDefinition != null) {
-            mTranslateRecyclerView.adapter = TranslatorRecyclerAdapter(
-                    mTranslations,
-                    dictDefinition.partsOfSpeech
-            ) { _, text -> this.clickOnSynonymItem(text) }
-        } else {
-            mTranslateRecyclerView.adapter = TranslatorRecyclerAdapter(
-                    mTranslations, null
-            ) { _, text -> this.clickOnSynonymItem(text) }
-        }
+    private fun setupRecycler() {
+        mTranslateRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = TranslatorRecyclerAdapter(
+            mOnItemClickListener = { _, text -> this.clickOnSynonymItem(text) }
+        )
+        mTranslateRecyclerView.adapter = adapter
     }
 
     private fun clickOnGeneralContainer(): Boolean {
@@ -817,16 +764,11 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         return true
     }
 
-    private fun clickOnSrcLangButton() {
-        val intent = Intent(context, SourceLangActivity::class.java)
-        startActivityForResult(intent, SRC_LANG_ACTIVITY_REQUEST_CODE)
-    }
-
     private fun clickOnSwitchLangButton() {
-        val oldSrcLang = textButtonSrcLang
-        val oldTrgLang = textButtonTrgLang
-        textButtonSrcLang = oldTrgLang
-        textButtonTrgLang = oldSrcLang
+        val oldSrcLang = getTextButtonSrcLang()
+        val oldTrgLang = getTextButtonTrgLang()
+        setTextButtonSrcLang(oldTrgLang)
+        setTextButtonTrgLang(oldSrcLang)
 
         val srcLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_SRC_LANG, "")
         val trgLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_TRG_LANG, "")
@@ -838,8 +780,8 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
                 apply()
             }
 
-            setTextCustomEditText(textTranslatedResultView)
-            if (!isEmptyCustomEditText && mPresenter.requestTranslatorAPI()) {
+            setTextCustomEditText(getTextTranslatedResultView())
+            if (!isEmptyCustomEditText() && mPresenter.requestTranslatorAPI()) {
                 showLoadingDictionary()
                 hideSuccess()
             } else {
@@ -848,9 +790,15 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         }
     }
 
-    private fun clickOnTrgLangButton() {
-        val intent = Intent(context, TargetLangActivity::class.java)
-        startActivityForResult(intent, TRG_LANG_ACTIVITY_REQUEST_CODE)
+    private fun onSelectLanguageButtonClick(isSource: Boolean) {
+        val intent = Intent(context, SelectLanguageActivity::class.java).apply {
+            putExtra("TYPE", if (isSource) "SOURCE" else "TARGET")
+        }
+        startActivityForResult(
+            intent,
+            if (isSource) SRC_LANG_ACTIVITY_REQUEST_CODE
+            else TRG_LANG_ACTIVITY_REQUEST_CODE
+        )
     }
 
     private fun clickOnRetryButton() {
@@ -861,7 +809,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
 
     private fun clickOnFullscreenButton() {
         val intent = Intent(context, FullscreenActivity::class.java)
-        intent.putExtra(TRANSLATED_RESULT, textTranslatedResultView)
+        intent.putExtra(TRANSLATED_RESULT, getTextTranslatedResultView())
         startActivity(intent)
     }
 
@@ -870,7 +818,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     private fun clickOnRecognizePhotoOrVocalizeSourceText() {
-        if (!isEmptyCustomEditText) {
+        if (!isEmptyCustomEditText()) {
             showLoadingSourceVoice()
             hideIconSourceVoice()
             mPresenter.vocalizeSourceText()
@@ -880,10 +828,10 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     private fun clickOnRecognizeSourceText() {
-        if (!isRecordAudioGranted) {
+        if (!isRecordAudioGranted()) {
             requestRecordAudioPermissions()
         }
-        if (!isRecognizingSourceText() && isRecordAudioGranted) {
+        if (!isRecognizingSourceText() && isRecordAudioGranted()) {
             setRecognizingSourceText(true)
             showAnimationMicroWaves()
             mPresenter.recognizeSourceText()
@@ -916,7 +864,7 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/plain"
         intent.putExtra(Intent.EXTRA_SUBJECT, context!!.resources.getString(R.string.share_subject))
-        intent.putExtra(Intent.EXTRA_TEXT, textTranslatedResultView)
+        intent.putExtra(Intent.EXTRA_TEXT, getTextTranslatedResultView())
         startActivity(Intent.createChooser(intent, context!!.resources.getString(R.string.chooser_title)))
     }
 
@@ -929,12 +877,18 @@ class TranslatorFragment : Fragment(), TranslatorContract.View {
     }
 
     private fun clickOnVocalizeTargetText() {
-        if (!isEmptyTranslatedResultView) {
+        if (!isEmptyTranslatedResultView()) {
             showLoadingTargetVoice()
             hideIconTargetVoice()
             mPresenter.vocalizeTargetText()
         } else {
             UIUtils.showToast(context, context!!.resources.getString(R.string.try_vocalize_empty_result))
+        }
+    }
+
+    private fun bindViewModel() {
+        viewModel.translationsLiveData.observe(viewLifecycleOwner) {
+            adapter?.updateAll(it.first, it.second)
         }
     }
 }

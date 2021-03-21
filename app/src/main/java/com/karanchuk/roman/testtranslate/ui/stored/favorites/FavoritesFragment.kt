@@ -12,7 +12,6 @@ import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.karanchuk.roman.testtranslate.R
 import com.karanchuk.roman.testtranslate.common.Constants.*
 import com.karanchuk.roman.testtranslate.utils.extensions.bind
@@ -99,15 +98,15 @@ class FavoritesFragment : Fragment(),
         val mDividerItemDecoration = DividerItemDecoration(mFavoritesRecycler.context, RecyclerView.VERTICAL)
         mFavoritesRecycler.addItemDecoration(mDividerItemDecoration)
 
-        val navigation = activity!!.findViewById<AHBottomNavigation>(R.id.navigation)
-        val translatorNavigationItem = navigation.findViewById<View>(R.id.navigation_translate)
+//        val navigation = activity!!.findViewById<AHBottomNavigation>(R.id.navigation)
+//        val translatorNavigationItem = navigation.findViewById<View>(R.id.navigation_translate)
 
-        mFavoritesRecycler.adapter = StoredRecyclerAdapter(
-                mFavoritesTranslatedItems,
-                { item -> clickOnItemStoredRecycler(item, translatorNavigationItem) },
-                { item -> clickOnSetFavoriteItem(item) },
-                UNIQUE_FAVORITES_FRAGMENT_ID)
-
+//        mFavoritesRecycler.adapter = StoredRecyclerAdapter(
+//                mFavoritesTranslatedItems,
+//                { item -> clickOnItemStoredRecycler(item, translatorNavigationItem) },
+//                { item -> clickOnSetFavoriteItem(item) },
+//                UNIQUE_FAVORITES_FRAGMENT_ID)
+//
         registerForContextMenu(mFavoritesRecycler)
 
         chooseCurView()

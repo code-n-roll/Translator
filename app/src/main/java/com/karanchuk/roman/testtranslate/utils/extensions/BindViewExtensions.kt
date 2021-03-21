@@ -20,5 +20,5 @@ fun <T: View> Activity.bind(@IdRes idRes: Int): Lazy<T> {
 
 fun <T: View> Fragment.bind(@IdRes idRes: Int): Lazy<T> {
     @Suppress("UNCHECKED_CAST")
-    return unsafeLazy { activity!!.findViewById<T>(idRes) }
+    return unsafeLazy { view!!.findViewById<T>(idRes) }
 }

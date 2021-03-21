@@ -1,4 +1,4 @@
-package com.karanchuk.roman.testtranslate.di
+package com.karanchuk.roman.testtranslate.di.module
 
 import com.karanchuk.roman.testtranslate.data.network.RetrofitCreator
 import com.karanchuk.roman.testtranslate.data.network.YandexDictionaryApi
@@ -15,14 +15,19 @@ import okhttp3.OkHttpClient
 class NetworkModule {
 
     @Provides
-    fun provideYandexTranslateApi(): YandexTranslateApi {
-        return RetrofitCreator.getInstance(RetrofitCreator.API_BASE_URL_TRANSLATOR, OkHttpClient())
+    fun provideOkHttpClient(): OkHttpClient {
+        return OkHttpClient()
+    }
+
+    @Provides
+    fun provideYandexTranslateApi(okHttpClient: OkHttpClient): YandexTranslateApi {
+        return RetrofitCreator.getInstance(RetrofitCreator.API_BASE_URL_TRANSLATOR, okHttpClient)
                 .create(YandexTranslateApi::class.java)
     }
 
     @Provides
-    fun provideYandexDictionaryApi(): YandexDictionaryApi {
-        return RetrofitCreator.getInstance(RetrofitCreator.API_BASE_URL_DICTIONARY, OkHttpClient())
+    fun provideYandexDictionaryApi(okHttpClient: OkHttpClient): YandexDictionaryApi {
+        return RetrofitCreator.getInstance(RetrofitCreator.API_BASE_URL_DICTIONARY, okHttpClient)
                 .create(YandexDictionaryApi::class.java)
     }
     @Provides

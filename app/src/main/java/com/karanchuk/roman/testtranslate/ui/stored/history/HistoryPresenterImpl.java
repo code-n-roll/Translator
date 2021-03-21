@@ -6,10 +6,10 @@ import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
+import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLocalRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl;
-import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
  * Created by roman on 29.6.17.
  */
 
-public class HistoryPresenterImpl implements HistoryPresenter,
+public class HistoryPresenterImpl implements HistoryContract.HistoryPresenter,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver,
         ContentManager.TranslatedItemChanged {
@@ -45,8 +45,7 @@ public class HistoryPresenterImpl implements HistoryPresenter,
 
     private HistoryFragment mView;
 
-    public HistoryPresenterImpl(HistoryView view, Context context) {
-        mView = (HistoryFragment) view;
+    public HistoryPresenterImpl(Context context) {
         TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(context);
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
 
@@ -55,7 +54,9 @@ public class HistoryPresenterImpl implements HistoryPresenter,
     }
 
     @Override
-    public void attachView() {
+    public void attachView(HistoryFragment fragment) {
+        mView = (HistoryFragment) fragment;
+
         mRepository.addHistoryContentObserver(this);
         mRepository.addFavoritesContentObserver(this);
         mContentManager.addContentObserver(this);
@@ -88,6 +89,7 @@ public class HistoryPresenterImpl implements HistoryPresenter,
         mMainHandler = null;
     }
 
+    @Override
     public List<TranslatedItem> getHistoryTranslatedItems() {
         return mHistoryTranslatedItems;
     }
@@ -150,7 +152,6 @@ public class HistoryPresenterImpl implements HistoryPresenter,
             mView.chooseCurView();
             mView.mHistoryRecycler.getAdapter().notifyDataSetChanged();
         }
-
     }
 
     @Override

@@ -26,7 +26,6 @@ import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepo
 import com.karanchuk.roman.testtranslate.data.database.storage.TextDataStorage;
 import com.karanchuk.roman.testtranslate.data.database.storage.TextDataStorageImpl;
 import com.karanchuk.roman.testtranslate.data.database.storage.TranslationSaver;
-import com.karanchuk.roman.testtranslate.TestTranslatorApplication;
 import com.karanchuk.roman.testtranslate.data.repository.YandexDictionaryRepository;
 import com.karanchuk.roman.testtranslate.data.repository.YandexTranslateRepository;
 import com.karanchuk.roman.testtranslate.utils.JsonUtils;
@@ -36,8 +35,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -77,10 +74,10 @@ import static com.karanchuk.roman.testtranslate.common.Constants.TRG_LANG;
  * Created by roman on 16.6.17.
  */
 
-public class TranslatorPresenter implements TranslatorContract.Presenter,
+public class TranslatorPresenterImpl implements TranslatorContract.Presenter,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver {
 
-    private static final String MAIN_HANDLER_THREAD = TranslatorPresenter.class.getName() + ".MAIN_HANDLER_THREAD";
+    private static final String MAIN_HANDLER_THREAD = TranslatorPresenterImpl.class.getName() + ".MAIN_HANDLER_THREAD";
 
     private SharedPreferences mSettings;
     private TranslatorRepositoryImpl mRepository;
@@ -99,14 +96,9 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
     private Recognizer mRecognizer;
     private TextDataStorage mTextDataStorage;
 
-    @Inject
-    Gson mGson;
-
-    @Inject
-    YandexTranslateRepository mYandexTranslateRepository;
-
-    @Inject
-    YandexDictionaryRepository mYandexDictionaryRepository;
+    private Gson mGson;
+    private YandexTranslateRepository mYandexTranslateRepository;
+    private YandexDictionaryRepository mYandexDictionaryRepository;
 
     private VocalizerListener mVocalizerListener = new VocalizerListener() {
         @Override
@@ -202,21 +194,32 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         }
     };
 
-    public TranslatorPresenter(TranslatorContract.View view) {
-        TestTranslatorApplication.appComponent.inject(this);
+    public TranslatorPresenterImpl(
+            Context context,
+            Gson gson,
+            YandexTranslateRepository yandexTranslateRepository,
+            YandexDictionaryRepository yandexDictionaryRepository
+    ) {
+        mGson = gson;
+        mYandexTranslateRepository = yandexTranslateRepository;
+        mYandexDictionaryRepository = yandexDictionaryRepository;
+        mTextDataStorage = new TextDataStorageImpl(context, mGson);
+        mSaver = new TranslationSaver(context, mGson);
 
+        TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(context);
+        mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
+    }
+
+    @Override
+    public void attachView(TranslatorFragment view) {
         mView = (TranslatorFragment) view;
-//        SpeechKit.getInstance().init(mView.requireContext(), SPEECH_KIT_API_KEY);
 
         mTextDataStorage = new TextDataStorageImpl(mView.getContext(), mGson);
         mSaver = new TranslationSaver(mView.getContext(), mGson);
 
         TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(mView.getContext());
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
-    }
 
-    @Override
-    public void attachView(Context context) {
         mRepository.addHistoryContentObserver(this);
 
         mMainHandlerThread = new HandlerThread(MAIN_HANDLER_THREAD);
@@ -316,7 +319,7 @@ public class TranslatorPresenter implements TranslatorContract.Presenter,
         }
 
         TranslatorRecyclerAdapter adapter = (TranslatorRecyclerAdapter) mView.getMTranslateRecyclerView().getAdapter();
-        adapter.updateData(translations, dictDefinition.getPartsOfSpeech());
+        adapter.updateAll(translations, dictDefinition.getPartsOfSpeech());
 
         String curEditTextContent = mView.getMCustomEditText().getText().toString().trim();
         String srcLangAPI = mSettings.getString(CUR_SELECTED_ITEM_SRC_LANG,"");

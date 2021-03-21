@@ -1,10 +1,10 @@
-package com.karanchuk.roman.testtranslate.di
+package com.karanchuk.roman.testtranslate.di.module
 
+import android.content.Context
 import androidx.room.Room
 import com.karanchuk.roman.testtranslate.data.database.room.TestTranslatorDatabase
 import com.karanchuk.roman.testtranslate.data.database.room.dao.TranslationFavoriteDao
 import com.karanchuk.roman.testtranslate.data.database.room.dao.TranslationHistoryDao
-import com.karanchuk.roman.testtranslate.TestTranslatorApplication
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -14,10 +14,10 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(application: TestTranslatorApplication): TestTranslatorDatabase {
-        return Room.databaseBuilder(application, TestTranslatorDatabase::class.java, "testtranslatordb")
-                .fallbackToDestructiveMigration()
-                .build()
+    fun provideDatabase(context: Context): TestTranslatorDatabase {
+        return Room.databaseBuilder(context, TestTranslatorDatabase::class.java, "testtranslatordb")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

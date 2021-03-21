@@ -4,8 +4,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import androidx.appcompat.app.AppCompatActivity
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
+import androidx.fragment.app.FragmentFactory
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.karanchuk.roman.testtranslate.R
 import com.karanchuk.roman.testtranslate.common.Constants
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract.TranslatedItemEntry
@@ -20,13 +26,17 @@ import com.karanchuk.roman.testtranslate.ui.stored.ClearStoredDialogFragment
 import com.karanchuk.roman.testtranslate.ui.stored.ClearStoredDialogFragment.ClearStoredDialogListener
 import com.karanchuk.roman.testtranslate.ui.stored.StoredFragment
 import com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment
+import dagger.android.AndroidInjection
 import java.util.Arrays
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     companion object {
         private const val MAIN_HANDLER_THREAD = "MAIN_HANDLER_THREAD"
     }
+
+    @Inject lateinit var fragmentInjectionFactory: FragmentFactory
 
     private var mHistoryTranslatedItems: List<TranslatedItem>? = null
     private var mFavoritesTranslatedItems: List<TranslatedItem>? = null
@@ -35,8 +45,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private var mMainHandlerThread: HandlerThread? = null
 
     // private ContentManager mContentManager;
-    private var mMainViewPager: NoSwipePager? = null
-    private var mMainPagerAdapter: BottomBarAdapter? = null
 
     private val clearStoredDialogListener = object : ClearStoredDialogListener {
         override fun onDialogPositiveClick(dialog: ClearStoredDialogFragment?) {
@@ -83,29 +91,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        inject()
         super.onCreate(savedInstanceState)
 
         // mContentManager = ContentManager.getInstance();
-        mMainViewPager = findViewById(R.id.pager)
-        mMainViewPager!!.setSwipingEnabled(false)
-        mMainPagerAdapter = BottomBarAdapter(supportFragmentManager)
-        mMainPagerAdapter!!.addFragment(TranslatorFragment())
-        mMainPagerAdapter!!.addFragment(StoredFragment())
-        mMainPagerAdapter!!.addFragment(SettingsFragment())
-        mMainViewPager!!.setAdapter(mMainPagerAdapter)
-        mMainViewPager!!.setOffscreenPageLimit(3)
-        val bottomNavigation = findViewById<AHBottomNavigation>(R.id.navigation)
-        val item1 = AHBottomNavigationItem("", R.drawable.translation_black_back_dark512)
-        val item2 = AHBottomNavigationItem("", R.drawable.bookmark_black_shape_light512)
-        val item3 = AHBottomNavigationItem("", R.drawable.gear_black_shape_light512)
-        bottomNavigation.addItems(Arrays.asList(item1, item2, item3))
-        bottomNavigation.setOnTabSelectedListener { position: Int, wasSelected: Boolean ->
-            if (!wasSelected) {
-                mMainViewPager!!.setCurrentItem(position)
-                return@setOnTabSelectedListener true
-            }
-            false
-        }
+
+        setupNavigation()
     }
 
     override fun onStart() {
@@ -136,11 +127,39 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         mMainHandler = null
     }
 
-    private fun setupPager() {
+    private fun setupNavigation() {
+        val navView: BottomNavigationView = findViewById(R.id.nav_view)
 
+        val navController = findNavController(R.id.nav_host_fragment)
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.navigation_translator,
+                R.id.navigation_history,
+                R.id.navigation_settings
+            )
+        )
+//        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
+        navView.setOnNavigationItemSelectedListener {
+            if (it.itemId != navView.selectedItemId) {
+                when(it.title) {
+//                    getString(R.string.title_explore) -> {
+//                    }
+//                    getString(R.string.title_profile) -> {
+//                    }
+//                    getString(R.string.title_challenge) -> {
+//                    }
+                }
+                NavigationUI.onNavDestinationSelected(it, navController)
+            }
+            true
+        }
     }
 
-    private fun setupListeners() {
-
+    private fun inject() {
+        AndroidInjection.inject(this)
+        supportFragmentManager.fragmentFactory = fragmentInjectionFactory
     }
 }

@@ -4,17 +4,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 import com.karanchuk.roman.testtranslate.R;
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
@@ -22,6 +22,7 @@ import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorLoca
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepository;
 import com.karanchuk.roman.testtranslate.data.database.repository.TranslatorRepositoryImpl;
 import com.karanchuk.roman.testtranslate.ui.stored.favorites.FavoritesFragment;
+import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryContract;
 import com.karanchuk.roman.testtranslate.ui.stored.history.HistoryFragment;
 import com.karanchuk.roman.testtranslate.utils.ContentManager;
 import com.karanchuk.roman.testtranslate.utils.UIUtils;
@@ -29,6 +30,8 @@ import com.karanchuk.roman.testtranslate.utils.UIUtils;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by roman on 8.4.17.
@@ -46,7 +49,7 @@ public class StoredFragment extends Fragment implements
     private TabLayout mTabLayout;
     private ImageButton mClearStored;
     private View mMainActivityContainer;
-    private AHBottomNavigation mBottomNavigation;
+//    private AHBottomNavigation mBottomNavigation;
     private ClearStoredDialogFragment mClearHistoryDialog;
 
     private List<TranslatedItem> mFavoritesItems;
@@ -60,6 +63,10 @@ public class StoredFragment extends Fragment implements
     private int mCurPosition = 0;
     private int mBottomPadding;
     private Bundle mBundle;
+
+    @Inject public HistoryContract.HistoryPresenter mPresenter;
+
+    @Inject public StoredFragment() {}
 
     private ViewPager.OnPageChangeListener mStorePageChangeListener = new ViewPager.OnPageChangeListener() {
 
@@ -141,7 +148,7 @@ public class StoredFragment extends Fragment implements
     }
 
     private void findViewsOnActivity(){
-        mBottomNavigation = getActivity().findViewById(R.id.navigation);
+//        mBottomNavigation = getActivity().findViewById(R.id.navigation);
     }
 
     private void clickOnClearStored(Bundle bundle){
@@ -231,11 +238,11 @@ public class StoredFragment extends Fragment implements
                             //         mMainActivityContainer,
                             //         mBottomNavigation);
                     } else if (!isOpen && isAdded()){
-                            UIUtils.showBottomNavViewSetBottomPadding(
-                                    getActivity(),
-                                    mMainActivityContainer,
-                                    mBottomNavigation,
-                                    mBottomPadding);
+//                            UIUtils.showBottomNavViewSetBottomPadding(
+//                                    getActivity(),
+//                                    mMainActivityContainer,
+//                                    mBottomNavigation,
+//                                    mBottomPadding);
                     }
                 });
     }

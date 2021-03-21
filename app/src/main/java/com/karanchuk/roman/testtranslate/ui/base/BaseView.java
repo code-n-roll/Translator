@@ -6,5 +6,5 @@ package com.karanchuk.roman.testtranslate.ui.base;
 
 public interface BaseView<T> {
 
-    void setPresenter(T presenter);
+//    void setPresenter(T presenter);
 }

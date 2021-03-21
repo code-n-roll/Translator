@@ -4,13 +4,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 import com.karanchuk.roman.testtranslate.R;
 
@@ -63,7 +64,7 @@ public class TextGenLayout extends LinearLayout {
     private void initComponents(Context context){
         LayoutInflater inflater = (LayoutInflater)
                 context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.layout_textgen, this);
+        inflater.inflate(R.layout.view_textgen, this);
 
         mTextTextView = findViewById(R.id.tv_text_layout_textgen);
         mGenTextView = findViewById(R.id.tv_gen_layout_textgen);

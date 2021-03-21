@@ -668,8 +668,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun showActiveBorderInput() {
         try {
-            customEditText.background = Drawable.createFromXml(resources,
-                    resources.getLayout(R.layout.edittext_border_active))
+            customEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.selector_edittext_border_active)
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -679,8 +678,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun hideActiveBorderInput() {
         try {
-            customEditText.background = Drawable.createFromXml(resources,
-                    resources.getLayout(R.layout.edittext_border))
+            customEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.selector_edittext_border)
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -690,8 +688,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun showActiveRecognizerInput() {
         try {
-            customEditText.background = Drawable.createFromXml(resources,
-                    resources.getLayout(R.layout.edittext_recognizer_active))
+            customEditText.background = ContextCompat.getDrawable(requireContext(), R.drawable.selector_edittext_recognizer_active)
         } catch (e: XmlPullParserException) {
             e.printStackTrace()
         } catch (e: IOException) {

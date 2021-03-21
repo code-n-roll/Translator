@@ -6,9 +6,9 @@
 
     <include
         android:id="@+id/include_content_history_full_item_list"
-        layout="@layout/content_history_full_item_list"/>
+        layout="@layout/layout_history_full_item_list"/>
 
     <include
         android:id="@+id/include_content_history_empty_item_list"
-        layout="@layout/content_empty_item_list"/>
+        layout="@layout/layout_empty_item_list"/>
 </FrameLayout>

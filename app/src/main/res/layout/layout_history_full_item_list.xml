@@ -22,6 +22,6 @@
 
         <include
             android:id="@+id/include_content_history_empty_search"
-            layout="@layout/content_empty_search"/>
+            layout="@layout/layout_empty_search"/>
     </FrameLayout>
 </LinearLayout>

@@ -50,7 +50,7 @@ public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAd
     @Override
     public StoredRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType){
         View view = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.content_favorite_item, parent, false);
+                R.layout.item_favorite, parent, false);
         return new ViewHolder(view);
     }
 

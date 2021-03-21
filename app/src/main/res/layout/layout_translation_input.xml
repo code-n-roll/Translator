@@ -22,7 +22,7 @@
         android:gravity="top|start"
         android:imeOptions="actionDone"
         android:cursorVisible="false"
-        android:background="@layout/edittext_border"/>
+        android:background="@drawable/selector_edittext_border"/>
 
     <ImageButton
         android:id="@+id/clear_edittext"
@@ -39,7 +39,7 @@
 
     <include
         android:id="@+id/include_content_micro_waves"
-        layout="@layout/content_micro_waves"
+        layout="@layout/layout_micro_waves"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

@@ -1,48 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/general_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:id="@+id/general_container">
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/translator_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize">
 
-        <include
-            layout="@layout/actionbar_translator"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/center_actionbar_button"
+                android:layout_width="54dp"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_centerInParent="true"
+                android:adjustViewBounds="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="15dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/double_arrow512" />
+
+            <Button
+                android:id="@+id/left_actionbar_button"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_toStartOf="@id/center_actionbar_button"
+                android:layout_toLeftOf="@id/center_actionbar_button"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Русский"
+                android:textAppearance="@style/firstCapitalizeTabTextTheme"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/right_actionbar_button"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_toEndOf="@id/center_actionbar_button"
+                android:layout_toRightOf="@id/center_actionbar_button"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Английский"
+                android:textAppearance="@style/firstCapitalizeTabTextTheme"
+                android:textColor="@android:color/white" />
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
 
     <include
         android:id="@+id/container_edittext"
-        layout="@layout/content_input_translation"/>
+        layout="@layout/layout_translation_input" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <include
-            android:id="@+id/connection_successful_content"
-            layout="@layout/content_connection_succesful"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-
-        <include
-            android:id="@+id/connection_error_content"
-            layout="@layout/content_connection_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-
-        <ProgressBar
-            android:id="@+id/fragment_translator_progressbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-    </FrameLayout>
+    <include layout="@layout/layout_translation_result" />
 </LinearLayout>

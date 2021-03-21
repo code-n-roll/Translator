@@ -4,12 +4,15 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import androidx.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.karanchuk.roman.testtranslate.data.database.TablePersistenceContract;
 import com.karanchuk.roman.testtranslate.data.database.TranslatorDatabaseHelper;
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -234,5 +237,15 @@ public class TranslatorLocalRepository implements TranslatorRepository {
         } else {
             Log.d(LOG_TAG, "Cursor is null");
         }
+    }
+
+    @Override
+    public void addHistoryContentObserver(TranslatorRepositoryImpl.@NotNull HistoryTranslatedItemsRepositoryObserver observer) {
+
+    }
+
+    @Override
+    public void removeHistoryContentObserver(TranslatorRepositoryImpl.@NotNull HistoryTranslatedItemsRepositoryObserver observer) {
+
     }
 }

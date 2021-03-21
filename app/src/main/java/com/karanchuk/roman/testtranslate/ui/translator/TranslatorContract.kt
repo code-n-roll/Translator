@@ -1,32 +1,15 @@
 package com.karanchuk.roman.testtranslate.ui.translator
 
-import com.karanchuk.roman.testtranslate.data.database.model.DictDefinition
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem
-import com.karanchuk.roman.testtranslate.ui.base.BaseView
 
 /**
  * Created by roman on 11.12.17.
  */
 interface TranslatorContract {
-    interface Presenter {
-        fun attachView(view: TranslatorFragment)
-        fun detachView()
-        fun requestTranslatorAPI(): Boolean
-        fun requestDictionaryAPI()
-        fun vocalizeSourceText()
-        fun vocalizeTargetText()
-        fun recognizeSourceText()
-        fun resetRecognizer()
-        fun saveToSharedPreferences()
-        fun handleDictionaryResponse(dictDefinition: DictDefinition)
-        fun clearContainerSuccess()
-        val historyTranslatedItems: List<TranslatedItem>
-    }
 
-    interface View : BaseView<Presenter?> {
+    interface View {
         fun setHintOnInput()
         fun createPredictedTranslatedItem(): TranslatedItem
-        fun getTranslatedItemFromCache(maybeExistedItem: TranslatedItem)
         fun setTextButtonSrcLang(text: String)
         fun getTextButtonSrcLang(): String
         fun setTextButtonTrgLang(text: String)

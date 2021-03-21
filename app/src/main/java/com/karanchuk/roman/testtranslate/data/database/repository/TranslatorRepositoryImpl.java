@@ -49,13 +49,15 @@ public class TranslatorRepositoryImpl implements TranslatorRepository {
         }
     }
 
-    public void addHistoryContentObserver(final HistoryTranslatedItemsRepositoryObserver observer){
+    @Override
+    public void addHistoryContentObserver(@NonNull final HistoryTranslatedItemsRepositoryObserver observer){
         if (!mHistoryObservers.contains(observer)){
             mHistoryObservers.add(observer);
         }
     }
 
-    public void removeHistoryContentObserver(final HistoryTranslatedItemsRepositoryObserver observer){
+    @Override
+    public void removeHistoryContentObserver(@NonNull final HistoryTranslatedItemsRepositoryObserver observer){
         mHistoryObservers.remove(observer);
     }
 

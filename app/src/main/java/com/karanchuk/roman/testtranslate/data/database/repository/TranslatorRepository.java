@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
@@ -29,4 +31,7 @@ public interface TranslatorRepository {
                                          @NonNull final boolean isFavorite);
 
     void printAllTranslatedItems(@NonNull final String tableName);
+
+    void addHistoryContentObserver(@NotNull TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver observer);
+    void removeHistoryContentObserver(@NotNull TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver observer);
 }

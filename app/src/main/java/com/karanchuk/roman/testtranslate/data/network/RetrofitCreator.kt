@@ -13,13 +13,14 @@ class RetrofitCreator {
         const val API_BASE_URL_TRANSLATOR = "https://translate.yandex.net/"
         const val API_BASE_URL_DICTIONARY = "https://dictionary.yandex.net/"
 
-        fun getInstance(baseUrl: String,
-                        client: OkHttpClient
+        fun getInstance(
+            baseUrl: String,
+            client: OkHttpClient
         ): Retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .client(client)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            .baseUrl(baseUrl)
+            .client(client)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
     }
 }

@@ -8,10 +8,12 @@ import com.karanchuk.roman.testtranslate.data.database.room.table.TranslationFav
 import com.karanchuk.roman.testtranslate.data.database.room.table.TranslationHistory
 
 
-@Database(version = 1,
-          entities = [ TranslationHistory::class, TranslationFavorite::class ],
-          exportSchema = false)
-abstract class TestTranslatorDatabase : RoomDatabase() {
+@Database(
+    version = 1,
+    entities = [TranslationHistory::class, TranslationFavorite::class],
+    exportSchema = false
+)
+abstract class TranslatorDatabase : RoomDatabase() {
 
     abstract val translationFavoriteDao: TranslationFavoriteDao
     abstract val translationHistoryDao: TranslationHistoryDao

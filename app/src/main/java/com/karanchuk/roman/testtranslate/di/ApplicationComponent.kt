@@ -1,6 +1,6 @@
 package com.karanchuk.roman.testtranslate.di
 
-import com.karanchuk.roman.testtranslate.TestTranslatorApplication
+import com.karanchuk.roman.testtranslate.TranslatorApplication
 import com.karanchuk.roman.testtranslate.di.module.ActivityModule
 import com.karanchuk.roman.testtranslate.di.module.ApplicationModule
 import com.karanchuk.roman.testtranslate.di.module.DatabaseModule
@@ -20,5 +20,5 @@ import javax.inject.Singleton
     DatabaseModule::class
 ])
 interface ApplicationComponent{
-    fun inject(app: TestTranslatorApplication)
+    fun inject(app: TranslatorApplication)
 }

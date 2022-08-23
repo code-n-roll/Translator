@@ -3,7 +3,7 @@ package com.karanchuk.roman.testtranslate.di.module
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.karanchuk.roman.testtranslate.TestTranslatorApplication
+import com.karanchuk.roman.testtranslate.TranslatorApplication
 import com.karanchuk.roman.testtranslate.common.Constants
 import com.karanchuk.roman.testtranslate.common.Recognizer
 import com.karanchuk.roman.testtranslate.common.RecognizerImpl
@@ -22,7 +22,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class ApplicationModule(private val application: TestTranslatorApplication) {
+class ApplicationModule(private val application: TranslatorApplication) {
 
     @Singleton
     @Provides

@@ -33,8 +33,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.karanchuk.roman.testtranslate.R
-import com.karanchuk.roman.testtranslate.TestTranslatorApplication
-import com.karanchuk.roman.testtranslate.common.Constants
+import com.karanchuk.roman.testtranslate.TranslatorApplication
 import com.karanchuk.roman.testtranslate.common.Constants.*
 import com.karanchuk.roman.testtranslate.data.database.model.DictDefinition
 import com.karanchuk.roman.testtranslate.data.database.model.TranslatedItem
@@ -487,7 +486,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun showKeyboard() {
-        val `in` = TestTranslatorApplication.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val `in` = TranslatorApplication.instance.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         `in`.toggleSoftInput(
             InputMethodManager.SHOW_IMPLICIT,
             InputMethodManager.HIDE_IMPLICIT_ONLY

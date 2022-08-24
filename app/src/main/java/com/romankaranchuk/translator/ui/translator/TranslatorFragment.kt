@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
-import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +39,7 @@ import com.romankaranchuk.translator.utils.extensions.bind
 import com.romankaranchuk.translator.utils.network.ContentResult
 import org.xmlpull.v1.XmlPullParserException
 import ru.yandex.speechkit.Language
+import timber.log.Timber
 import java.io.IOException
 import java.util.ArrayList
 import javax.inject.Inject
@@ -147,7 +147,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 //        UIUtils.changeSoftInputModeWithOrientation(activity!!)
 //        setupStartedUI()
 
-        Log.d(TAG, "onViewCreated")
+        Timber.d("onViewCreated")
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -158,7 +158,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 //            restoreVisibility(savedInstanceState, mContainerSuccess, CONT_SUCCESS_VISIBILITY)
 //            restoreVisibility(savedInstanceState, mProgressDictionary, PROGRESS_BAR_VISIBILITY)
 //        }
-        Log.d(TAG, "onActivityCreated")
+        Timber.d("onActivityCreated")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -169,7 +169,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             putString(CONT_SUCCESS_VISIBILITY, mContainerSuccess.visibility.toString())
             putString(PROGRESS_BAR_VISIBILITY, mProgressDictionary.visibility.toString())
         }
-        Log.d(TAG, "onSaveInstanceState")
+        Timber.d("onSaveInstanceState")
     }
 
     override fun setTextButtonSrcLang(text: String) {
@@ -650,7 +650,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                     viewModel.getTranslatedItemFromCache(maybeExistedItem)
 //                    mTranslatedResult.text = translatedItems[id].trgMeaning
                 }
-                Log.d("keyboard state", "ACTION_DONE & customEditText is not empty")
+                Timber.d("ACTION_DONE & customEditText is not empty")
             }
             false
         }
@@ -958,7 +958,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     fun handleDictionaryResponse(dictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition) {
-        Log.d("myLogs", dictDefinition.toString())
+        Timber.d(dictDefinition.toString())
 
         val translations: MutableList<com.romankaranchuk.translator.data.database.model.Translation> = ArrayList()
         var index: Int

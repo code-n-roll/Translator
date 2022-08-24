@@ -4,18 +4,19 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.romankaranchuk.translator.data.database.model.TranslatedItem;
 import com.romankaranchuk.translator.data.database.TablePersistenceContract;
 import com.romankaranchuk.translator.data.database.TranslatorDatabaseHelper;
+import com.romankaranchuk.translator.data.database.model.TranslatedItem;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Created by roman on 9.4.17.
@@ -24,7 +25,6 @@ import java.util.List;
 public class TranslatorLocalRepository implements TranslatorRepository {
 
     private static TranslatorLocalRepository INSTANCE;
-    private static final String LOG_TAG = "MY_DB_LOG";
     private final TranslatorDatabaseHelper mDatabaseHelper;
 
     private TranslatorLocalRepository(@NonNull final Context context){
@@ -77,7 +77,7 @@ public class TranslatorLocalRepository implements TranslatorRepository {
         db.insert(tableName,null, values);
         db.close();
 
-        Log.d(LOG_TAG, "save item DB "+tableName);
+        Timber.d("save item DB "+tableName);
         printAllTranslatedItems(tableName);
 
         return true;
@@ -97,7 +97,7 @@ public class TranslatorLocalRepository implements TranslatorRepository {
         db.delete(tableName, selection, selectionArgs);
         db.close();
 
-        Log.d(LOG_TAG, "delete item DB "+tableName);
+        Timber.d("delete item DB "+tableName);
         printAllTranslatedItems(tableName);
     }
 
@@ -107,7 +107,7 @@ public class TranslatorLocalRepository implements TranslatorRepository {
         final String clearTable = "DELETE FROM " + tableName;
         db.execSQL(clearTable);
 
-        Log.d(LOG_TAG, "delete items DB " + tableName);
+        Timber.d("delete items DB " + tableName);
         printAllTranslatedItems(tableName);
 
         db.close();
@@ -142,7 +142,7 @@ public class TranslatorLocalRepository implements TranslatorRepository {
         db.update(tableName, values, whereClause, whereArgs);
         db.close();
 
-        Log.d(LOG_TAG, "update item DB " + tableName);
+        Timber.d("update item DB " + tableName);
         printAllTranslatedItems(tableName);
     }
 
@@ -203,7 +203,7 @@ public class TranslatorLocalRepository implements TranslatorRepository {
         }
         db.close();
 
-        Log.d(LOG_TAG, "get items DB " + tableName);
+        Timber.d("get items DB " + tableName);
         printAllTranslatedItems(tableName);
         return items;
     }
@@ -231,11 +231,11 @@ public class TranslatorLocalRepository implements TranslatorRepository {
                     for (final String cn : c.getColumnNames()){
                         str = str.concat(cn + " = " + c.getString(c.getColumnIndex(cn)) + "; ");
                     }
-                    Log.d(LOG_TAG, str);
+                    Timber.d(str);
                 } while (c.moveToNext());
             }
         } else {
-            Log.d(LOG_TAG, "Cursor is null");
+            Timber.d("Cursor is null");
         }
     }
 

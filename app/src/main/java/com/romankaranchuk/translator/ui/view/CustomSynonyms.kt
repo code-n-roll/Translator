@@ -7,10 +7,10 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextPaint
 import android.text.style.ClickableSpan
-import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.romankaranchuk.translator.R
+import timber.log.Timber
 
 /**
  * need to add gen to string before setSpan!!!
@@ -57,7 +57,7 @@ class CustomSynonyms(private val mContext: Context, private val mTranslation: co
         )
         accumLength += commaLength
         if (mTranslation.synonyms != null) {
-            Log.d("myLogs", "length = " + mTranslation.representSynonyms.length.toString())
+            Timber.d("length = " + mTranslation.representSynonyms.length.toString())
             for (synonym in mTranslation.synonyms!!) {
                 textLength = synonym.text.length
                 resultSpan.setSpan(

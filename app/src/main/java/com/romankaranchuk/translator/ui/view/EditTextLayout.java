@@ -2,9 +2,7 @@ package com.romankaranchuk.translator.ui.view;
 
 import android.content.Context;
 import android.os.Build;
-import androidx.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.animation.Animation;
@@ -12,8 +10,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import com.romankaranchuk.translator.R;
 import com.romankaranchuk.translator.ui.edittextnavigator.EditTextLayoutPresenterImpl;
+
+import timber.log.Timber;
 
 /**
  * Created by roman on 28.6.17.
@@ -80,10 +82,10 @@ public class EditTextLayout extends RelativeLayout implements GestureDetector.On
 
         offsetLeftAndRight(Math.min((int)(motionEvent2.getX() - motionEvent1.getX()),
                                     (int)(motionEvent2.getX() % 1000)));
-        Log.d("myLogs onScroll ", String.valueOf("event1 x = " + motionEvent1.getX()) + " " +
-                String.valueOf("event2 x = " + motionEvent2.getX()) +
-                " getLeft() = " + String.valueOf(getLeft()) +
-                " getWidth() = " + String.valueOf(getWidth()) +
+        Timber.d("event1 x = " + motionEvent1.getX() + " " +
+                "event2 x = " + motionEvent2.getX() +
+                " getLeft() = " + getLeft() +
+                " getWidth() = " + getWidth() +
                 " alpha = " + getAlpha());
 
 //        setAlpha(1 - ((float) Math.abs(getLeft()) / getWidth()) * 1.5f);
@@ -115,9 +117,9 @@ public class EditTextLayout extends RelativeLayout implements GestureDetector.On
                 Toast.makeText(mContext, "left to right", Toast.LENGTH_SHORT).show();
             }
 
-            Log.d("myLogs on Fling", String.valueOf("event1 x = " + motionEvent1.getX()) + " " +
-                                     String.valueOf("event2 x = " + motionEvent2.getX()) + " " +
-                                     String.valueOf("velocityX = " + velocityX));
+            Timber.d("event1 x = " + motionEvent1.getX() + " " +
+                    "event2 x = " + motionEvent2.getX() + " " +
+                    "velocityX = " + velocityX);
 
         } catch (Exception e) {
             e.printStackTrace();

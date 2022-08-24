@@ -1,6 +1,5 @@
 package com.romankaranchuk.translator.common
 
-import android.util.Log
 import ru.yandex.speechkit.Emotion
 import ru.yandex.speechkit.Error
 import ru.yandex.speechkit.Language
@@ -9,6 +8,7 @@ import ru.yandex.speechkit.Synthesis
 import ru.yandex.speechkit.Vocalizer
 import ru.yandex.speechkit.VocalizerListener
 import ru.yandex.speechkit.Voice
+import timber.log.Timber
 
 interface Vocalizer {
     fun init(language: Language)
@@ -24,11 +24,11 @@ class VocalizerImpl : com.romankaranchuk.translator.common.Vocalizer {
         override fun onSynthesisDone(vocalizer: Vocalizer) {}
         override fun onPartialSynthesis(vocalizer: Vocalizer, synthesis: Synthesis) {}
         override fun onPlayingBegin(vocalizer: Vocalizer) {
-            Log.d("myLogs", " onPlayingBegin")
+            Timber.d(" onPlayingBegin")
         }
 
         override fun onPlayingDone(vocalizer: Vocalizer) {
-            Log.d("myLogs", " onPlayingDone")
+            Timber.d(" onPlayingDone")
 //            if (mView != null) {
 //                mView.hideLoadingTargetVoice()
 //                mView.hideLoadingSourceVoice()
@@ -39,8 +39,8 @@ class VocalizerImpl : com.romankaranchuk.translator.common.Vocalizer {
 
         override fun onVocalizerError(vocalizer: Vocalizer, error: Error) {
             reset()
-            Log.d("myLogs", error.toString())
-            Log.d("myLogs", " onVocalizerError")
+            Timber.d(error.toString())
+            Timber.d(" onVocalizerError")
         }
     }
 

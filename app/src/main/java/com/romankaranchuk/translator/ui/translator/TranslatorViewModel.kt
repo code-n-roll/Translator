@@ -2,7 +2,6 @@ package com.romankaranchuk.translator.ui.translator
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.romankaranchuk.translator.common.Recognizer
@@ -221,7 +220,7 @@ class TranslatorViewModel @Inject constructor(
             )
             handleDictionaryResponse(translation ?: "", existedItem)
 //            mTranslatedResult.text = translatedItems[id].trgMeaning
-            Log.d("myLogs", translatedItems[id].trgMeaning)
+            Timber.d(translatedItems[id].trgMeaning)
         }
     }
 

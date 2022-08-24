@@ -1,6 +1,5 @@
 package com.romankaranchuk.translator.common
 
-import android.util.Log
 import ru.yandex.speechkit.Error
 import ru.yandex.speechkit.Language
 import ru.yandex.speechkit.OnlineModel
@@ -8,6 +7,7 @@ import ru.yandex.speechkit.OnlineRecognizer
 import ru.yandex.speechkit.Recognition
 import ru.yandex.speechkit.RecognizerListener
 import ru.yandex.speechkit.Track
+import timber.log.Timber
 
 interface Recognizer {
     fun init(language: Language)
@@ -21,26 +21,26 @@ class RecognizerImpl : Recognizer {
 
     private val mRecognizerListener: RecognizerListener = object : RecognizerListener {
         override fun onRecordingBegin(recognizer: ru.yandex.speechkit.Recognizer) {
-            Log.d("myLogs", " onRecordingBegin")
+            Timber.d(" onRecordingBegin")
         }
 
         override fun onSpeechDetected(recognizer: ru.yandex.speechkit.Recognizer) {
-            Log.d("myLogs", " onSpeechDetected")
+            Timber.d(" onSpeechDetected")
         }
 
         override fun onSpeechEnds(recognizer: ru.yandex.speechkit.Recognizer) {
-            Log.d("myLogs", " onSpeechEnds")
+            Timber.d(" onSpeechEnds")
         }
 
         override fun onRecordingDone(recognizer: ru.yandex.speechkit.Recognizer) {
-            Log.d("myLogs", " onRecordingDone")
+            Timber.d(" onRecordingDone")
 //            if (mView != null && mView.isAdded()) {
 //                mView.deactivateVoiceRecognizer()
 //            }
         }
 
         override fun onPowerUpdated(recognizer: ru.yandex.speechkit.Recognizer, v: Float) {
-            Log.d("myLogs", " onPowerUpdated")
+            Timber.d(" onPowerUpdated")
         }
 
         override fun onPartialResults(
@@ -48,7 +48,7 @@ class RecognizerImpl : Recognizer {
             recognition: Recognition,
             endOfUtterance: Boolean
         ) {
-            Log.d("myLogs", " onPartialResults")
+            Timber.d(" onPartialResults")
             if (endOfUtterance) {
 //                if (mView != null) {
 //                    mView.mCustomEditText.setText(recognition.bestResultText)
@@ -59,7 +59,7 @@ class RecognizerImpl : Recognizer {
 
         override fun onRecognitionDone(recognizer: ru.yandex.speechkit.Recognizer) {}
         override fun onRecognizerError(recognizer: ru.yandex.speechkit.Recognizer, error: Error) {
-            Log.d("myLogs", " onError")
+            Timber.d(" onError")
 //            if (mView != null) {
 //                mView.showError()
 //                UIUtils.showToast(

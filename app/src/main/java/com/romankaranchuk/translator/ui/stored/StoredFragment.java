@@ -74,7 +74,7 @@ public class StoredFragment extends Fragment implements
         public void onPageScrolled(int position,
                                    float positionOffset,
                                    int positionOffsetPixels) {
-//        Log.d("viewpager log",
+//        Timber.d(
 //                "onPageScrellod, position="+String.valueOf(position)+
 //                        ",positionOffset="+String.valueOf(positionOffset)+
 //                        ",positionOffsetPixels="+String.valueOf(positionOffsetPixels)
@@ -94,12 +94,12 @@ public class StoredFragment extends Fragment implements
                 mContentManager.notifyTranslatedItemChanged();
             }
             mCurPosition = position;
-//        Log.d("viewpager log", "onPageSelected, position="+ String.valueOf(position));
+//        Timber.d("onPageSelected, position="+ String.valueOf(position));
         }
 
         @Override
         public void onPageScrollStateChanged(int state) {
-//        Log.d("viewpager log", "onPageScrollStateChanged, state="+String.valueOf(state));
+//        Timber.d("onPageScrollStateChanged, state="+String.valueOf(state));
         }
     };
 

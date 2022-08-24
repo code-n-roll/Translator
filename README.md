@@ -1,10 +1,9 @@
 # Translator
 
 ## Getting Started:
-1. Create account on [Yandex.Passport](https://passport.yandex.com) 
-2. Get API key on [Yandex.Dictionary](https://yandex.com/dev/dictionary/) -> enter API key in `local.properties`:<br/>`YANDEX_DICTIONARY_API_KEY_PROD=<your_api_key>`
-3. Get API key on [Yandex.Translate](https://yandex.com/dev/translate) -> enter API key in `local.properties`:<br/>`YANDEX_TRANSLATE_API_KEY_PROD=<your_api_key>`
-4. Compile & Run project
+1. Get API key on [Yandex.Dictionary](https://yandex.com/dev/dictionary/) -> enter API key in `local.properties`:<br/>`YANDEX_DICTIONARY_API_KEY_PROD=<your_api_key>`
+2. Get API key on [Yandex.Translate](https://yandex.com/dev/translate) -> enter API key in `local.properties`:<br/>`YANDEX_TRANSLATE_API_KEY_PROD=<your_api_key>`
+3. Compile & Run project
 
 ## Architecture & refactoring:
 same as [MusicPlayer repo A&R](https://github.com/code-n-roll/MusicPlayer#architecture--refactoring-wip)

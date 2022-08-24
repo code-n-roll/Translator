@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view_history"
         android:layout_width="match_parent"
-        android:layout_height="50dp"/>
+        android:layout_height="50dp" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -18,10 +17,10 @@
             android:id="@+id/history_items_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical" />
 
         <include
             android:id="@+id/include_content_history_empty_search"
-            layout="@layout/layout_empty_search"/>
+            layout="@layout/layout_empty_search" />
     </FrameLayout>
 </LinearLayout>

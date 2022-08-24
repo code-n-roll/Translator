@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -13,27 +12,27 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tablayout_favorites"
-            android:background="@android:color/transparent"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            app:tabMode="scrollable"
             android:layout_gravity="center_horizontal"
-            app:tabTextAppearance="@style/firstCapitalizeTabTextTheme"/>
+            android:background="@android:color/transparent"
+            app:tabMode="scrollable"
+            app:tabTextAppearance="@style/firstCapitalizeTabTextTheme" />
 
         <ImageButton
             android:id="@+id/imagebutton_clear_stored"
             android:layout_width="54dp"
             android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
             android:layout_gravity="end"
-            android:padding="15dp"
+            android:adjustViewBounds="true"
             android:background="@android:color/transparent"
-            android:src="@drawable/trash_black_shape512"/>
+            android:padding="15dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/trash_black_shape512" />
     </FrameLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager_stored"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

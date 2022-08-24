@@ -3,10 +3,10 @@ package com.romankaranchuk.translator.di.module
 import com.romankaranchuk.translator.data.network.RetrofitCreator
 import com.romankaranchuk.translator.data.network.YandexDictionaryApi
 import com.romankaranchuk.translator.data.network.YandexTranslateApi
-import com.romankaranchuk.translator.data.repository.YandexDictionaryRepository
-import com.romankaranchuk.translator.data.repository.YandexDictionaryRepositoryImpl
-import com.romankaranchuk.translator.data.repository.YandexTranslateRepository
-import com.romankaranchuk.translator.data.repository.YandexTranslateRepositoryImpl
+import com.romankaranchuk.translator.data.repository.DictionaryRepository
+import com.romankaranchuk.translator.data.repository.DictionaryRepositoryImpl
+import com.romankaranchuk.translator.data.repository.TranslateRepository
+import com.romankaranchuk.translator.data.repository.TranslateRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -31,12 +31,12 @@ class NetworkModule {
                 .create(YandexDictionaryApi::class.java)
     }
     @Provides
-    fun provideYandexTranslateRepository(api: YandexTranslateApi): YandexTranslateRepository {
-        return YandexTranslateRepositoryImpl(api)
+    fun provideTranslateRepository(api: YandexTranslateApi): TranslateRepository {
+        return TranslateRepositoryImpl(api)
     }
 
     @Provides
-    fun provideYandexDictionaryRepository(api: YandexDictionaryApi): YandexDictionaryRepository {
-        return YandexDictionaryRepositoryImpl(api)
+    fun provideDictionaryRepository(api: YandexDictionaryApi): DictionaryRepository {
+        return DictionaryRepositoryImpl(api)
     }
 }

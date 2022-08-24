@@ -10,13 +10,6 @@ import retrofit2.http.Query
  */
 interface YandexDictionaryApi {
 
-//    @GET("api/v1/dicservice.json/lookup?")
-//    fun getValueFromDictionary(
-//        @Query("key") key: String,
-//        @Query("text") text: String,
-//        @Query("lang") lang: String
-//    ): Single<DictDefinition>
-
     @GET("api/v1/dicservice.json/lookup?")
     suspend fun getValueFromDictionaryCoroutine(
         @Query("key") key: String,

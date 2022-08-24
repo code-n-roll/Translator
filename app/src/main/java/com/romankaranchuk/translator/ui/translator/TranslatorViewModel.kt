@@ -13,8 +13,8 @@ import com.romankaranchuk.translator.data.database.repository.TranslatorReposito
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
 import com.romankaranchuk.translator.data.database.storage.TranslationSaver
-import com.romankaranchuk.translator.data.repository.YandexDictionaryRepository
-import com.romankaranchuk.translator.data.repository.YandexTranslateRepository
+import com.romankaranchuk.translator.data.repository.DictionaryRepository
+import com.romankaranchuk.translator.data.repository.TranslateRepository
 import com.romankaranchuk.translator.ui.base.BaseViewModel
 import com.romankaranchuk.translator.ui.base.launchOnIO
 import com.romankaranchuk.translator.ui.base.switchToUi
@@ -30,8 +30,8 @@ class TranslatorViewModel @Inject constructor(
     private val sharedPrefs: SharedPreferences,
     private val gson: Gson,
     private val translationSaver: TranslationSaver,
-    private val yandexTranslateRepository: YandexTranslateRepository,
-    private val yandexDictionaryRepository: YandexDictionaryRepository,
+    private val translateRepository: TranslateRepository,
+    private val dictionaryRepository: DictionaryRepository,
     private val translatorRepository: TranslatorRepository,
     private val vocalizer: Vocalizer,
     private val recognizer: Recognizer,
@@ -104,7 +104,7 @@ class TranslatorViewModel @Inject constructor(
             val mTranslationDirection = "$srcLangAPI-$trgLangAPI"
             val translation: TranslationResponse
             try {
-                translation = yandexTranslateRepository.getTranslationCoroutine(
+                translation = translateRepository.getTranslation(
                     Constants.TRANSLATOR_API_KEY,
                     inputText,
                     mTranslationDirection
@@ -130,7 +130,7 @@ class TranslatorViewModel @Inject constructor(
         val dictDefinition: DictDefinition?
         val langs = JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
         try {
-            dictDefinition = yandexDictionaryRepository.getValueFromDictionaryCoroutine(
+            dictDefinition = dictionaryRepository.getValueFromDictionary(
                 Constants.DICTIONARY_API_KEY,
                 inputText,
                 "${langs[sourceLang].asString}-${langs[targetLang].asString}"

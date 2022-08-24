@@ -1,65 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/general_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:id="@+id/general_container">
+    android:orientation="horizontal">
 
     <com.romankaranchuk.translator.ui.view.EditTextLayout
         android:id="@+id/container_edittext"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
         android:layout_margin="10dp"
+        android:layout_weight="1"
         android:background="@drawable/selector_edittext_border">
 
         <com.romankaranchuk.translator.ui.view.CustomEditText
             android:id="@+id/edittext"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:ems="10"
-            android:inputType="textMultiLine"
-            android:hint="@string/translate_hint"
-            android:scrollbars="vertical"
             android:background="@android:color/transparent"
+            android:ems="10"
             android:gravity="top|start"
+            android:hint="@string/translate_hint"
+            android:imeOptions="actionDone|flagNoExtractUi"
+            android:inputType="textMultiLine"
             android:paddingStart="10dp"
             android:paddingLeft="10dp"
-            android:paddingRight="60dp"
-            android:paddingEnd="60dp"
             android:paddingTop="6dp"
+            android:paddingEnd="60dp"
+            android:paddingRight="60dp"
             android:paddingBottom="6dp"
-            android:imeOptions="actionDone|flagNoExtractUi"/>
+            android:scrollbars="vertical" />
 
         <ImageButton
             android:id="@+id/clear_edittext"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
             android:layout_below="@+id/get_source_voice_container"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/cancel_dark512"
-            android:background="@android:color/transparent"
-            android:adjustViewBounds="true"/>
+            android:src="@drawable/cancel_dark512" />
 
         <include
             android:id="@+id/include_content_micro_waves"
-            layout="@layout/layout_micro_waves"/>
+            layout="@layout/layout_micro_waves" />
 
         <ImageButton
             android:id="@+id/get_audio_spelling"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_height="38dp"
             android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/tool_dark512"
-            android:background="@android:color/transparent"/>
+            android:src="@drawable/tool_dark512" />
 
         <FrameLayout
             android:id="@+id/get_source_voice_container"
@@ -71,18 +70,18 @@
 
             <ImageButton
                 android:id="@+id/get_source_voice"
-                android:layout_height="38dp"
                 android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/camera_dark512"
-                android:background="@android:color/transparent"/>
+                android:src="@drawable/camera_dark512" />
 
             <ProgressBar
                 android:id="@+id/get_source_voice_progress"
                 android:layout_width="38dp"
-                android:layout_height="38dp"/>
+                android:layout_height="38dp" />
         </FrameLayout>
     </com.romankaranchuk.translator.ui.view.EditTextLayout>
 
@@ -90,9 +89,8 @@
         layout="@layout/layout_translation_result"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        />
+        android:layout_weight="1" />
 </LinearLayout>

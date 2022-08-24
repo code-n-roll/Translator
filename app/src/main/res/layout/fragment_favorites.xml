@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include
         android:id="@+id/include_content_favorites_full_item_list"
-        layout="@layout/layout_favorites_full_item_list"/>
+        layout="@layout/layout_favorites_full_item_list" />
 
     <include
         android:id="@+id/include_content_favorites_empty_item_list"
-        layout="@layout/layout_empty_item_list"/>
+        layout="@layout/layout_empty_item_list" />
 </FrameLayout>

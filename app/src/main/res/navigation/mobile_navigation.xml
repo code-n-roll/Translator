@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_translator"
-        android:name="com.karanchuk.roman.testtranslate.ui.translator.TranslatorFragment"
+        android:name="com.romankaranchuk.translator.ui.translator.TranslatorFragment"
         android:label="Translator"
         tools:layout="@layout/fragment_translator" />
 
     <fragment
         android:id="@+id/navigation_history"
-        android:name="com.karanchuk.roman.testtranslate.ui.stored.StoredFragment"
+        android:name="com.romankaranchuk.translator.ui.stored.StoredFragment"
         android:label="Stored"
         tools:layout="@layout/fragment_stored" />
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.karanchuk.roman.testtranslate.ui.settings.SettingsFragment"
+        android:name="com.romankaranchuk.translator.ui.settings.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>

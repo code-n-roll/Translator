@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:id="@+id/general_container">
 
-    <com.karanchuk.roman.testtranslate.ui.view.EditTextLayout
+    <com.romankaranchuk.translator.ui.view.EditTextLayout
         android:id="@+id/container_edittext"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -14,7 +14,7 @@
         android:layout_margin="10dp"
         android:background="@drawable/selector_edittext_border">
 
-        <com.karanchuk.roman.testtranslate.ui.view.CustomEditText
+        <com.romankaranchuk.translator.ui.view.CustomEditText
             android:id="@+id/edittext"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -84,7 +84,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"/>
         </FrameLayout>
-    </com.karanchuk.roman.testtranslate.ui.view.EditTextLayout>
+    </com.romankaranchuk.translator.ui.view.EditTextLayout>
 
     <include
         layout="@layout/layout_translation_result"

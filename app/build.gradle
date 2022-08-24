@@ -9,7 +9,7 @@ android {
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
     defaultConfig {
-        applicationId "com.karanchuk.roman.testtranslate"
+        applicationId "com.romankaranchuk.translator"
         minSdkVersion 16
         targetSdkVersion 30
         versionCode 1
@@ -17,6 +17,9 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
+
+        buildConfigField "String", "YANDEX_DICTIONARY_API_KEY_PROD", "\""+getApiKey("YANDEX_DICTIONARY_API_KEY_PROD")+"\""
+        buildConfigField "String", "YANDEX_TRANSLATE_API_KEY_PROD", "\""+getApiKey("YANDEX_TRANSLATE_API_KEY_PROD")+"\""
     }
 
     buildTypes {
@@ -35,6 +38,12 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+def getApiKey(String key) {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty(key)
 }
 
 def VERSION_ROOM = '2.2.6'
@@ -64,7 +73,6 @@ dependencies {
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVer"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVer"
-    implementation "com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0"
 
     // 3rd party
     implementation "org.apmem.tools:layouts:1.10@aar"

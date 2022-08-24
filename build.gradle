@@ -8,7 +8,7 @@ buildscript {
         okHttpVer = '3.10.0'
         rxJavaVer = '2.1.7'
         rxAndroidVer = '2.0.2'
-        retrofitVer = '2.3.0'
+        retrofitVer = '2.6.0'
         daggerVer = '2.16'
         yandexSpeechKitVer = '3.12.2'
         mockitoVer = '2.16.0'

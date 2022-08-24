@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.karanchuk.roman.testtranslate.ui.view.TextGenLayout
+    <com.romankaranchuk.translator.ui.view.TextGenLayout
         android:id="@+id/layout_text_transcription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

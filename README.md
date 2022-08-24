@@ -6,7 +6,7 @@
 3. Compile & Run project
 
 ## Architecture & refactoring:
-same as [MusicPlayer repo A&R](https://github.com/code-n-roll/MusicPlayer#architecture--refactoring-wip)
+same as at [MusicPlayer section](https://github.com/code-n-roll/MusicPlayer#architecture--refactoring-wip)
 
 ## Portrait views:
 <img src="screenshots/screenshot_start_translator.png" 
@@ -43,4 +43,4 @@ alt="screenshot_landscape_favorites_empty_list.png" width="420x" height="whateve
 alt="screenshot_landscape_favorites_full_list.png" width="420x" height="whatever" align=left|top>
 
 ## OS requirements and limitations:
-same as [MusicPlayer repo OS R&L](https://github.com/code-n-roll/MusicPlayer/blob/master/README.md#os-requirements-and-limitations)
+same as [MusicPlayer section](https://github.com/code-n-roll/MusicPlayer/blob/master/README.md#os-requirements-and-limitations)

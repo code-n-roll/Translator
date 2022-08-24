@@ -10,13 +10,14 @@ import android.text.style.ClickableSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.romankaranchuk.translator.R
+import com.romankaranchuk.translator.data.database.model.Translation
 import timber.log.Timber
 
 /**
  * need to add gen to string before setSpan!!!
  * Created by roman on 23.6.17.
  */
-class CustomSynonyms(private val mContext: Context, private val mTranslation: com.romankaranchuk.translator.data.database.model.Translation) {
+class CustomSynonyms(private val mContext: Context, private val mTranslation: Translation) {
     private val mSpanTextListener: ClickableSpan? = null
     private val mSpanGenListener: ClickableSpan
     private val mSpanCommaListener: ClickableSpan
@@ -37,7 +38,7 @@ class CustomSynonyms(private val mContext: Context, private val mTranslation: co
         if (mTranslation.gen != null && !mTranslation.gen!!.isEmpty()) {
             genLength = " ".length + mTranslation.gen!!.length
             resultSpan.setSpan(
-                com.romankaranchuk.translator.ui.view.GenClickableSpan(
+                GenClickableSpan(
                     mContext
                 ), accumLength, accumLength + genLength,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -50,7 +51,7 @@ class CustomSynonyms(private val mContext: Context, private val mTranslation: co
             0
         }
         resultSpan.setSpan(
-            com.romankaranchuk.translator.ui.view.CommaClickableSpan(
+            CommaClickableSpan(
                 mContext
             ), accumLength, accumLength + commaLength,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -72,7 +73,7 @@ class CustomSynonyms(private val mContext: Context, private val mTranslation: co
                     0
                 }
                 resultSpan.setSpan(
-                    com.romankaranchuk.translator.ui.view.GenClickableSpan(
+                    GenClickableSpan(
                         mContext
                     ), accumLength, accumLength + genLength,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -83,7 +84,7 @@ class CustomSynonyms(private val mContext: Context, private val mTranslation: co
                     commaLength = 2
                 }
                 resultSpan.setSpan(
-                    com.romankaranchuk.translator.ui.view.CommaClickableSpan(
+                    CommaClickableSpan(
                         mContext
                     ), accumLength, accumLength + commaLength,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

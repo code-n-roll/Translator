@@ -12,8 +12,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry
+import com.romankaranchuk.translator.data.database.model.TranslatedItem
+import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository
+import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
+import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver
+import com.romankaranchuk.translator.ui.stored.ClearStoredDialogFragment
 import com.romankaranchuk.translator.ui.stored.ClearStoredDialogFragment.ClearStoredDialogListener
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -26,16 +31,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     @Inject lateinit var fragmentInjectionFactory: FragmentFactory
 
-    private var mHistoryTranslatedItems: List<com.romankaranchuk.translator.data.database.model.TranslatedItem>? = null
-    private var mFavoritesTranslatedItems: List<com.romankaranchuk.translator.data.database.model.TranslatedItem>? = null
-    private var mRepository: com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl? = null
+    private var mHistoryTranslatedItems: List<TranslatedItem>? = null
+    private var mFavoritesTranslatedItems: List<TranslatedItem>? = null
+    private var mRepository: TranslatorRepositoryImpl? = null
     private var mMainHandler: Handler? = null
     private var mMainHandlerThread: HandlerThread? = null
 
     // private ContentManager mContentManager;
 
     private val clearStoredDialogListener = object : ClearStoredDialogListener {
-        override fun onDialogPositiveClick(dialog: com.romankaranchuk.translator.ui.stored.ClearStoredDialogFragment?) {
+        override fun onDialogPositiveClick(dialog: ClearStoredDialogFragment?) {
             val curTitle = dialog!!.arguments!!.getString("title")
             if (curTitle != null) {
                 when (curTitle) {
@@ -59,7 +64,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             }
         }
 
-        override fun onDialogNegativeClick(dialog: com.romankaranchuk.translator.ui.stored.ClearStoredDialogFragment?) {
+        override fun onDialogNegativeClick(dialog: ClearStoredDialogFragment?) {
 //        UIUtils.showToast(this,"cancel was clicked");
         }
     }
@@ -90,8 +95,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onStart() {
         super.onStart()
 
-        val localDataSource: com.romankaranchuk.translator.data.database.repository.TranslatorRepository = com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository.getInstance(this)
-        mRepository = com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.getInstance(localDataSource)
+        val localDataSource: TranslatorRepository = TranslatorLocalRepository.getInstance(this)
+        mRepository = TranslatorRepositoryImpl.getInstance(localDataSource)
         mRepository!!.addHistoryContentObserver(historyTranslatedItemsRepositoryObserver)
         mRepository!!.addFavoritesContentObserver(favoritesTranslatedItemsRepositoryObserver)
         mMainHandlerThread = HandlerThread(MAIN_HANDLER_THREAD)

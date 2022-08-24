@@ -1,5 +1,6 @@
 package com.romankaranchuk.translator.data.repository
 
+import com.romankaranchuk.translator.data.database.model.DictDefinition
 import com.romankaranchuk.translator.data.network.YandexDictionaryApi
 import io.reactivex.Single
 
@@ -10,13 +11,13 @@ interface YandexDictionaryRepository {
 //        key: String,
 //        text: String,
 //        lang: String
-//    ): Single<com.romankaranchuk.translator.data.database.model.DictDefinition>
+//    ): Single<DictDefinition>
 
     suspend fun getValueFromDictionaryCoroutine(
         key: String,
         text: String,
         lang: String
-    ): com.romankaranchuk.translator.data.database.model.DictDefinition
+    ): DictDefinition
 }
 
 class YandexDictionaryRepositoryImpl(
@@ -27,7 +28,7 @@ class YandexDictionaryRepositoryImpl(
 //        key: String,
 //        text: String,
 //        lang: String
-//    ): Single<com.romankaranchuk.translator.data.database.model.DictDefinition> {
+//    ): Single<DictDefinition> {
 //        return api.getValueFromDictionary(key, text, lang)
 //    }
 
@@ -35,7 +36,7 @@ class YandexDictionaryRepositoryImpl(
         key: String,
         text: String,
         lang: String
-    ): com.romankaranchuk.translator.data.database.model.DictDefinition {
+    ): DictDefinition {
         return api.getValueFromDictionaryCoroutine(key, text, lang)
     }
 }

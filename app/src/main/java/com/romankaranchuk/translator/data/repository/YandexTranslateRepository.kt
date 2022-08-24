@@ -1,5 +1,6 @@
 package com.romankaranchuk.translator.data.repository
 
+import com.romankaranchuk.translator.data.database.model.TranslationResponse
 import com.romankaranchuk.translator.data.network.YandexTranslateApi
 import io.reactivex.Single
 
@@ -10,13 +11,13 @@ interface YandexTranslateRepository {
         key: String,
         text: String,
         lang: String
-    ): Single<com.romankaranchuk.translator.data.database.model.TranslationResponse>
+    ): Single<TranslationResponse>
 
     suspend fun getTranslationCoroutine(
         key: String,
         text: String,
         lang: String
-    ): com.romankaranchuk.translator.data.database.model.TranslationResponse
+    ): TranslationResponse
 }
 
 class YandexTranslateRepositoryImpl(
@@ -27,7 +28,7 @@ class YandexTranslateRepositoryImpl(
         key: String,
         text: String,
         lang: String
-    ): Single<com.romankaranchuk.translator.data.database.model.TranslationResponse> {
+    ): Single<TranslationResponse> {
         return api.getTranslation(key, text, lang)
     }
 
@@ -35,7 +36,7 @@ class YandexTranslateRepositoryImpl(
         key: String,
         text: String,
         lang: String
-    ): com.romankaranchuk.translator.data.database.model.TranslationResponse {
-        return com.romankaranchuk.translator.data.database.model.TranslationResponse()//api.getTranslationCoroutine(key, text, lang)
+    ): TranslationResponse {
+        return TranslationResponse()//api.getTranslationCoroutine(key, text, lang)
     }
 }

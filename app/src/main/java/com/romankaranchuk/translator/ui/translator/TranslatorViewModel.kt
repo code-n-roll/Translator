@@ -4,14 +4,21 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
+import com.romankaranchuk.translator.common.Constants
 import com.romankaranchuk.translator.common.Recognizer
 import com.romankaranchuk.translator.common.Vocalizer
+import com.romankaranchuk.translator.data.database.TablePersistenceContract.*
+import com.romankaranchuk.translator.data.database.model.*
+import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver
+import com.romankaranchuk.translator.data.database.storage.TextDataStorage
+import com.romankaranchuk.translator.data.database.storage.TranslationSaver
 import com.romankaranchuk.translator.data.repository.YandexDictionaryRepository
 import com.romankaranchuk.translator.data.repository.YandexTranslateRepository
 import com.romankaranchuk.translator.ui.base.BaseViewModel
 import com.romankaranchuk.translator.ui.base.launchOnIO
 import com.romankaranchuk.translator.ui.base.switchToUi
+import com.romankaranchuk.translator.utils.JsonUtils
 import com.romankaranchuk.translator.utils.network.ContentResult
 import ru.yandex.speechkit.Language
 import timber.log.Timber
@@ -22,50 +29,50 @@ class TranslatorViewModel @Inject constructor(
     private val context: Context,
     private val sharedPrefs: SharedPreferences,
     private val gson: Gson,
-    private val translationSaver: com.romankaranchuk.translator.data.database.storage.TranslationSaver,
+    private val translationSaver: TranslationSaver,
     private val yandexTranslateRepository: YandexTranslateRepository,
     private val yandexDictionaryRepository: YandexDictionaryRepository,
-    private val translatorRepository: com.romankaranchuk.translator.data.database.repository.TranslatorRepository,
+    private val translatorRepository: TranslatorRepository,
     private val vocalizer: Vocalizer,
     private val recognizer: Recognizer,
-    private val textDataStorage: com.romankaranchuk.translator.data.database.storage.TextDataStorage
+    private val textDataStorage: TextDataStorage
 ) : BaseViewModel(), HistoryTranslatedItemsRepositoryObserver {
 
-    val translationsLiveData = MutableLiveData<Pair<List<com.romankaranchuk.translator.data.database.model.Translation>, List<com.romankaranchuk.translator.data.database.model.PartOfSpeech>>>()
-    val translateLiveData = MutableLiveData<ContentResult<com.romankaranchuk.translator.data.database.model.TranslationResponse>>()
-    val definitionLiveData = MutableLiveData<ContentResult<com.romankaranchuk.translator.data.database.model.DictDefinition>>()
+    val translationsLiveData = MutableLiveData<Pair<List<Translation>, List<PartOfSpeech>>>()
+    val translateLiveData = MutableLiveData<ContentResult<TranslationResponse>>()
+    val definitionLiveData = MutableLiveData<ContentResult<DictDefinition>>()
 
     var translation: String? = null
 
-    private var mCurDictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition? = null
-    var mHistoryTranslatedItems: List<com.romankaranchuk.translator.data.database.model.TranslatedItem>? = null
+    private var mCurDictDefinition: DictDefinition? = null
+    var mHistoryTranslatedItems: List<TranslatedItem>? = null
 
     init {
         translatorRepository.addHistoryContentObserver(this)
 
         launchOnIO {
             mHistoryTranslatedItems = translatorRepository.getTranslatedItems(
-                com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY
+                TranslatedItemEntry.TABLE_NAME_HISTORY
             )
 
-            val dictDefString: String = sharedPrefs.getString(com.romankaranchuk.translator.common.Constants.TRANSL_CONTENT, "") ?: ""
+            val dictDefString: String = sharedPrefs.getString(Constants.TRANSL_CONTENT, "") ?: ""
             if (dictDefString != "null") {
-                mCurDictDefinition = gson.fromJson<com.romankaranchuk.translator.data.database.model.DictDefinition>(
+                mCurDictDefinition = gson.fromJson(
                     dictDefString,
-                    com.romankaranchuk.translator.data.database.model.DictDefinition::class.java
+                    DictDefinition::class.java
                 )
             }
         }
     }
 
     fun loadTranslations() = launchOnIO {
-        val dictDefString = sharedPrefs.getString(com.romankaranchuk.translator.common.Constants.TRANSL_CONTENT, "") ?: ""
+        val dictDefString = sharedPrefs.getString(Constants.TRANSL_CONTENT, "") ?: ""
 
-        val translations: MutableList<com.romankaranchuk.translator.data.database.model.Translation> = mutableListOf()
+        val translations: MutableList<Translation> = mutableListOf()
 
-        var dictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition? = null
+        var dictDefinition: DictDefinition? = null
         if (dictDefString.isNotEmpty()) {
-            dictDefinition = gson.fromJson(dictDefString, com.romankaranchuk.translator.data.database.model.DictDefinition::class.java)
+            dictDefinition = gson.fromJson(dictDefString, DictDefinition::class.java)
             if (dictDefinition != null) {
                 for (POS in dictDefinition.partsOfSpeech) {
                     translations.addAll(POS.translations)
@@ -86,7 +93,7 @@ class TranslatorViewModel @Inject constructor(
         targetLang: String,
         inputText: String
     ) = launchOnIO {
-        val langs = com.romankaranchuk.translator.utils.JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
+        val langs = JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
 
         val currentTranslatedItem = translationSaver.curTranslatedItem
         if (currentTranslatedItem != null && currentTranslatedItem.srcMeaning != inputText
@@ -95,10 +102,10 @@ class TranslatorViewModel @Inject constructor(
             val srcLangAPI = langs[sourceLang].asString
             val trgLangAPI = langs[targetLang].asString
             val mTranslationDirection = "$srcLangAPI-$trgLangAPI"
-            val translation: com.romankaranchuk.translator.data.database.model.TranslationResponse
+            val translation: TranslationResponse
             try {
                 translation = yandexTranslateRepository.getTranslationCoroutine(
-                    com.romankaranchuk.translator.common.Constants.TRANSLATOR_API_KEY,
+                    Constants.TRANSLATOR_API_KEY,
                     inputText,
                     mTranslationDirection
                 )
@@ -120,11 +127,11 @@ class TranslatorViewModel @Inject constructor(
         sourceLang: String,
         targetLang: String
     ) = launchOnIO {
-        val dictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition?
-        val langs = com.romankaranchuk.translator.utils.JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
+        val dictDefinition: DictDefinition?
+        val langs = JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
         try {
             dictDefinition = yandexDictionaryRepository.getValueFromDictionaryCoroutine(
-                com.romankaranchuk.translator.common.Constants.DICTIONARY_API_KEY,
+                Constants.DICTIONARY_API_KEY,
                 inputText,
                 "${langs[sourceLang].asString}-${langs[targetLang].asString}"
             )
@@ -171,25 +178,25 @@ class TranslatorViewModel @Inject constructor(
         sourceLang: String,
         targetLang: String,
         inputText: String,
-        dictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition
+        dictDefinition: DictDefinition
     ) {
         mCurDictDefinition = dictDefinition
         val savedData = HashMap<String, Any>()
-        savedData[com.romankaranchuk.translator.common.Constants.SRC_LANG] = sourceLang
-        savedData[com.romankaranchuk.translator.common.Constants.TRG_LANG] = targetLang
-        savedData[com.romankaranchuk.translator.common.Constants.EDITTEXT_DATA] = inputText
-        savedData[com.romankaranchuk.translator.common.Constants.TRANSL_RESULT] = translation ?: ""
-        savedData[com.romankaranchuk.translator.common.Constants.TRANSL_CONTENT] = dictDefinition
+        savedData[Constants.SRC_LANG] = sourceLang
+        savedData[Constants.TRG_LANG] = targetLang
+        savedData[Constants.EDITTEXT_DATA] = inputText
+        savedData[Constants.TRANSL_RESULT] = translation ?: ""
+        savedData[Constants.TRANSL_CONTENT] = dictDefinition
         translationSaver.setSavedData(savedData)
         Thread(translationSaver).start()
     }
 
-    private fun handleDictionaryResponse(inputText: String, dictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition) {
+    private fun handleDictionaryResponse(inputText: String, dictDefinition: DictDefinition) {
         val curEditTextContent = inputText.trim { it <= ' ' }
-        val srcLangAPI = sharedPrefs.getString(com.romankaranchuk.translator.common.Constants.CUR_SELECTED_ITEM_SRC_LANG, "") ?: ""
-        val trgLangAPI = sharedPrefs.getString(com.romankaranchuk.translator.common.Constants.CUR_SELECTED_ITEM_TRG_LANG, "") ?: ""
+        val srcLangAPI = sharedPrefs.getString(Constants.CUR_SELECTED_ITEM_SRC_LANG, "") ?: ""
+        val trgLangAPI = sharedPrefs.getString(Constants.CUR_SELECTED_ITEM_TRG_LANG, "") ?: ""
         val maybeExistedItem =
-            com.romankaranchuk.translator.data.database.model.TranslatedItem(
+            TranslatedItem(
                 srcLangAPI,
                 trgLangAPI,
                 null,
@@ -200,23 +207,23 @@ class TranslatorViewModel @Inject constructor(
                 null
             )
         val mHistoryTranslatedItems = translatorRepository.getTranslatedItems(
-            com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY
+            TranslatedItemEntry.TABLE_NAME_HISTORY
         )
         if (!mHistoryTranslatedItems.contains(maybeExistedItem)) {
             saveToRepository(srcLangAPI, trgLangAPI, inputText, dictDefinition)
         }
     }
 
-    fun getTranslatedItemFromCache(maybeExistedItem: com.romankaranchuk.translator.data.database.model.TranslatedItem) {
+    fun getTranslatedItemFromCache(maybeExistedItem: TranslatedItem) {
         val translatedItems = translatorRepository.getTranslatedItems(
-            com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY
+            TranslatedItemEntry.TABLE_NAME_HISTORY
         )
         val id = translatedItems.indexOf(maybeExistedItem)
         if (id != -1) {
             val dictDefinitionJSON = translatedItems[id].dictDefinitionJSON
-            val existedItem: com.romankaranchuk.translator.data.database.model.DictDefinition = gson.fromJson(
+            val existedItem: DictDefinition = gson.fromJson(
                 dictDefinitionJSON,
-                com.romankaranchuk.translator.data.database.model.DictDefinition::class.java
+                DictDefinition::class.java
             )
             handleDictionaryResponse(translation ?: "", existedItem)
 //            mTranslatedResult.text = translatedItems[id].trgMeaning
@@ -245,13 +252,13 @@ class TranslatorViewModel @Inject constructor(
         outputText: String
     ) {
         val data = HashMap<String, Any>()
-        data[com.romankaranchuk.translator.common.Constants.EDITTEXT_DATA] = inputText
-        data[com.romankaranchuk.translator.common.Constants.SRC_LANG] = sourceLang
-        data[com.romankaranchuk.translator.common.Constants.TRG_LANG] = targetLang
-        data[com.romankaranchuk.translator.common.Constants.TRANSL_RESULT] = outputText
-        data[com.romankaranchuk.translator.common.Constants.TRANSL_CONTENT] = mCurDictDefinition!!
+        data[Constants.EDITTEXT_DATA] = inputText
+        data[Constants.SRC_LANG] = sourceLang
+        data[Constants.TRG_LANG] = targetLang
+        data[Constants.TRANSL_RESULT] = outputText
+        data[Constants.TRANSL_CONTENT] = mCurDictDefinition!!
         if (translationSaver.curTranslatedItem != null) {
-            data[com.romankaranchuk.translator.common.Constants.CUR_TRANSLATED_ITEM] = translationSaver.curTranslatedItem.toString()
+            data[Constants.CUR_TRANSLATED_ITEM] = translationSaver.curTranslatedItem.toString()
         }
         textDataStorage.saveToSharedPreferences(data)
     }
@@ -259,7 +266,7 @@ class TranslatorViewModel @Inject constructor(
     override fun onHistoryTranslatedItemsChanged() {
         launchOnIO {
             translatorRepository.getTranslatedItems(
-                com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY
+                TranslatedItemEntry.TABLE_NAME_HISTORY
             ).also {
                 mHistoryTranslatedItems = it
             }

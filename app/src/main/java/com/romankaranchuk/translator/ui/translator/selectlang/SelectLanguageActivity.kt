@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
+import com.romankaranchuk.translator.utils.UIUtils
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -58,7 +59,7 @@ class SelectLanguageActivity : AppCompatActivity(R.layout.activity_select_langua
             itemClickListener = { language ->
                 viewModel.saveSelectedLanguage(isSource, language)
 
-                com.romankaranchuk.translator.utils.UIUtils.showToast(applicationContext, "selected $language")
+                UIUtils.showToast(applicationContext, "selected $language")
                 setResult(RESULT_OK, Intent().apply {
                     putExtra("result", language.name)
                 })

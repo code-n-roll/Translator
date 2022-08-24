@@ -1,5 +1,7 @@
 package com.romankaranchuk.translator.ui.translator
 
+import com.romankaranchuk.translator.data.database.model.TranslatedItem
+
 /**
  * Created by roman on 11.12.17.
  */
@@ -7,7 +9,7 @@ interface TranslatorContract {
 
     interface View {
         fun setHintOnInput()
-        fun createPredictedTranslatedItem(): com.romankaranchuk.translator.data.database.model.TranslatedItem
+        fun createPredictedTranslatedItem(): TranslatedItem
         fun setTextButtonSrcLang(text: String)
         fun getTextButtonSrcLang(): String
         fun setTextButtonTrgLang(text: String)

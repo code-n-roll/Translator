@@ -34,7 +34,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.TranslatorApplication
 import com.romankaranchuk.translator.common.Constants.*
+import com.romankaranchuk.translator.data.database.model.DictDefinition
+import com.romankaranchuk.translator.data.database.model.TranslatedItem
+import com.romankaranchuk.translator.data.database.model.Translation
+import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
+import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
+import com.romankaranchuk.translator.data.database.storage.TextDataStorage
+import com.romankaranchuk.translator.ui.fullscreen.FullscreenActivity
 import com.romankaranchuk.translator.ui.translator.selectlang.SelectLanguageActivity
+import com.romankaranchuk.translator.ui.view.CustomEditText
+import com.romankaranchuk.translator.utils.UIUtils
 import com.romankaranchuk.translator.utils.extensions.bind
 import com.romankaranchuk.translator.utils.network.ContentResult
 import org.xmlpull.v1.XmlPullParserException
@@ -69,7 +78,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     private val mProgressTargetVoice: ProgressBar by bind(R.id.get_target_voice_progress)
     private val mProgressSourceVoice: ProgressBar by bind(R.id.get_source_voice_progress)
     val mTranslateRecyclerView: RecyclerView by bind(R.id.container_dict_defin)
-    val mCustomEditText: com.romankaranchuk.translator.ui.view.CustomEditText by bind(R.id.edittext)
+    val mCustomEditText: CustomEditText by bind(R.id.edittext)
     val mTranslatedResult: TextView by bind(R.id.textview_translate_result)
     private val mContainerEditText: RelativeLayout by bind(R.id.container_edittext)
     private val mContainerSuccess: RelativeLayout by bind(R.id.connection_successful_content)
@@ -87,7 +96,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
 //    private var mView: View? = null
     private var mMainActivityContainer: FrameLayout? = null
-    private var mTranslations: MutableList<com.romankaranchuk.translator.data.database.model.Translation> = mutableListOf()
+    private var mTranslations: MutableList<Translation> = mutableListOf()
     private var mBottomPadding: Int = 0
 
     private var mAnimatorSet: AnimatorSet? = null
@@ -103,11 +112,11 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     private var adapter: TranslatorRecyclerAdapter? = null
 
 //    private lateinit var mNavigation: AHBottomNavigation
-    private lateinit var mRepository: com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
-    private lateinit var customEditText: com.romankaranchuk.translator.ui.view.CustomEditText
+    private lateinit var mRepository: TranslatorRepositoryImpl
+    private lateinit var customEditText: CustomEditText
 
-    @Inject lateinit var textDataStorage: com.romankaranchuk.translator.data.database.storage.TextDataStorage
-    @Inject lateinit var translatorRepository: com.romankaranchuk.translator.data.database.repository.TranslatorRepository
+    @Inject lateinit var textDataStorage: TextDataStorage
+    @Inject lateinit var translatorRepository: TranslatorRepository
     @Inject lateinit var mSettings: SharedPreferences
 
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -313,7 +322,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             //            mPresenter.recognizeSourceText();
             mButtonGetAudioSpelling.setImageResource(R.drawable.tool_dark512)
         } else {
-            com.romankaranchuk.translator.utils.UIUtils.showToast(
+            UIUtils.showToast(
                 context,
                 resources.getString(R.string.record_audio_not_granted)
             )
@@ -488,12 +497,12 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         mButtonSwitchLang!!.performClick()
     }
 
-    override fun createPredictedTranslatedItem(): com.romankaranchuk.translator.data.database.model.TranslatedItem {
+    override fun createPredictedTranslatedItem(): TranslatedItem {
         val curEditTextContent = mCustomEditText.text.toString().trim { it <= ' ' }
         val srcLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_SRC_LANG, "")
         val trgLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_TRG_LANG, "")
 
-        return com.romankaranchuk.translator.data.database.model.TranslatedItem(
+        return TranslatedItem(
             srcLangAPI, trgLangAPI, null, null,
             curEditTextContent, null, null, null
         )
@@ -845,7 +854,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     private fun clickOnFullscreenButton() {
-        val intent = Intent(context, com.romankaranchuk.translator.ui.fullscreen.FullscreenActivity::class.java)
+        val intent = Intent(context, FullscreenActivity::class.java)
         intent.putExtra(TRANSLATED_RESULT, getTextTranslatedResultView())
         startActivity(intent)
     }
@@ -864,7 +873,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 language = Language.ENGLISH
             )
         } else {
-            com.romankaranchuk.translator.utils.UIUtils.showToast(context, context!!.resources.getString(R.string.try_to_get_photo))
+            UIUtils.showToast(context, context!!.resources.getString(R.string.try_to_get_photo))
         }
     }
 
@@ -910,7 +919,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         //         }
         //        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
         //        UIUtils.showToast(mContext, "set favorite was clicked");
-        com.romankaranchuk.translator.utils.UIUtils.showToast(context, context!!.resources.getString(R.string.set_favorite_message))
+        UIUtils.showToast(context, context!!.resources.getString(R.string.set_favorite_message))
     }
 
 
@@ -950,17 +959,17 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 language = Language.RUSSIAN
             )
         } else {
-            com.romankaranchuk.translator.utils.UIUtils.showToast(
+            UIUtils.showToast(
                 context,
                 context!!.resources.getString(R.string.try_vocalize_empty_result)
             )
         }
     }
 
-    fun handleDictionaryResponse(dictDefinition: com.romankaranchuk.translator.data.database.model.DictDefinition) {
+    fun handleDictionaryResponse(dictDefinition: DictDefinition) {
         Timber.d(dictDefinition.toString())
 
-        val translations: MutableList<com.romankaranchuk.translator.data.database.model.Translation> = ArrayList()
+        val translations: MutableList<Translation> = ArrayList()
         var index: Int
         for (POS in dictDefinition.partsOfSpeech) {
             translations.addAll(POS.translations)

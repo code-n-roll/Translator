@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
+import com.romankaranchuk.translator.data.database.model.PartOfSpeech
+import com.romankaranchuk.translator.data.database.model.Translation
 import com.romankaranchuk.translator.ui.view.CustomSynonyms
+import com.romankaranchuk.translator.ui.view.TextGenLayout
 
 /**
  * Created by roman on 11.4.17.
@@ -17,8 +20,8 @@ class TranslatorRecyclerAdapter(
     private val mOnItemClickListener: (View, String) -> Unit
 ) : RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>() {
 
-    private val mPartsOfSpeech: MutableList<com.romankaranchuk.translator.data.database.model.PartOfSpeech> = mutableListOf()
-    private val mItems: MutableList<com.romankaranchuk.translator.data.database.model.Translation> = mutableListOf()
+    private val mPartsOfSpeech: MutableList<PartOfSpeech> = mutableListOf()
+    private val mItems: MutableList<Translation> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -35,8 +38,8 @@ class TranslatorRecyclerAdapter(
     }
 
     fun updateAll(
-        newItems: List<com.romankaranchuk.translator.data.database.model.Translation>,
-        partsOfSpeech: List<com.romankaranchuk.translator.data.database.model.PartOfSpeech>
+        newItems: List<Translation>,
+        partsOfSpeech: List<PartOfSpeech>
     ) {
         mPartsOfSpeech.clear()
         mPartsOfSpeech.addAll(partsOfSpeech)
@@ -53,9 +56,9 @@ class TranslatorRecyclerAdapter(
         private val mMeanDictDefinItem: TextView = itemView.findViewById(R.id.mean_dict_defin_item)
         private val mExprDictDefinItem: TextView = itemView.findViewById(R.id.expr_dict_defin_item)
         private val mLabelPartOfSpeech: TextView = itemView.findViewById(R.id.tv_label_part_of_speech)
-        private val mTextTranscription: com.romankaranchuk.translator.ui.view.TextGenLayout = itemView.findViewById(R.id.layout_text_transcription)
+        private val mTextTranscription = itemView.findViewById<TextGenLayout>(R.id.layout_text_transcription)
 
-        fun bind(item: com.romankaranchuk.translator.data.database.model.Translation) {
+        fun bind(item: Translation) {
             initHeaderAndSubHeaders(item)
             mNumberDictDefinItem.text = item.number
             initSynonyms(item)
@@ -73,7 +76,7 @@ class TranslatorRecyclerAdapter(
             }
         }
 
-        private fun initHeaderAndSubHeaders(item: com.romankaranchuk.translator.data.database.model.Translation) {
+        private fun initHeaderAndSubHeaders(item: Translation) {
             if (item.number == "1") {
                 if (mItems!!.indexOf(item) == 0) {
                     if (mPartsOfSpeech != null) {
@@ -102,7 +105,7 @@ class TranslatorRecyclerAdapter(
             }
         }
 
-        private fun initSynonyms(item: com.romankaranchuk.translator.data.database.model.Translation) {
+        private fun initSynonyms(item: Translation) {
             val synonyms = CustomSynonyms(itemView.context, item)
             mTranslDictDefinItem.text = synonyms.toSpannable(mOnItemClickListener)
             mTranslDictDefinItem.movementMethod = LinkMovementMethod.getInstance()

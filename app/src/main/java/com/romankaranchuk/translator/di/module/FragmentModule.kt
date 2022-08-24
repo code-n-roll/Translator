@@ -3,6 +3,7 @@ package com.romankaranchuk.translator.di.module
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import com.romankaranchuk.translator.di.FragmentInjectionFactory
+import com.romankaranchuk.translator.ui.stored.StoredFragment
 import com.romankaranchuk.translator.ui.translator.TranslatorFragment
 import dagger.Binds
 import dagger.Module
@@ -22,6 +23,6 @@ abstract class FragmentModule {
 
     @Binds
     @IntoMap
-    @FragmentKey(com.romankaranchuk.translator.ui.stored.StoredFragment::class)
-    abstract fun bindStoredFragment(fragment: com.romankaranchuk.translator.ui.stored.StoredFragment): Fragment
+    @FragmentKey(StoredFragment::class)
+    abstract fun bindStoredFragment(fragment: StoredFragment): Fragment
 }

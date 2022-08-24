@@ -16,6 +16,11 @@ import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.common.Constants.*
 import com.romankaranchuk.translator.utils.extensions.bind
 import com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry
+import com.romankaranchuk.translator.data.database.model.TranslatedItem
+import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository.*
+import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
+import com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
+import com.romankaranchuk.translator.utils.ContentManager
 import java.util.*
 
 /**
@@ -24,9 +29,9 @@ import java.util.*
 
 class FavoritesFragment : Fragment(),
         SearchView.OnQueryTextListener,
-        com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver,
-        com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
-        com.romankaranchuk.translator.utils.ContentManager.TranslatedItemChanged {
+        TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver,
+        TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
+        ContentManager.TranslatedItemChanged {
     private val mFavoritesRecycler: RecyclerView by bind(R.id.favorites_items_list)
     private val mSearchViewFavorites: SearchView by bind(R.id.search_view_favorites)
     private val mButtonIsFavorite: ImageButton by bind(R.id.imagebutton_isfavorite_favorite_item)
@@ -41,12 +46,12 @@ class FavoritesFragment : Fragment(),
     private var mLayoutManager: RecyclerView.LayoutManager? = null
     private var mClearStored: ImageButton? = null
     private var mView: View? = null
-    private var mRepository: com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl? = null
-    private var mFavoritesTranslatedItems: MutableList<com.romankaranchuk.translator.data.database.model.TranslatedItem>? = null
-    private var mHistoryTranslatedItems: MutableList<com.romankaranchuk.translator.data.database.model.TranslatedItem>? = null
-    private var mCopyFavoritesTranslatedItems: MutableList<com.romankaranchuk.translator.data.database.model.TranslatedItem>? = null
+    private var mRepository: TranslatorRepositoryImpl? = null
+    private var mFavoritesTranslatedItems: MutableList<TranslatedItem>? = null
+    private var mHistoryTranslatedItems: MutableList<TranslatedItem>? = null
+    private var mCopyFavoritesTranslatedItems: MutableList<TranslatedItem>? = null
     private var mMainHandler: Handler? = null
-    private var mContentManager: com.romankaranchuk.translator.utils.ContentManager? = null
+    private var mContentManager: ContentManager? = null
     private var mSettings: SharedPreferences? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,10 +65,10 @@ class FavoritesFragment : Fragment(),
         if (parentView != null) {
             mClearStored = parentView.findViewById(R.id.imagebutton_clear_stored)
         }
-        mContentManager = com.romankaranchuk.translator.utils.ContentManager.getInstance()
+        mContentManager = ContentManager.getInstance()
 
-        val localDataSource = com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository.getInstance(context!!)
-        mRepository = com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.getInstance(localDataSource)
+        val localDataSource = getInstance(context!!)
+        mRepository = TranslatorRepositoryImpl.getInstance(localDataSource)
         mFavoritesTranslatedItems = mRepository!!.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES)
         mHistoryTranslatedItems = mRepository!!.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY)
         mCopyFavoritesTranslatedItems = ArrayList(mFavoritesTranslatedItems!!)
@@ -112,7 +117,7 @@ class FavoritesFragment : Fragment(),
         return inflater.inflate(R.layout.fragment_favorites, container, false)
     }
 
-    private fun clickOnSetFavoriteItem(item: com.romankaranchuk.translator.data.database.model.TranslatedItem) {
+    private fun clickOnSetFavoriteItem(item: TranslatedItem) {
         if (item.isFavorite()) {
             item.isFavoriteUp(false)
             mRepository!!.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)
@@ -127,7 +132,7 @@ class FavoritesFragment : Fragment(),
         //        UIUtils.showToast(getContext(),"isFavorite was clicked in favorites");
     }
 
-    private fun clickOnItemStoredRecycler(item: com.romankaranchuk.translator.data.database.model.TranslatedItem, view: View) {
+    private fun clickOnItemStoredRecycler(item: TranslatedItem, view: View) {
         mSettings!!.edit().apply {
             putString(EDITTEXT_DATA, item.srcMeaning)
             putString(SRC_LANG, item.srcLanguageForUser)
@@ -177,7 +182,7 @@ class FavoritesFragment : Fragment(),
         var newText = newText
         //        mFavoritesTranslatedItems = mRepository.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES);
         newText = newText.toLowerCase()
-        val newList = ArrayList<com.romankaranchuk.translator.data.database.model.TranslatedItem>()
+        val newList = ArrayList<TranslatedItem>()
         for (item in mFavoritesTranslatedItems!!) {
             val srcMeaning = item.srcMeaning
             val trgMeaning = item.trgMeaning
@@ -185,14 +190,14 @@ class FavoritesFragment : Fragment(),
                 newList.add(item)
             }
         }
-        val adapter = mFavoritesRecycler.adapter as com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
+        val adapter = mFavoritesRecycler.adapter as StoredRecyclerAdapter
         adapter.setFilter(newList)
 
         chooseCurSearchView(newList)
         return true
     }
 
-    private fun chooseCurSearchView(list: List<com.romankaranchuk.translator.data.database.model.TranslatedItem>) {
+    private fun chooseCurSearchView(list: List<TranslatedItem>) {
         if (list.isEmpty()) {
             mEmptySearchView.visibility = View.VISIBLE
             mFavoritesRecycler.visibility = View.INVISIBLE
@@ -254,7 +259,7 @@ class FavoritesFragment : Fragment(),
     }
 
     private fun performContextItemDeletion() {
-        val adapter = mFavoritesRecycler.adapter as com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
+        val adapter = mFavoritesRecycler.adapter as StoredRecyclerAdapter
         val position = adapter.position
         val item = mFavoritesTranslatedItems!![position]
         mRepository!!.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)

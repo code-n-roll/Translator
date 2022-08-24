@@ -1,5 +1,6 @@
 package com.romankaranchuk.translator.data.network
 
+import com.romankaranchuk.translator.data.database.model.TranslationResponse
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -14,12 +15,12 @@ interface YandexTranslateApi {
         @Query("key") key: String,
         @Query("text") text: String,
         @Query("lang") lang: String
-    ): Single<com.romankaranchuk.translator.data.database.model.TranslationResponse>
+    ): Single<TranslationResponse>
 
     @GET("api/v1.5/tr.json/translate?")
     suspend fun getTranslationCoroutine(
         @Query("key") key: String,
         @Query("text") text: String,
         @Query("lang") lang: String
-    ): com.romankaranchuk.translator.data.database.model.TranslationResponse
+    ): TranslationResponse
 }

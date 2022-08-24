@@ -18,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.common.Constants.UNIQUE_HISTORY_FRAGMENT_ID
+import com.romankaranchuk.translator.data.database.model.TranslatedItem
+import com.romankaranchuk.translator.ui.stored.StoredFragment
+import com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
 
 /**
  * Created by roman on 9.4.17.
@@ -48,7 +51,7 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mPresenter = (parentFragment as com.romankaranchuk.translator.ui.stored.StoredFragment).mPresenter
+        mPresenter = (parentFragment as StoredFragment).mPresenter
 
         mPresenter?.attachView(this)
         findViewsOnFragment(view)
@@ -85,7 +88,7 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
             DividerItemDecoration(mHistoryRecycler!!.context, RecyclerView.VERTICAL)
         mHistoryRecycler!!.addItemDecoration(verticalItemDecoration)
         mHistoryRecycler!!.adapter =
-            com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter(
+            StoredRecyclerAdapter(
                 mPresenter?.historyTranslatedItems,
                 { item -> clickOnItemStoredRecycler(item /*,translatorNavView*/) },
                 this::clickOnSetFavoriteItem,
@@ -94,12 +97,12 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
         registerForContextMenu(mHistoryRecycler!!)
     }
 
-    private fun clickOnItemStoredRecycler(item: com.romankaranchuk.translator.data.database.model.TranslatedItem) {
+    private fun clickOnItemStoredRecycler(item: TranslatedItem) {
         mPresenter?.clickOnItemStoredRecycler(item)
 //        view.performClick()
     }
 
-    private fun clickOnSetFavoriteItem(item: com.romankaranchuk.translator.data.database.model.TranslatedItem) {
+    private fun clickOnSetFavoriteItem(item: TranslatedItem) {
         mPresenter?.clickOnSetFavoriteItem(item)
         mHistoryRecycler!!.adapter!!.notifyItemChanged(
             mPresenter?.historyTranslatedItems!!.indexOf(
@@ -146,13 +149,13 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
 
     override fun onQueryTextChange(newText: String): Boolean {
         val newList = mPresenter?.getSearchedText(newText) ?: emptyList()
-        val adapter = mHistoryRecycler!!.adapter as com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter?
+        val adapter = mHistoryRecycler!!.adapter as StoredRecyclerAdapter?
         adapter!!.setFilter(newList)
         handleShowingSearchView(newList)
         return true
     }
 
-    override fun handleShowingSearchView(list: List<com.romankaranchuk.translator.data.database.model.TranslatedItem>) {
+    override fun handleShowingSearchView(list: List<TranslatedItem>) {
         if (list.isEmpty()) {
             mEmptySearchView!!.visibility = View.VISIBLE
             mHistoryRecycler!!.visibility = View.INVISIBLE
@@ -170,7 +173,7 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
-        return if (item.groupId == com.romankaranchuk.translator.common.Constants.UNIQUE_HISTORY_FRAGMENT_ID) {
+        return if (item.groupId == UNIQUE_HISTORY_FRAGMENT_ID) {
             when (item.itemId) {
                 R.id.menu_item_delete -> {
                     performContextItemDeletion()
@@ -194,7 +197,7 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
     }
 
     private fun performContextItemDeletion() {
-        val adapter = mHistoryRecycler!!.adapter as com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter?
+        val adapter = mHistoryRecycler!!.adapter as StoredRecyclerAdapter?
         val position = adapter!!.position
         mPresenter?.performContextItemDeletion(position)
         mHistoryRecycler!!.adapter!!.notifyItemRemoved(position)

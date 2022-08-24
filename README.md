@@ -1,5 +1,15 @@
 # Translator
-## Portrait views
+
+## Getting Started:
+1. Create account on [Yandex.Passport](https://passport.yandex.com) 
+2. Get API key on [Yandex.Dictionary](https://yandex.com/dev/dictionary/) -> enter API key in `local.properties`:<br/>`YANDEX_DICTIONARY_API_KEY_PROD=<your_api_key>`
+3. Get API key on [Yandex.Translate](https://yandex.com/dev/translate) -> enter API key in `local.properties`:<br/>`YANDEX_TRANSLATE_API_KEY_PROD=<your_api_key>`
+4. Compile & Run project
+
+## Architecture & refactoring:
+same as [MusicPlayer repo A&R](https://github.com/code-n-roll/MusicPlayer#architecture--refactoring-wip)
+
+## Portrait views:
 <img src="screenshots/screenshot_start_translator.png" 
 alt="screenshot_start_translator.png" width="250x" height="whatever" align=left>
 <img src="screenshots/screenshot_translator.png" 
@@ -15,7 +25,7 @@ alt="screenshot_history_list.png" width="250x" height="whatever" align=left>
 <img src="screenshots/screenshot_favorites_list.png" 
 alt="screenshot_favorites_list.png" width="250x" height="whatever" align=down>
 
-## Landscape views
+## Landscape views:
 <img src="screenshots/screenshot_landscape_translator_empty.png" 
 alt="screenshot_landscape_translator_empty.png" width="420x" height="whatever" align=left>
 <img src="screenshots/screenshot_landscape_translator_full_keyboard_hidden.png" 
@@ -32,3 +42,6 @@ alt="screenshot_landscape_history_full_list.png" width="420x" height="whatever" 
 alt="screenshot_landscape_favorites_empty_list.png" width="420x" height="whatever" align=left>
 <img src="screenshots/screenshot_landscape_favorites_full_list.png" 
 alt="screenshot_landscape_favorites_full_list.png" width="420x" height="whatever" align=left|top>
+
+## OS requirements and limitations:
+same as [MusicPlayer repo OS R&L](https://github.com/code-n-roll/MusicPlayer/blob/master/README.md#os-requirements-and-limitations)

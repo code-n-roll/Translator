@@ -86,7 +86,7 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
         mHistoryRecycler!!.addItemDecoration(verticalItemDecoration)
         mHistoryRecycler!!.adapter =
             StoredRecyclerAdapter(
-                mPresenter?.historyTranslatedItems,
+                mPresenter?.historyTranslatedItems ?: ArrayList(),
                 { item -> clickOnItemStoredRecycler(item /*,translatorNavView*/) },
                 this::clickOnSetFavoriteItem,
                 UNIQUE_HISTORY_FRAGMENT_ID
@@ -121,7 +121,7 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
     }
 
     fun chooseCurView() {
-        if (!mPresenter?.historyTranslatedItems!!.isEmpty()) {
+        if (mPresenter?.historyTranslatedItems?.isEmpty() == false) {
             mEmptyView!!.visibility = View.GONE
             mContentView!!.visibility = View.VISIBLE
         } else {
@@ -146,8 +146,8 @@ class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQu
 
     override fun onQueryTextChange(newText: String): Boolean {
         val newList = mPresenter?.getSearchedText(newText) ?: emptyList()
-        val adapter = mHistoryRecycler!!.adapter as StoredRecyclerAdapter?
-        adapter!!.setFilter(newList)
+        val adapter = mHistoryRecycler?.adapter as? StoredRecyclerAdapter?
+        adapter?.setFilter(newList)
         handleShowingSearchView(newList)
         return true
     }

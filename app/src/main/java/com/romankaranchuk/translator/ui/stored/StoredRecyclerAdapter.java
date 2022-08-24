@@ -1,7 +1,5 @@
 package com.romankaranchuk.translator.ui.stored;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,14 +7,18 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.romankaranchuk.translator.data.database.model.TranslatedItem;
-import com.romankaranchuk.translator.R;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.romankaranchuk.translator.R;
+import com.romankaranchuk.translator.data.database.model.TranslatedItem;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAdapter.ViewHolder>{
-    private List<TranslatedItem> mItems;
+    private List<TranslatedItem> mItems = new ArrayList();
     private final OnItemClickListener mItemClickListener, mIsFavoriteListener;
     private int mPosition;
     private int mUniqueFragmentId;
@@ -33,11 +35,14 @@ public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAd
         this.mPosition = position;
     }
 
-    public StoredRecyclerAdapter(List<TranslatedItem> items,
-                                 OnItemClickListener itemClickListener,
-                                 OnItemClickListener isFavoriteListener,
-                                 int uniqueFragmentId){
-        mItems = items;
+    public StoredRecyclerAdapter(
+            List<TranslatedItem> items,
+            OnItemClickListener itemClickListener,
+            OnItemClickListener isFavoriteListener,
+            int uniqueFragmentId
+    ) {
+        mItems.clear();
+        mItems.addAll(items);
         mItemClickListener = itemClickListener;
         mIsFavoriteListener = isFavoriteListener;
         mUniqueFragmentId = uniqueFragmentId;

@@ -2,8 +2,8 @@ package com.romankaranchuk.translator.di.module
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.romankaranchuk.translator.di.ViewModelFactory
-import com.romankaranchuk.translator.di.ViewModelKey
+import com.romankaranchuk.translator.di.util.ViewModelFactory
+import com.romankaranchuk.translator.di.util.ViewModelKey
 import com.romankaranchuk.translator.ui.translator.TranslatorViewModel
 import com.romankaranchuk.translator.ui.translator.selectlang.SelectLanguageViewModel
 import dagger.Binds

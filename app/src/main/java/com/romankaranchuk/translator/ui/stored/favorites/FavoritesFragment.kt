@@ -187,8 +187,8 @@ class FavoritesFragment : Fragment(),
                 newList.add(item)
             }
         }
-        val adapter = mFavoritesRecycler.adapter as StoredRecyclerAdapter
-        adapter.setFilter(newList)
+        val adapter = mFavoritesRecycler.adapter as? StoredRecyclerAdapter
+        adapter?.setFilter(newList)
 
         chooseCurSearchView(newList)
         return true

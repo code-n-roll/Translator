@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         private const val MAIN_HANDLER_THREAD = "MAIN_HANDLER_THREAD"
     }
 
-    @Inject lateinit var fragmentInjectionFactory: FragmentFactory
+//    @Inject lateinit var fragmentInjectionFactory: FragmentFactory
 
     private var mHistoryTranslatedItems: List<TranslatedItem>? = null
     private var mFavoritesTranslatedItems: List<TranslatedItem>? = null
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
 
     private fun inject() {
-        AndroidInjection.inject(this)
-        supportFragmentManager.fragmentFactory = fragmentInjectionFactory
+//        AndroidInjection.inject(this)
+//        supportFragmentManager.fragmentFactory = fragmentInjectionFactory
     }
 }

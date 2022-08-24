@@ -1,4 +1,4 @@
-package com.romankaranchuk.translator.di.module
+package com.romankaranchuk.translator.di.module.injector
 
 import com.romankaranchuk.translator.ui.main.MainActivity
 import com.romankaranchuk.translator.ui.translator.selectlang.SelectLanguageActivity

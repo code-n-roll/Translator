@@ -9,7 +9,7 @@ buildscript {
         rxJavaVer = '2.1.7'
         rxAndroidVer = '2.0.2'
         retrofitVer = '2.9.0'
-        daggerVer = '2.16'
+        daggerVer = '2.42'
 //        yandexSpeechKitVer = '3.12.2'
         mockitoVer = '3.9.0'
         junitVer = '4.13.2'

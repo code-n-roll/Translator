@@ -1,4 +1,4 @@
-package com.romankaranchuk.translator.di
+package com.romankaranchuk.translator.di.util
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory

@@ -1,4 +1,4 @@
-package com.romankaranchuk.translator.di
+package com.romankaranchuk.translator.di.util
 
 import androidx.lifecycle.ViewModel
 import dagger.MapKey

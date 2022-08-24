@@ -42,6 +42,7 @@ import com.romankaranchuk.translator.data.database.model.Translation
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
+import com.romankaranchuk.translator.di.util.Injectable
 import com.romankaranchuk.translator.ui.fullscreen.FullscreenActivity
 import com.romankaranchuk.translator.ui.translator.selectlang.SelectLanguageActivity
 import com.romankaranchuk.translator.ui.view.CustomEditText
@@ -58,7 +59,7 @@ import java.util.ArrayList
 import javax.inject.Inject
 
 
-class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.View {
+class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.View, Injectable {
 
     companion object {
         const val SRC_LANG_ACTIVITY_REQUEST_CODE = 1

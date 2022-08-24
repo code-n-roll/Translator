@@ -3,9 +3,6 @@ package com.romankaranchuk.translator.data.database.model
 import com.google.gson.annotations.SerializedName
 import com.romankaranchuk.translator.data.database.model.ExpressionTranslation
 
-/**
- * Created by roman on 18.6.17.
- */
 class Expression {
     @SerializedName("text")
     var text: String? = null

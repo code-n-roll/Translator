@@ -23,9 +23,6 @@ import com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
 import com.romankaranchuk.translator.utils.ContentManager
 import java.util.*
 
-/**
- * Created by roman on 9.4.17.
- */
 
 class FavoritesFragment : Fragment(),
         SearchView.OnQueryTextListener,

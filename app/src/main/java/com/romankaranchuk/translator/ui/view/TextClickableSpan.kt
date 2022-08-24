@@ -8,9 +8,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.romankaranchuk.translator.R
 
-/**
- * Created by roman on 23.6.17.
- */
 class TextClickableSpan(
     private val mContext: Context,
     private val mOnItemClickListener: (View, String) -> Unit,

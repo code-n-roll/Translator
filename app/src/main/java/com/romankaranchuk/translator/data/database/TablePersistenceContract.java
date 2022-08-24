@@ -2,10 +2,6 @@ package com.romankaranchuk.translator.data.database;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by roman on 9.4.17.
- */
-
 public final class TablePersistenceContract {
 
     private TablePersistenceContract(){

@@ -9,9 +9,6 @@ import androidx.core.content.ContextCompat;
 
 import com.romankaranchuk.translator.R;
 
-/**
- * Created by roman on 26.6.17.
- */
 
 public class CommaClickableSpan extends ClickableSpan {
     private Context mContext;

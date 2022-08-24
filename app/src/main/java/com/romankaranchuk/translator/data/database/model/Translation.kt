@@ -4,9 +4,6 @@ import com.romankaranchuk.translator.data.database.model.Synonym
 import com.romankaranchuk.translator.data.database.model.Meaning
 import com.google.gson.annotations.SerializedName
 
-/**
- * Created by roman on 11.4.17.
- */
 class Translation(
     var number: String?,
     @SerializedName("syn") var synonyms: List<Synonym>?,

@@ -3,9 +3,6 @@ package com.romankaranchuk.translator.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by roman on 17.4.17.
- */
 
 public class ContentManager {
     private static ContentManager INSTANCE = null;

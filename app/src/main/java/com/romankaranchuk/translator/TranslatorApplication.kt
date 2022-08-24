@@ -8,7 +8,7 @@ import com.romankaranchuk.translator.di.DaggerApplicationComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
-import ru.yandex.speechkit.SpeechKit
+//import ru.yandex.speechkit.SpeechKit
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -50,7 +50,7 @@ class TranslatorApplication : MultiDexApplication(), HasActivityInjector {//, Ha
             .inject(this)
     }
 
-    private fun setupSpeechKit() {
-        SpeechKit.getInstance().init(this, SPEECH_KIT_API_KEY);
-    }
+//    private fun setupSpeechKit() {
+//        SpeechKit.getInstance().init(this, SPEECH_KIT_API_KEY);
+//    }
 }

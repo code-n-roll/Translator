@@ -17,10 +17,6 @@ import com.romankaranchuk.translator.ui.edittextnavigator.EditTextLayoutPresente
 
 import timber.log.Timber;
 
-/**
- * Created by roman on 28.6.17.
- */
-
 public class EditTextLayout extends RelativeLayout implements GestureDetector.OnGestureListener{
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_THRESHOLD_VELOCITY = 100;

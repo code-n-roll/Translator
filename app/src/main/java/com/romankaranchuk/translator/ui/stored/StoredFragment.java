@@ -33,9 +33,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-/**
- * Created by roman on 8.4.17.
- */
 
 public class StoredFragment extends Fragment implements
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,

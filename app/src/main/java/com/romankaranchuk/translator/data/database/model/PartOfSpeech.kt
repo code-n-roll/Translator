@@ -3,9 +3,6 @@ package com.romankaranchuk.translator.data.database.model
 import com.romankaranchuk.translator.data.database.model.Translation
 import com.google.gson.annotations.SerializedName
 
-/**
- * Created by roman on 19.4.17.
- */
 class PartOfSpeech(
     @SerializedName("pos") var name: String,
     @SerializedName("tr") var translations: List<Translation>

@@ -14,9 +14,6 @@ import com.romankaranchuk.translator.R;
 
 import java.util.List;
 
-/**
- * Created by roman on 9.4.17.
- */
 
 public class StoredRecyclerAdapter extends RecyclerView.Adapter<StoredRecyclerAdapter.ViewHolder>{
     private List<TranslatedItem> mItems;

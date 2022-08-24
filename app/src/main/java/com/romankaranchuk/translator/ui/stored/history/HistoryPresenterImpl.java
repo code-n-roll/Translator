@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by roman on 29.6.17.
- */
 
 public class HistoryPresenterImpl implements HistoryContract.HistoryPresenter,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,

@@ -10,10 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 
-/**
- * Created by roman on 17.4.17.
- */
-
 public class UIUtils {
     public static void updateUIFragment(final FragmentManager fm,
                                         final String fragmentTag){

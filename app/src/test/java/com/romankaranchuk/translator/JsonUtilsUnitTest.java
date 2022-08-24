@@ -1,5 +1,9 @@
 package com.romankaranchuk.translator;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
 
 import com.google.gson.Gson;
@@ -15,13 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
-
-/**
- * Created by roman on 27.6.17.
- */
 
 @RunWith(MockitoJUnitRunner.class)
 public class JsonUtilsUnitTest {

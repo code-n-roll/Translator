@@ -1,13 +1,9 @@
 package com.romankaranchuk.translator.data.network
 
 import com.romankaranchuk.translator.data.database.model.DictDefinition
-import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-/**
- * Created by roman on 17.6.17.
- */
 interface YandexDictionaryApi {
 
     @GET("api/v1/dicservice.json/lookup?")

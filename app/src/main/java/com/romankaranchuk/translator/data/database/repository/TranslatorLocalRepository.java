@@ -18,9 +18,6 @@ import java.util.List;
 
 import timber.log.Timber;
 
-/**
- * Created by roman on 9.4.17.
- */
 
 public class TranslatorLocalRepository implements TranslatorRepository {
 

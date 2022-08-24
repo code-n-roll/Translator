@@ -53,7 +53,6 @@
     </androidx.appcompat.widget.Toolbar>
 
     <include
-        android:id="@+id/container_edittext"
         layout="@layout/layout_translation_input" />
 
     <include layout="@layout/layout_translation_result" />

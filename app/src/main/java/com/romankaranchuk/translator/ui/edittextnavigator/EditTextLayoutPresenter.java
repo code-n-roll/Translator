@@ -3,9 +3,6 @@ package com.romankaranchuk.translator.ui.edittextnavigator;
 import com.romankaranchuk.translator.data.database.model.TranslatedItem;
 import com.romankaranchuk.translator.ui.base.BasePresenter;
 
-/**
- * Created by roman on 28.6.17.
- */
 
 public interface EditTextLayoutPresenter extends BasePresenter {
 

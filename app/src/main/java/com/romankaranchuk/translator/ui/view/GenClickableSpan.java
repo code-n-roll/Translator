@@ -8,9 +8,6 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Toast;
 
-/**
- * Created by roman on 23.6.17.
- */
 
 public class GenClickableSpan extends ClickableSpan {
     private Context mContext;

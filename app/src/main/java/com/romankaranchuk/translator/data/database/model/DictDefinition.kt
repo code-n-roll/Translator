@@ -5,9 +5,6 @@ import com.google.gson.annotations.SerializedName
 import com.romankaranchuk.translator.data.database.model.Translation
 import java.util.ArrayList
 
-/**
- * Created by roman on 19.4.17.
- */
 class DictDefinition(
     var text: String,
     var transcription: String,

@@ -15,9 +15,6 @@ import androidx.core.content.ContextCompat;
 
 import com.romankaranchuk.translator.R;
 
-/**
- * Created by roman on 18.6.17.
- */
 
 public class TextGenLayout extends LinearLayout {
     private TextView mTextTextView;

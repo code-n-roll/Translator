@@ -6,7 +6,6 @@
     android:orientation="horizontal">
 
     <com.romankaranchuk.translator.ui.view.EditTextLayout
-        android:id="@+id/container_edittext"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_margin="10dp"

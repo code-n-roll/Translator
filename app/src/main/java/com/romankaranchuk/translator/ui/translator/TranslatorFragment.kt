@@ -28,7 +28,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
@@ -46,16 +48,15 @@ import com.romankaranchuk.translator.ui.view.CustomEditText
 import com.romankaranchuk.translator.utils.UIUtils
 import com.romankaranchuk.translator.utils.extensions.bind
 import com.romankaranchuk.translator.utils.network.ContentResult
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.xmlpull.v1.XmlPullParserException
-import ru.yandex.speechkit.Language
+//import ru.yandex.speechkit.Language
 import timber.log.Timber
 import java.io.IOException
 import java.util.ArrayList
 import javax.inject.Inject
 
-/**
- * Created by roman on 8.4.17.
- */
 
 class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.View {
 
@@ -80,7 +81,6 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     val mTranslateRecyclerView: RecyclerView by bind(R.id.container_dict_defin)
     val mCustomEditText: CustomEditText by bind(R.id.edittext)
     val mTranslatedResult: TextView by bind(R.id.textview_translate_result)
-    private val mContainerEditText: RelativeLayout by bind(R.id.container_edittext)
     private val mContainerSuccess: RelativeLayout by bind(R.id.connection_successful_content)
     private val mContainerError: LinearLayout by bind(R.id.connection_error_content)
 
@@ -113,7 +113,6 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
 //    private lateinit var mNavigation: AHBottomNavigation
     private lateinit var mRepository: TranslatorRepositoryImpl
-    private lateinit var customEditText: CustomEditText
 
     @Inject lateinit var textDataStorage: TextDataStorage
     @Inject lateinit var translatorRepository: TranslatorRepository
@@ -135,7 +134,6 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
 //        findViewsOnActivity()
         findViewsOnActionBar()
-        findViewsOnContainerEditText()
 
         setupRecycler()
         initCustomEditText()
@@ -150,7 +148,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         bindViewModel()
         viewModel.loadTranslations()
 
-//        val localDataSource = TranslatorLocalRepository.getInstance(context!!)
+//        val localDataSource = TranslatorLocalRepository.getInstance(requireContext())
 //        mRepository = TranslatorRepositoryImpl.getInstance(localDataSource)
 //
 //        UIUtils.changeSoftInputModeWithOrientation(activity!!)
@@ -215,7 +213,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     override fun isRecordAudioGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
-            context!!,
+            requireContext(),
             Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
     }
@@ -295,10 +293,6 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             mButtonSrcLang!!.text = it.getString(SRC_LANG, title)
             mButtonTrgLang!!.text = it.getString(TRG_LANG, title)
         }
-    }
-
-    private fun findViewsOnContainerEditText() {
-        customEditText = mContainerEditText.findViewById(R.id.edittext)
     }
 
     override fun requestRecordAudioPermissions() {
@@ -588,9 +582,8 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                     val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
                     val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
                     val inputText = mCustomEditText.getText().toString()
-                    viewModel.translate(
-                        sourceLang, targetLang, inputText
-                    )
+                    viewModel.translate(sourceLang, targetLang, inputText)
+                    viewModel.loadDefinition(inputText, sourceLang, targetLang)
                 }
             }
             TRG_LANG_ACTIVITY_REQUEST_CODE -> if (resultCode == AppCompatActivity.RESULT_OK) {
@@ -607,9 +600,8 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                     val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
                     val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
                     val inputText = mCustomEditText.getText().toString()
-                    viewModel.translate(
-                        sourceLang, targetLang, inputText
-                    )
+                    viewModel.translate(sourceLang, targetLang, inputText)
+                    viewModel.loadDefinition(inputText, sourceLang, targetLang)
                 }
             }
             else -> {
@@ -700,7 +692,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun showActiveBorderInput() {
         try {
-            customEditText.background = ContextCompat.getDrawable(
+            mCustomEditText.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.selector_edittext_border_active
             )
@@ -713,7 +705,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun hideActiveBorderInput() {
         try {
-            customEditText.background = ContextCompat.getDrawable(
+            mCustomEditText.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.selector_edittext_border
             )
@@ -726,7 +718,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun showActiveRecognizerInput() {
         try {
-            customEditText.background = ContextCompat.getDrawable(
+            mCustomEditText.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.selector_edittext_recognizer_active
             )
@@ -868,12 +860,12 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             showLoadingSourceVoice()
             hideIconSourceVoice()
 
-            viewModel.vocalizeText(
-                text = mCustomEditText.text.toString(),
-                language = Language.ENGLISH
-            )
+//            viewModel.vocalizeText(
+//                text = mCustomEditText.text.toString(),
+//                language = Language.ENGLISH
+//            )
         } else {
-            UIUtils.showToast(context, context!!.resources.getString(R.string.try_to_get_photo))
+            UIUtils.showToast(context, requireContext().resources.getString(R.string.try_to_get_photo))
         }
     }
 
@@ -919,19 +911,19 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         //         }
         //        mRepository.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item);
         //        UIUtils.showToast(mContext, "set favorite was clicked");
-        UIUtils.showToast(context, context!!.resources.getString(R.string.set_favorite_message))
+        UIUtils.showToast(context, requireContext().resources.getString(R.string.set_favorite_message))
     }
 
 
     private fun clickOnShareButton() {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/plain"
-        intent.putExtra(Intent.EXTRA_SUBJECT, context!!.resources.getString(R.string.share_subject))
+        intent.putExtra(Intent.EXTRA_SUBJECT, requireContext().resources.getString(R.string.share_subject))
         intent.putExtra(Intent.EXTRA_TEXT, getTextTranslatedResultView())
         startActivity(
             Intent.createChooser(
                 intent,
-                context!!.resources.getString(R.string.chooser_title)
+                requireContext().resources.getString(R.string.chooser_title)
             )
         )
     }
@@ -954,14 +946,14 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             hideIconTargetVoice()
 
 
-            viewModel.vocalizeText(
-                text = mTranslatedResult.text.toString(),
-                language = Language.RUSSIAN
-            )
+//            viewModel.vocalizeText(
+//                text = mTranslatedResult.text.toString(),
+//                language = Language.RUSSIAN
+//            )
         } else {
             UIUtils.showToast(
                 context,
-                context!!.resources.getString(R.string.try_vocalize_empty_result)
+                requireContext().resources.getString(R.string.try_vocalize_empty_result)
             )
         }
     }
@@ -993,6 +985,13 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     private fun bindViewModel() {
+//        lifecycleScope.launch {
+//            repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                viewModel.viewState.collect {
+//
+//                }
+//            }
+//        }
         viewModel.translationsLiveData.observe(viewLifecycleOwner) {
             adapter?.updateAll(it.first, it.second)
         }
@@ -1011,15 +1010,6 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                     mTranslatedResult.text = it.content.text?.get(0)
                     showLoadingDictionary()
                     hideSuccess()
-
-                    val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
-                    val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
-                    val inputText = mCustomEditText.getText().toString()
-                    viewModel.loadDefinition(
-                        inputText = inputText,
-                        sourceLang = sourceLang,
-                        targetLang = targetLang
-                    )
                 }
             }
         }

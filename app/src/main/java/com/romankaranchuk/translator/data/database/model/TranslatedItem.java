@@ -4,10 +4,6 @@ import com.google.gson.Gson;
 
 import java.util.UUID;
 
-/**
- * Created by roman on 9.4.17.
- */
-
 public class TranslatedItem {
     private String mId;
     private String mSrcLanguageForAPI;

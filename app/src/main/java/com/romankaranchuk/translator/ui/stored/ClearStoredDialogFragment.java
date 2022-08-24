@@ -9,9 +9,6 @@ import androidx.fragment.app.DialogFragment;
 
 import com.romankaranchuk.translator.R;
 
-/**
- * Created by roman on 14.4.17.
- */
 
 public class ClearStoredDialogFragment extends DialogFragment {
     private ClearStoredDialogListener mListener;

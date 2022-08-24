@@ -7,9 +7,6 @@ import android.view.KeyEvent;
 
 import androidx.appcompat.widget.AppCompatEditText;
 
-/**
- * Created by roman on 9.4.17.
- */
 
 public class CustomEditText extends AppCompatEditText {
     public CustomEditText(Context context){

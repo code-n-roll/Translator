@@ -2,10 +2,6 @@ package com.romankaranchuk.translator.common;
 
 import com.romankaranchuk.translator.BuildConfig;
 
-/**
- * Created by roman on 16.6.17.
- */
-
 public class Constants {
     public static final String TRANSLATED_RESULT = "translated_result";
     public static final String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT";

@@ -22,9 +22,6 @@ import com.romankaranchuk.translator.data.database.model.TranslatedItem
 import com.romankaranchuk.translator.ui.stored.StoredFragment
 import com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
 
-/**
- * Created by roman on 9.4.17.
- */
 class HistoryFragment : Fragment(), HistoryContract.HistoryView, SearchView.OnQueryTextListener {
 
     private var mEmptyView: View? = null

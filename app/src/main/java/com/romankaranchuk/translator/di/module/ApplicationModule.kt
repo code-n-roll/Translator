@@ -71,15 +71,15 @@ class ApplicationModule(private val application: TranslatorApplication) {
         )
     }
 
-    @Singleton
-    @Provides
-    fun provideVocalizer(): Vocalizer {
-        return VocalizerImpl()
-    }
-
-    @Singleton
-    @Provides
-    fun provideRecognizer(): Recognizer {
-        return RecognizerImpl()
-    }
+//    @Singleton
+//    @Provides
+//    fun provideVocalizer(): Vocalizer {
+//        return VocalizerImpl()
+//    }
+//
+//    @Singleton
+//    @Provides
+//    fun provideRecognizer(): Recognizer {
+//        return RecognizerImpl()
+//    }
 }

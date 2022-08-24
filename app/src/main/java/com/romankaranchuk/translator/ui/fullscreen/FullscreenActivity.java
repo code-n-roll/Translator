@@ -9,9 +9,6 @@ import android.widget.TextView;
 import com.romankaranchuk.translator.common.Constants;
 import com.romankaranchuk.translator.R;
 
-/**
- * Created by roman on 13.4.17.
- */
 
 public class FullscreenActivity extends AppCompatActivity{
     @Override

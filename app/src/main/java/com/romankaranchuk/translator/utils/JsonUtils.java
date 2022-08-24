@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by roman on 18.4.17.
- */
 
 public class JsonUtils {
     public static JsonObject getJsonObjectFromAssetsFile(Context context, Gson gson, String filename){

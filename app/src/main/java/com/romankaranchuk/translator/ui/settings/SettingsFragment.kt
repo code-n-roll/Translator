@@ -10,9 +10,6 @@ import android.view.ViewGroup
 
 import com.romankaranchuk.translator.R
 
-/**
- * Created by roman on 8.4.17.
- */
 
 class SettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,

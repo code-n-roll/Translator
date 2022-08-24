@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.romankaranchuk.translator.common.Constants
-import com.romankaranchuk.translator.common.Recognizer
-import com.romankaranchuk.translator.common.Vocalizer
+//import com.romankaranchuk.translator.common.Recognizer
+//import com.romankaranchuk.translator.common.Vocalizer
 import com.romankaranchuk.translator.data.database.TablePersistenceContract.*
 import com.romankaranchuk.translator.data.database.model.*
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
@@ -20,7 +20,9 @@ import com.romankaranchuk.translator.ui.base.launchOnIO
 import com.romankaranchuk.translator.ui.base.switchToUi
 import com.romankaranchuk.translator.utils.JsonUtils
 import com.romankaranchuk.translator.utils.network.ContentResult
-import ru.yandex.speechkit.Language
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+//import ru.yandex.speechkit.Language
 import timber.log.Timber
 import java.util.HashMap
 import javax.inject.Inject
@@ -33,14 +35,16 @@ class TranslatorViewModel @Inject constructor(
     private val translateRepository: TranslateRepository,
     private val dictionaryRepository: DictionaryRepository,
     private val translatorRepository: TranslatorRepository,
-    private val vocalizer: Vocalizer,
-    private val recognizer: Recognizer,
+//    private val vocalizer: Vocalizer,
+//    private val recognizer: Recognizer,
     private val textDataStorage: TextDataStorage
 ) : BaseViewModel(), HistoryTranslatedItemsRepositoryObserver {
 
     val translationsLiveData = MutableLiveData<Pair<List<Translation>, List<PartOfSpeech>>>()
     val translateLiveData = MutableLiveData<ContentResult<TranslationResponse>>()
     val definitionLiveData = MutableLiveData<ContentResult<DictDefinition>>()
+    private val _viewState = MutableSharedFlow<ViewState>()
+    val viewState = _viewState.asSharedFlow()
 
     var translation: String? = null
 
@@ -158,20 +162,20 @@ class TranslatorViewModel @Inject constructor(
         language: Language
     ) {
         if (!text.isEmpty()) {
-            vocalizer.reset()
-            vocalizer.init(language)
-            vocalizer.vocalize(text)
+//            vocalizer.reset()
+//            vocalizer.init(language)
+//            vocalizer.vocalize(text)
         }
     }
 
     fun startRecognizeText() {
-        recognizer.reset()
-        recognizer.init(Language.ENGLISH)
-        recognizer.recognize()
+//        recognizer.reset()
+//        recognizer.init(Language.ENGLISH)
+//        recognizer.recognize()
     }
 
     fun stopRecognizeText() {
-        recognizer.reset()
+//        recognizer.reset()
     }
 
     private fun saveToRepository(
@@ -277,5 +281,15 @@ class TranslatorViewModel @Inject constructor(
         super.onCleared()
 
         translatorRepository.removeHistoryContentObserver(this)
+    }
+
+    sealed class ViewState {
+        class TranslateSuccess() : ViewState()
+        class TranslateError() : ViewState()
+        class TranslateLoading() : ViewState()
+
+        class DictionarySuccess() : ViewState()
+        class DictionaryError() : ViewState()
+        class DictionaryLoading() : ViewState()
     }
 }

@@ -13,9 +13,6 @@ import com.romankaranchuk.translator.data.database.model.Translation
 import com.romankaranchuk.translator.ui.view.CustomSynonyms
 import com.romankaranchuk.translator.ui.view.TextGenLayout
 
-/**
- * Created by roman on 11.4.17.
- */
 class TranslatorRecyclerAdapter(
     private val mOnItemClickListener: (View, String) -> Unit
 ) : RecyclerView.Adapter<TranslatorRecyclerAdapter.ViewHolder>() {

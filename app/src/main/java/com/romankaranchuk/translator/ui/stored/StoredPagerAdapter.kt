@@ -5,10 +5,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import java.util.*
 
-/**
- * Created by roman on 9.4.17.
- */
-
 class StoredPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
     private val fragments = ArrayList<Fragment>()
     private val fragmentTitles = ArrayList<String>()

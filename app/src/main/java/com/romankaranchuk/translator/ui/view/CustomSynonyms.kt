@@ -13,10 +13,7 @@ import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.data.database.model.Translation
 import timber.log.Timber
 
-/**
- * need to add gen to string before setSpan!!!
- * Created by roman on 23.6.17.
- */
+// TODO() need to add gen to string before setSpan
 class CustomSynonyms(private val mContext: Context, private val mTranslation: Translation) {
     private val mSpanTextListener: ClickableSpan? = null
     private val mSpanGenListener: ClickableSpan

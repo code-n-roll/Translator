@@ -14,9 +14,6 @@ import com.romankaranchuk.translator.utils.UIUtils
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
-/**
- * Created by roman on 10.4.17.
- */
 class SelectLanguageActivity : AppCompatActivity(R.layout.activity_select_language) {
 
     private var sourceLanguageRecycler: RecyclerView? = null

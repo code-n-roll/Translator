@@ -11,9 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.data.database.model.Language
 
-/**
- * Created by roman on 11.4.17.
- */
 class SelectLanguageRecyclerAdapter(
     private val itemClickListener: (Language) -> Unit
 ) : RecyclerView.Adapter<SelectLanguageRecyclerAdapter.ViewHolder>() {

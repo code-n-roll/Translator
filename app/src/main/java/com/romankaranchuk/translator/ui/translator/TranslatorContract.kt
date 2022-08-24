@@ -2,9 +2,6 @@ package com.romankaranchuk.translator.ui.translator
 
 import com.romankaranchuk.translator.data.database.model.TranslatedItem
 
-/**
- * Created by roman on 11.12.17.
- */
 interface TranslatorContract {
 
     interface View {

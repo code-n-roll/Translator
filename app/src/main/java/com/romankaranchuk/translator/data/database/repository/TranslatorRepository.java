@@ -8,9 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/**
- * Created by roman on 9.4.17.
- */
 
 public interface TranslatorRepository {
     boolean saveTranslatedItem(@NonNull final String tableName,

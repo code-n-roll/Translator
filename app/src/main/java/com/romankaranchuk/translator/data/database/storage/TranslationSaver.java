@@ -16,9 +16,6 @@ import com.romankaranchuk.translator.utils.JsonUtils;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by roman on 22.6.17.
- */
 
 public class TranslationSaver implements Runnable {
     private TranslatedItem mCurTranslatedItem;

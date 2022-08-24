@@ -4,9 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Created by roman on 17.6.17.
- */
 
 public class TranslationResponse {
     @SerializedName("text")

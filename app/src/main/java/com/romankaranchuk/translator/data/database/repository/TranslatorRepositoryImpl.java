@@ -12,9 +12,6 @@ import java.util.Map;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkNotNull;
 
-/**
- * Created by roman on 9.4.17.
- */
 
 public class TranslatorRepositoryImpl implements TranslatorRepository {
     private static TranslatorRepositoryImpl INSTANCE = null;

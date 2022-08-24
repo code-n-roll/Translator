@@ -2,9 +2,6 @@ package com.romankaranchuk.translator.data.database.model
 
 import java.util.Objects
 
-/**
- * Created by roman on 18.4.17.
- */
 data class Language(
     var name: String,
     var abbr: String,

@@ -9,9 +9,6 @@ import com.romankaranchuk.translator.common.Constants;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by roman on 22.6.17.
- */
 
 public class TextDataStorageImpl implements TextDataStorage {
     private SharedPreferences mSettings;

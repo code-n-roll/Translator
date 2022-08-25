@@ -71,6 +71,11 @@ class ApplicationModule(private val application: TranslatorApplication) {
         )
     }
 
+    @Provides
+    fun provideEnvironmentHolder(): EnvironmentHolder {
+        return EnvironmentHolder
+    }
+
 //    @Singleton
 //    @Provides
 //    fun provideVocalizer(): Vocalizer {

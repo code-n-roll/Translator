@@ -1,7 +1,5 @@
 package com.romankaranchuk.translator.common;
 
-import com.romankaranchuk.translator.BuildConfig;
-
 public class Constants {
     public static final String TRANSLATED_RESULT = "translated_result";
     public static final String TRANSLATOR_FRAGMENT = "TRANSLATOR_FRAGMENT";
@@ -20,8 +18,6 @@ public class Constants {
     public static final String CONT_ERROR_VISIBILITY = "CONT_ERROR_VISIBILITY";
     public static final String PROGRESS_BAR_VISIBILITY = "PROGRESS_BAR_VISIBILITY";
     public static final String IS_FAVORITE ="SetFavorite";
-    public static final String TRANSLATOR_API_KEY = BuildConfig.YANDEX_TRANSLATE_API_KEY_PROD;
-    public static final String DICTIONARY_API_KEY = BuildConfig.YANDEX_DICTIONARY_API_KEY_PROD;
     // TODO() migrate on AWS or GC
     public static final String SPEECH_KIT_API_KEY = "dcc7627a-2eab-47ba-bf1e-be47ec22bc3c";
     public static final String CUR_DICT_DEFINITION = "curDictDefinition";

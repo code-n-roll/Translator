@@ -7,7 +7,7 @@ import retrofit2.http.Query
 interface YandexDictionaryApi {
 
     @GET("api/v1/dicservice.json/lookup?")
-    suspend fun getValueFromDictionaryCoroutine(
+    suspend fun getDictDefinition(
         @Query("key") key: String,
         @Query("text") text: String,
         @Query("lang") lang: String

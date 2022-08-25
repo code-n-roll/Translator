@@ -109,7 +109,6 @@ class TranslatorViewModel @Inject constructor(
             val translation: TranslationResponse
             try {
                 translation = translateRepository.getTranslation(
-                    Constants.TRANSLATOR_API_KEY,
                     inputText,
                     mTranslationDirection
                 )
@@ -134,8 +133,7 @@ class TranslatorViewModel @Inject constructor(
         val dictDefinition: DictDefinition?
         val langs = JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
         try {
-            dictDefinition = dictionaryRepository.getValueFromDictionary(
-                Constants.DICTIONARY_API_KEY,
+            dictDefinition = dictionaryRepository.getDictDefinition(
                 inputText,
                 "${langs[sourceLang].asString}-${langs[targetLang].asString}"
             )

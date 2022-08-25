@@ -4,14 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.romankaranchuk.translator.common.Constants;
 import com.romankaranchuk.translator.data.database.TablePersistenceContract;
 import com.romankaranchuk.translator.data.database.model.TranslatedItem;
 import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository;
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepository;
-import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl;
-import com.romankaranchuk.translator.utils.JsonUtils;
+import com.romankaranchuk.translator.data.datasource.LanguagesDataSource;
 
 import java.util.List;
 import java.util.Map;
@@ -20,22 +18,19 @@ import java.util.Map;
 public class TranslationSaver implements Runnable {
     private TranslatedItem mCurTranslatedItem;
     private Map<String, Object> mSavedData;
-    private JsonObject mLanguagesMap;
-    private TranslatorRepositoryImpl mRepository;
+    private TranslatorRepository mRepository;
     private List<TranslatedItem> mHistoryTranslatedItems;
     private Gson mGson;
+    private Context context;
+    private LanguagesDataSource languagesDataSource;
 
-    public TranslationSaver(Context context, Gson gson) {
+    public TranslationSaver(Context context, Gson gson, SharedPreferences sharedPreferences, LanguagesDataSource languagesDataSource, TranslatorLocalRepository translatorLocalRepository) {
         mGson = gson;
-        mLanguagesMap = JsonUtils.getJsonObjectFromAssetsFile(context, mGson, Constants.LANGS_FILE_NAME);
-
-        SharedPreferences settings = context.getSharedPreferences(Constants.PREFS_NAME, 0);
-        mCurTranslatedItem = mGson.fromJson(settings.getString(Constants.CUR_TRANSLATED_ITEM, ""), TranslatedItem.class);
-
-        TranslatorRepository localDataSource = TranslatorLocalRepository.getInstance(context);
-        mRepository = TranslatorRepositoryImpl.getInstance(localDataSource);
-        mHistoryTranslatedItems = mRepository.getTranslatedItems(
-                TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
+        this.context = context;
+        mCurTranslatedItem = mGson.fromJson(sharedPreferences.getString(Constants.CUR_TRANSLATED_ITEM, ""), TranslatedItem.class);
+        this.languagesDataSource = languagesDataSource;
+        mRepository = translatorLocalRepository;
+        mHistoryTranslatedItems = mRepository.getTranslatedItems(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
     }
 
     public TranslatedItem getCurTranslatedItem() {
@@ -53,9 +48,12 @@ public class TranslationSaver implements Runnable {
 
     @Override
     public void run() {
+        String sourceLang = ((String) mSavedData.get(Constants.SRC_LANG)).toLowerCase();
+        String targetLang = ((String) mSavedData.get(Constants.TRG_LANG)).toLowerCase();
+        List<String> mLanguagesMap = languagesDataSource.getLanguagesFromJson(Constants.LANGS_FILE_NAME, sourceLang, targetLang);
         mCurTranslatedItem = new TranslatedItem(
-                mLanguagesMap.get(((String) mSavedData.get(Constants.SRC_LANG)).toLowerCase()).getAsString(),
-                mLanguagesMap.get(((String) mSavedData.get(Constants.TRG_LANG)).toLowerCase()).getAsString(),
+                mLanguagesMap.get(0),
+                mLanguagesMap.get(1),
                 (String) mSavedData.get(Constants.SRC_LANG),
                 (String) mSavedData.get(Constants.TRG_LANG),
                 (String) mSavedData.get(Constants.EDITTEXT_DATA),

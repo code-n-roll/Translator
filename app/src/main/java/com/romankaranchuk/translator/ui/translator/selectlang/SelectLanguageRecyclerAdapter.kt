@@ -74,9 +74,7 @@ class SelectLanguageRecyclerAdapter(
         fun setSelected(isSelected: Boolean) {
             if (isSelected) {
                 mIsSelected.visibility = View.VISIBLE
-                itemView.setBackgroundColor(
-                    ContextCompat.getColor(context, R.color.colorSelectedItem)
-                )
+                itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.colorSelectedItem))
             } else {
                 mIsSelected.visibility = View.INVISIBLE
                 itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white))

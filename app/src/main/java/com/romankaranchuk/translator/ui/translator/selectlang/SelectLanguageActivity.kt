@@ -10,29 +10,39 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
+import com.romankaranchuk.translator.databinding.ActivitySelectLanguageBinding
 import com.romankaranchuk.translator.utils.UIUtils
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
-class SelectLanguageActivity : AppCompatActivity(R.layout.activity_select_language) {
+class SelectLanguageActivity : AppCompatActivity() {
 
-    private var sourceLanguageRecycler: RecyclerView? = null
     private var adapter: SelectLanguageRecyclerAdapter? = null
-    private var isSource = false
 
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel by viewModels<SelectLanguageViewModel> { viewModelFactory }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        inject()
-        super.onCreate(savedInstanceState)
+    private var _binding: ActivitySelectLanguageBinding? = null
+    private val binding get() = _binding!!
 
-        isSource = intent.getStringExtra("TYPE") == "SOURCE"
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
+        super.onCreate(savedInstanceState)
+        _binding = ActivitySelectLanguageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         setupToolbar()
         setupRecycler()
 
         bindViewModel()
-        viewModel.loadLanguages(isSource)
+
+        lifecycle.addObserver(viewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        lifecycle.removeObserver(viewModel)
     }
 
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
@@ -43,42 +53,44 @@ class SelectLanguageActivity : AppCompatActivity(R.layout.activity_select_langua
     }
 
     private fun bindViewModel() {
-        viewModel.languagesLiveData.observe(this) {
-            adapter?.updateAll(it.first, it.second)
+        viewModel.viewState.observe(this) { viewState ->
+            when (viewState) {
+                is SelectLanguageViewModel.ViewState.ShowLanguageSelected -> {
+                    UIUtils.showToast(applicationContext, "selected ${viewState.language}")
+                    setResult(RESULT_OK, Intent().apply {
+                        putExtra("result", viewState.language.name)
+                    })
+                    finish()
+                }
+                is SelectLanguageViewModel.ViewState.ShowLanguages -> {
+                    adapter?.updateAll(viewState.languages, viewState.selectedId)
+                }
+            }
         }
     }
 
     private fun setupRecycler() {
-        sourceLanguageRecycler = findViewById(R.id.recyclerview_src_lang)
-        sourceLanguageRecycler?.layoutManager = LinearLayoutManager(this)
-        sourceLanguageRecycler?.addItemDecoration(DividerItemDecoration(this, RecyclerView.VERTICAL))
-        adapter = SelectLanguageRecyclerAdapter(
-            itemClickListener = { language ->
-                viewModel.saveSelectedLanguage(isSource, language)
-
-                UIUtils.showToast(applicationContext, "selected $language")
-                setResult(RESULT_OK, Intent().apply {
-                    putExtra("result", language.name)
-                })
-                finish()
-            }
-        )
-        sourceLanguageRecycler?.adapter = adapter
+        with(binding.recyclerviewSrcLang) {
+            layoutManager = LinearLayoutManager(this@SelectLanguageActivity)
+            addItemDecoration(DividerItemDecoration(this@SelectLanguageActivity, RecyclerView.VERTICAL))
+            this@SelectLanguageActivity.adapter = SelectLanguageRecyclerAdapter(
+                itemClickListener = { language ->
+                    viewModel.onLanguageItemClick(language)
+                }
+            )
+            adapter = this@SelectLanguageActivity.adapter
+        }
     }
 
     private fun setupToolbar() {
         val actionBar = supportActionBar
         if (actionBar != null) {
-            actionBar.title = if (isSource) {
+            actionBar.title = if (viewModel.isSource) {
                 resources.getString(R.string.title_source_lang)
             } else {
                 resources.getString(R.string.title_target_lang)
             }
             actionBar.setDisplayHomeAsUpEnabled(true)
         }
-    }
-
-    private fun inject() {
-        AndroidInjection.inject(this)
     }
 }

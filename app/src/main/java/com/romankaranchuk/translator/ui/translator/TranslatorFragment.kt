@@ -539,7 +539,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 //                        mButtonTrgLang.setText(result);
                 //                        binding.layoutTranslationInput?.edittext?.setText(binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.getText());
 
-                //                        JsonObject languagesMap = JsonUtils.getJsonObjectFromAssetsFile(getContext(), "langs.json");
+                //                        JsonObject languagesMap = JsonUtils.getJsonObjectFromAssetsFile(getContext(), Constants.LANGS_FILE_NAME);
                 //
                 //                        String srcLangAPI = languagesMap.get(mButtonSrcLang.getText().toString().toLowerCase()).getAsString();
                 //                        String trgLangAPI = languagesMap.get(mButtonTrgLang.getText().toString().toLowerCase()).getAsString();

@@ -11,6 +11,7 @@ import com.romankaranchuk.translator.data.database.repository.TranslatorReposito
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
 import com.romankaranchuk.translator.data.database.storage.TextDataStorageImpl
 import com.romankaranchuk.translator.data.database.storage.TranslationSaver
+import com.romankaranchuk.translator.data.datasource.LanguagesDataSource
 import com.romankaranchuk.translator.ui.stored.history.HistoryContract
 import com.romankaranchuk.translator.ui.stored.history.HistoryPresenterImpl
 import dagger.Module
@@ -34,18 +35,32 @@ class ApplicationModule(private val application: TranslatorApplication) {
 
     @Singleton
     @Provides
-    fun provideTextDataStorage(context: Context, gson: Gson): TextDataStorage {
+    fun provideTextDataStorage(
+        context: Context,
+        gson: Gson,
+        sharedPreferences: SharedPreferences,
+        languagesDataSource: LanguagesDataSource,
+        translatorLocalRepository: TranslatorLocalRepository
+    ): TextDataStorage {
         return TextDataStorageImpl(
             context,
-            gson
+            gson,
+            sharedPreferences,
+            languagesDataSource,
+            translatorLocalRepository
         )
     }
 
     @Singleton
     @Provides
-    fun provideTranslatorRepository(context: Context): TranslatorRepository {
-        return TranslatorRepositoryImpl.getInstance(
-            TranslatorLocalRepository.getInstance(context))
+    fun provideTranslatorLocalRepository(context: Context): TranslatorLocalRepository {
+        return TranslatorLocalRepository.getInstance(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTranslatorRepository(translatorLocalRepository: TranslatorLocalRepository): TranslatorRepository {
+        return TranslatorRepositoryImpl.getInstance(translatorLocalRepository)
     }
 
     @Singleton
@@ -57,18 +72,19 @@ class ApplicationModule(private val application: TranslatorApplication) {
     @Singleton
     @Provides
     fun provideHistoryPresenter(context: Context): HistoryContract.HistoryPresenter {
-        return HistoryPresenterImpl(
-            context
-        )
+        return HistoryPresenterImpl(context)
     }
 
     @Singleton
     @Provides
-    fun provideTranslationSaver(context: Context, gson: Gson): TranslationSaver {
-        return TranslationSaver(
-            context,
-            gson
-        )
+    fun provideTranslationSaver(
+        context: Context,
+        gson: Gson,
+        languagesDataSource: LanguagesDataSource,
+        sharedPreferences: SharedPreferences,
+        translatorLocalRepository: TranslatorLocalRepository
+    ): TranslationSaver {
+        return TranslationSaver(context, gson, sharedPreferences, languagesDataSource, translatorLocalRepository)
     }
 
     @Provides

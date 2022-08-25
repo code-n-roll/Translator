@@ -13,12 +13,12 @@ import com.romankaranchuk.translator.data.database.repository.TranslatorReposito
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
 import com.romankaranchuk.translator.data.database.storage.TranslationSaver
+import com.romankaranchuk.translator.data.datasource.LanguagesDataSource
 import com.romankaranchuk.translator.data.repository.DictionaryRepository
 import com.romankaranchuk.translator.data.repository.TranslateRepository
 import com.romankaranchuk.translator.ui.base.BaseViewModel
 import com.romankaranchuk.translator.ui.base.launchOnIO
 import com.romankaranchuk.translator.ui.base.switchToUi
-import com.romankaranchuk.translator.utils.JsonUtils
 import com.romankaranchuk.translator.utils.network.ContentResult
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -37,7 +37,8 @@ class TranslatorViewModel @Inject constructor(
     private val translatorRepository: TranslatorRepository,
 //    private val vocalizer: Vocalizer,
 //    private val recognizer: Recognizer,
-    private val textDataStorage: TextDataStorage
+    private val textDataStorage: TextDataStorage,
+    private val languagesDataSource: LanguagesDataSource
 ) : BaseViewModel(), HistoryTranslatedItemsRepositoryObserver {
 
     val translationsLiveData = MutableLiveData<Pair<List<Translation>, List<PartOfSpeech>>>()
@@ -97,14 +98,14 @@ class TranslatorViewModel @Inject constructor(
         targetLang: String,
         inputText: String
     ) = launchOnIO {
-        val langs = JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
+        val langs: List<String> = languagesDataSource.getLanguagesFromJson(Constants.LANGS_FILE_NAME, sourceLang, targetLang)
 
         val currentTranslatedItem = translationSaver.curTranslatedItem
         if (currentTranslatedItem != null && currentTranslatedItem.srcMeaning != inputText
             || currentTranslatedItem == null
         ) {
-            val srcLangAPI = langs[sourceLang].asString
-            val trgLangAPI = langs[targetLang].asString
+            val srcLangAPI = langs.get(0)
+            val trgLangAPI = langs.get(1)
             val mTranslationDirection = "$srcLangAPI-$trgLangAPI"
             val translation: TranslationResponse
             try {
@@ -131,11 +132,11 @@ class TranslatorViewModel @Inject constructor(
         targetLang: String
     ) = launchOnIO {
         val dictDefinition: DictDefinition?
-        val langs = JsonUtils.getJsonObjectFromAssetsFile(context, gson, "langs.json")
+        val langs = languagesDataSource.getLanguagesFromJson(Constants.LANGS_FILE_NAME, sourceLang, targetLang)
         try {
             dictDefinition = dictionaryRepository.getDictDefinition(
                 inputText,
-                "${langs[sourceLang].asString}-${langs[targetLang].asString}"
+                "${langs.get(0)}-${langs.get(1)}"
             )
 
             switchToUi {

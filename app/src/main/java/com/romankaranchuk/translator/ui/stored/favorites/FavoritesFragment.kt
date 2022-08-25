@@ -3,25 +3,25 @@ package com.romankaranchuk.translator.ui.stored.favorites
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageButton
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.SearchView
-import android.view.*
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.common.Constants.*
-import com.romankaranchuk.translator.utils.extensions.bind
 import com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry
 import com.romankaranchuk.translator.data.database.model.TranslatedItem
-import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository.*
+import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository.getInstance
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
+import com.romankaranchuk.translator.databinding.FragmentFavoritesBinding
 import com.romankaranchuk.translator.ui.stored.StoredRecyclerAdapter
 import com.romankaranchuk.translator.utils.ContentManager
-import java.util.*
 
 
 class FavoritesFragment : Fragment(),
@@ -29,16 +29,6 @@ class FavoritesFragment : Fragment(),
         TranslatorRepositoryImpl.FavoritesTranslatedItemsRepositoryObserver,
         TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver,
         ContentManager.TranslatedItemChanged {
-    private val mFavoritesRecycler: RecyclerView by bind(R.id.favorites_items_list)
-    private val mSearchViewFavorites: SearchView by bind(R.id.search_view_favorites)
-    private val mButtonIsFavorite: ImageButton by bind(R.id.imagebutton_isfavorite_favorite_item)
-    private val mEmptyView: View by bind(R.id.include_content_favorites_empty_item_list)
-    private val mContentView: View by bind(R.id.include_content_favorites_full_item_list)
-    private val mEmptySearchView: View by bind(R.id.include_content_favorites_empty_search)
-    private val mTextViewEmptyFavorites: TextView by bind(R.id.textview_empty_item_list)
-    private val mTextViewEmptySearch: TextView by bind(R.id.textview_empty_search)
-    private val mImageViewEmptyFavorites: ImageView by bind(R.id.imageview_empty_item_list)
-    private val mImageViewEmptySearch: ImageView by bind(R.id.imageview_empty_search)
 
     private var mLayoutManager: RecyclerView.LayoutManager? = null
     private var mClearStored: ImageButton? = null
@@ -51,20 +41,23 @@ class FavoritesFragment : Fragment(),
     private var mContentManager: ContentManager? = null
     private var mSettings: SharedPreferences? = null
 
+    private var _binding: FragmentFavoritesBinding? = null
+    private val binding get() = _binding!!
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mMainHandler = Handler(context!!.mainLooper)
-        mSettings = activity!!.getSharedPreferences(PREFS_NAME, 0)
+        mMainHandler = Handler(Looper.getMainLooper())
+        mSettings = requireActivity().getSharedPreferences(PREFS_NAME, 0)
 
         mView = view
-        val parentView = parentFragment!!.view
+        val parentView = requireParentFragment().view
         if (parentView != null) {
             mClearStored = parentView.findViewById(R.id.imagebutton_clear_stored)
         }
         mContentManager = ContentManager.getInstance()
 
-        val localDataSource = getInstance(context!!)
+        val localDataSource = getInstance(requireContext())
         mRepository = TranslatorRepositoryImpl.getInstance(localDataSource)
         mFavoritesTranslatedItems = mRepository!!.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES)
         mHistoryTranslatedItems = mRepository!!.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_HISTORY)
@@ -74,36 +67,35 @@ class FavoritesFragment : Fragment(),
         mCopyFavoritesTranslatedItems!!.reverse()
         mHistoryTranslatedItems!!.reverse()
 
-        mEmptySearchView.visibility = View.INVISIBLE
+        binding.includeContentFavoritesFullItemList.includeContentFavoritesEmptySearch.root.visibility = View.INVISIBLE
 
-        mTextViewEmptyFavorites.setText(R.string.empty_favorites)
-        mImageViewEmptyFavorites.setImageResource(R.drawable.bookmark_black_shape_light512)
+        binding.includeContentFavoritesEmptyItemList.textviewEmptyItemList.setText(R.string.empty_favorites)
+        binding.includeContentFavoritesEmptyItemList.imageviewEmptyItemList.setImageResource(R.drawable.bookmark_black_shape_light512)
 
-        mTextViewEmptySearch.setText(R.string.empty_search)
-        mImageViewEmptySearch.setImageResource(R.drawable.bookmark_black_shape_light512)
+        binding.includeContentFavoritesFullItemList.includeContentFavoritesEmptySearch.textviewEmptySearch.setText(R.string.empty_search)
+        binding.includeContentFavoritesFullItemList.includeContentFavoritesEmptySearch.imageviewEmptySearch.setImageResource(R.drawable.bookmark_black_shape_light512)
 
-        mLayoutManager =
-            LinearLayoutManager(mView!!.context)
-        mFavoritesRecycler.layoutManager = mLayoutManager
+        mLayoutManager = LinearLayoutManager(mView!!.context)
+        binding.includeContentFavoritesFullItemList.favoritesItemsList.layoutManager = mLayoutManager
 
-        mSearchViewFavorites.setIconifiedByDefault(false)
-        mSearchViewFavorites.queryHint = "Search in Favorites"
-        mSearchViewFavorites.setOnQueryTextListener(this)
-        mSearchViewFavorites.visibility = View.GONE
+        binding.includeContentFavoritesFullItemList.searchViewFavorites.setIconifiedByDefault(false)
+        binding.includeContentFavoritesFullItemList.searchViewFavorites.queryHint = "Search in Favorites"
+        binding.includeContentFavoritesFullItemList.searchViewFavorites.setOnQueryTextListener(this)
+        binding.includeContentFavoritesFullItemList.searchViewFavorites.visibility = View.GONE
 
-        val mDividerItemDecoration = DividerItemDecoration(mFavoritesRecycler.context, RecyclerView.VERTICAL)
-        mFavoritesRecycler.addItemDecoration(mDividerItemDecoration)
+        val mDividerItemDecoration = DividerItemDecoration(binding.includeContentFavoritesFullItemList.favoritesItemsList.context, RecyclerView.VERTICAL)
+        binding.includeContentFavoritesFullItemList.favoritesItemsList.addItemDecoration(mDividerItemDecoration)
 
 //        val navigation = activity!!.findViewById<AHBottomNavigation>(R.id.navigation)
 //        val translatorNavigationItem = navigation.findViewById<View>(R.id.navigation_translate)
 
-//        mFavoritesRecycler.adapter = StoredRecyclerAdapter(
+//        binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter = StoredRecyclerAdapter(
 //                mFavoritesTranslatedItems,
 //                { item -> clickOnItemStoredRecycler(item, translatorNavigationItem) },
 //                { item -> clickOnSetFavoriteItem(item) },
 //                UNIQUE_FAVORITES_FRAGMENT_ID)
 //
-        registerForContextMenu(mFavoritesRecycler)
+        registerForContextMenu(binding.includeContentFavoritesFullItemList.favoritesItemsList)
 
         chooseCurView()
     }
@@ -111,18 +103,19 @@ class FavoritesFragment : Fragment(),
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_favorites, container, false)
+        _binding = FragmentFavoritesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     private fun clickOnSetFavoriteItem(item: TranslatedItem) {
         if (item.isFavorite()) {
             item.isFavoriteUp(false)
             mRepository!!.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)
-            mFavoritesRecycler.adapter?.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
+            binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter?.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
         } else {
             item.isFavoriteUp(true)
             mRepository!!.saveTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)
-            mFavoritesRecycler.adapter?.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
+            binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter?.notifyItemChanged(mFavoritesTranslatedItems!!.indexOf(item))
         }
         mRepository!!.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item)
 
@@ -154,17 +147,17 @@ class FavoritesFragment : Fragment(),
 
     private fun chooseCurView() {
         if (!mFavoritesTranslatedItems!!.isEmpty()) {
-            mEmptyView.visibility = View.GONE
-            mContentView.visibility = View.VISIBLE
+            binding.includeContentFavoritesEmptyItemList.root.visibility = View.GONE
+            binding.includeContentFavoritesFullItemList.root.visibility = View.VISIBLE
         } else {
-            mEmptyView.visibility = View.VISIBLE
-            mContentView.visibility = View.GONE
+            binding.includeContentFavoritesEmptyItemList.root.visibility = View.VISIBLE
+            binding.includeContentFavoritesFullItemList.root.visibility = View.GONE
         }
     }
 
     override fun onStop() {
         super.onStop()
-        unregisterForContextMenu(mFavoritesRecycler)
+        unregisterForContextMenu(binding.includeContentFavoritesFullItemList.favoritesItemsList)
 
         mRepository!!.removeHistoryContentObserver(this)
         mRepository!!.removeFavoritesContentObserver(this)
@@ -187,7 +180,7 @@ class FavoritesFragment : Fragment(),
                 newList.add(item)
             }
         }
-        val adapter = mFavoritesRecycler.adapter as? StoredRecyclerAdapter
+        val adapter = binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter as? StoredRecyclerAdapter
         adapter?.setFilter(newList)
 
         chooseCurSearchView(newList)
@@ -196,11 +189,11 @@ class FavoritesFragment : Fragment(),
 
     private fun chooseCurSearchView(list: List<TranslatedItem>) {
         if (list.isEmpty()) {
-            mEmptySearchView.visibility = View.VISIBLE
-            mFavoritesRecycler.visibility = View.INVISIBLE
+            binding.includeContentFavoritesFullItemList.includeContentFavoritesEmptySearch.root.visibility = View.VISIBLE
+            binding.includeContentFavoritesFullItemList.favoritesItemsList.visibility = View.INVISIBLE
         } else {
-            mEmptySearchView.visibility = View.INVISIBLE
-            mFavoritesRecycler.visibility = View.VISIBLE
+            binding.includeContentFavoritesFullItemList.includeContentFavoritesEmptySearch.root.visibility = View.INVISIBLE
+            binding.includeContentFavoritesFullItemList.favoritesItemsList.visibility = View.VISIBLE
         }
     }
 
@@ -210,7 +203,7 @@ class FavoritesFragment : Fragment(),
             mCopyFavoritesTranslatedItems!!.addAll(mRepository!!.getTranslatedItems(TranslatedItemEntry.TABLE_NAME_FAVORITES))
             mCopyFavoritesTranslatedItems!!.reverse()
 
-            //            mFavoritesRecycler.getAdapter().notifyDataSetChanged();
+            //            binding.includeContentFavoritesFullItemList.favoritesItemsList.getAdapter().notifyDataSetChanged();
         }
     }
 
@@ -228,7 +221,7 @@ class FavoritesFragment : Fragment(),
             mFavoritesTranslatedItems!!.addAll(it)
         }
         chooseCurView()
-        mFavoritesRecycler.adapter?.notifyDataSetChanged()
+        binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter?.notifyDataSetChanged()
     }
 
 //    override fun onContextItemSelected(item: MenuItem?): Boolean {
@@ -256,13 +249,13 @@ class FavoritesFragment : Fragment(),
     }
 
     private fun performContextItemDeletion() {
-        val adapter = mFavoritesRecycler.adapter as StoredRecyclerAdapter
+        val adapter = binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter as StoredRecyclerAdapter
         val position = adapter.position
         val item = mFavoritesTranslatedItems!![position]
         mRepository!!.deleteTranslatedItem(TranslatedItemEntry.TABLE_NAME_FAVORITES, item)
         item.isFavoriteUp(false)
         mRepository!!.updateTranslatedItem(TranslatedItemEntry.TABLE_NAME_HISTORY, item)
         mFavoritesTranslatedItems!!.removeAt(position)
-        mFavoritesRecycler.adapter?.notifyItemRemoved(position)
+        binding.includeContentFavoritesFullItemList.favoritesItemsList.adapter?.notifyItemRemoved(position)
     }
 }

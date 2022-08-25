@@ -53,7 +53,10 @@
     </androidx.appcompat.widget.Toolbar>
 
     <include
+        android:id="@+id/layout_translation_input"
         layout="@layout/layout_translation_input" />
 
-    <include layout="@layout/layout_translation_result" />
+    <include
+        android:id="@+id/layout_translation_result"
+        layout="@layout/layout_translation_result" />
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.romankaranchuk.translator.ui.translator
 
+//import ru.yandex.speechkit.Language
 import android.Manifest
 import android.Manifest.permission
 import android.animation.Animator
@@ -21,18 +22,15 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.TranslatorApplication
 import com.romankaranchuk.translator.common.Constants.*
@@ -42,20 +40,15 @@ import com.romankaranchuk.translator.data.database.model.Translation
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
+import com.romankaranchuk.translator.databinding.FragmentTranslatorBinding
 import com.romankaranchuk.translator.di.util.Injectable
 import com.romankaranchuk.translator.ui.fullscreen.FullscreenActivity
 import com.romankaranchuk.translator.ui.translator.selectlang.SelectLanguageActivity
-import com.romankaranchuk.translator.ui.view.CustomEditText
 import com.romankaranchuk.translator.utils.UIUtils
-import com.romankaranchuk.translator.utils.extensions.bind
 import com.romankaranchuk.translator.utils.network.ContentResult
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import org.xmlpull.v1.XmlPullParserException
-//import ru.yandex.speechkit.Language
 import timber.log.Timber
 import java.io.IOException
-import java.util.ArrayList
 import javax.inject.Inject
 
 
@@ -66,30 +59,6 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         const val TRG_LANG_ACTIVITY_REQUEST_CODE = 2
         val TAG = TranslatorFragment::class.java.simpleName.toString()
     }
-
-    private val mButtonGetPhotoOrSourceVoice: ImageButton by bind(R.id.get_source_voice)
-    private val mButtonGetAudioSpelling: ImageButton by bind(R.id.get_audio_spelling)
-    private val mButtonGetTargetVoice: ImageButton by bind(R.id.get_target_voice)
-    private val mButtonSetFavorite: ImageButton by bind(R.id.set_favorite)
-    private val mButtonShare: ImageButton by bind(R.id.share_translated_word)
-    private val mButtonFullscreen: ImageButton by bind(R.id.fullscreen_translated_word)
-    private val mClearEditText: ImageButton by bind(R.id.clear_edittext)
-    private val mButtonRetry: Button by bind(R.id.button_connection_error_retry)
-    private val mGeneralContainer: LinearLayout by bind(R.id.general_container)
-    private val mProgressDictionary: ProgressBar by bind(R.id.fragment_translator_progressbar)
-    private val mProgressTargetVoice: ProgressBar by bind(R.id.get_target_voice_progress)
-    private val mProgressSourceVoice: ProgressBar by bind(R.id.get_source_voice_progress)
-    val mTranslateRecyclerView: RecyclerView by bind(R.id.container_dict_defin)
-    val mCustomEditText: CustomEditText by bind(R.id.edittext)
-    val mTranslatedResult: TextView by bind(R.id.textview_translate_result)
-    private val mContainerSuccess: RelativeLayout by bind(R.id.connection_successful_content)
-    private val mContainerError: LinearLayout by bind(R.id.connection_error_content)
-
-    private val mCircleFirst: AppCompatImageView by bind(R.id.circle_first)
-    private val mCircleSecond: AppCompatImageView by bind(R.id.circle_first)
-    private val mCircleThird: AppCompatImageView by bind(R.id.circle_first)
-    private val mCircleForth: AppCompatImageView by bind(R.id.circle_first)
-    private val translatorToolbar: Toolbar by bind(R.id.translator_toolbar)
 
     var mButtonSwitchLang: ImageButton? = null
     var mButtonSrcLang: Button? = null
@@ -122,12 +91,16 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
     private val viewModel by viewModels<TranslatorViewModel> { viewModelFactory }
 
+    private var _binding: FragmentTranslatorBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_translator, container, false)
+        _binding = FragmentTranslatorBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -158,12 +131,17 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         Timber.d("onViewCreated")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
 //        if (savedInstanceState != null) {
-//            restoreVisibility(savedInstanceState, mContainerError, CONT_ERROR_VISIBILITY)
-//            restoreVisibility(savedInstanceState, mContainerSuccess, CONT_SUCCESS_VISIBILITY)
+//            restoreVisibility(savedInstanceState, binding.layoutTranslationResult?.connectionErrorContent?.root?, CONT_ERROR_VISIBILITY)
+//            restoreVisibility(savedInstanceState, binding.layoutTranslationResult?.connectionSuccessfulContent?, CONT_SUCCESS_VISIBILITY)
 //            restoreVisibility(savedInstanceState, mProgressDictionary, PROGRESS_BAR_VISIBILITY)
 //        }
         Timber.d("onActivityCreated")
@@ -173,9 +151,9 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         super.onSaveInstanceState(outState)
 
         outState.apply {
-            putString(CONT_ERROR_VISIBILITY, mContainerError.visibility.toString())
-            putString(CONT_SUCCESS_VISIBILITY, mContainerSuccess.visibility.toString())
-            putString(PROGRESS_BAR_VISIBILITY, mProgressDictionary.visibility.toString())
+            putString(CONT_ERROR_VISIBILITY, binding.layoutTranslationResult?.connectionErrorContent?.root?.visibility.toString())
+            putString(CONT_SUCCESS_VISIBILITY, binding.layoutTranslationResult?.connectionSuccessfulContent?.root?.visibility.toString())
+            putString(PROGRESS_BAR_VISIBILITY, binding.layoutTranslationResult?.fragmentTranslatorProgressbar?.visibility.toString())
         }
         Timber.d("onSaveInstanceState")
     }
@@ -197,15 +175,15 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun isEmptyTranslatedResultView(): Boolean {
-        return mTranslatedResult.text.toString().isEmpty()
+        return binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text.toString().isEmpty()
     }
 
     override fun getTextTranslatedResultView(): String {
-        return mTranslatedResult.text.toString()
+        return binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text.toString()
     }
 
     override fun isEmptyCustomEditText(): Boolean {
-        return mCustomEditText.text.toString().isEmpty()
+        return binding.layoutTranslationInput?.edittext?.text.toString().isEmpty()
     }
 
     override fun isRecognizingSourceText(): Boolean {
@@ -220,32 +198,32 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun setTextCustomEditText(text: String) {
-        mCustomEditText.setText(text)
+        binding.layoutTranslationInput?.edittext?.setText(text)
     }
 
     override fun clearCustomEditText() {
-        mCustomEditText.text?.clear()
+        binding.layoutTranslationInput?.edittext?.text?.clear()
     }
 
     private fun setupStartedUI() {
         if (isRecordAudioGranted()) {
-            mButtonGetAudioSpelling.setImageResource(R.drawable.tool_dark512)
+            binding.getAudioSpelling?.setImageResource(R.drawable.tool_dark512)
         } else {
-            mButtonGetAudioSpelling.setImageResource(R.drawable.tool_light512)
+            binding.getAudioSpelling?.setImageResource(R.drawable.tool_light512)
         }
 
-        if (mCustomEditText.text.toString().isEmpty()) {
-            mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.camera_dark512)
+        if (binding.layoutTranslationInput?.edittext?.text.toString().isEmpty()) {
+            binding.getSourceVoice?.setImageResource(R.drawable.camera_dark512)
         } else {
-            mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.volume_up_indicator_dark512)
+            binding.getSourceVoice?.setImageResource(R.drawable.volume_up_indicator_dark512)
         }
 
         mSettings?.let {
-            mTranslatedResult.text = it.getString(TRANSL_RESULT, "")
+            binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text = it.getString(TRANSL_RESULT, "")
             if (java.lang.Boolean.parseBoolean(it.getString(IS_FAVORITE, ""))) {
-                mButtonSetFavorite.setImageResource(R.drawable.bookmark_black_shape_gold512)
+                binding.layoutTranslationResult?.connectionSuccessfulContent?.setFavorite?.setImageResource(R.drawable.bookmark_black_shape_gold512)
             } else {
-                mButtonSetFavorite.setImageResource(R.drawable.bookmark_black_shape_dark512)
+                binding.layoutTranslationResult?.connectionSuccessfulContent?.setFavorite?.setImageResource(R.drawable.bookmark_black_shape_dark512)
             }
             if (it.getString(TRANSL_CONTENT, "")!!.isEmpty()) {
                 hideSuccess()
@@ -269,15 +247,15 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         mButtonSrcLang!!.setOnClickListener { this.onSelectLanguageButtonClick(true) }
 //        mButtonSwitchLang!!.setOnClickListener { this.clickOnSwitchLangButton() }
         mButtonTrgLang!!.setOnClickListener{ this.onSelectLanguageButtonClick(false) }
-//        mGeneralContainer.setOnTouchListener { view, event -> this.clickOnGeneralContainer() }
-//        mButtonRetry.setOnClickListener{ this.clickOnRetryButton() }
-//        mButtonFullscreen.setOnClickListener{ this.clickOnFullscreenButton() }
+//        binding.generalContainer.setOnTouchListener { view, event -> this.clickOnGeneralContainer() }
+//        binding.layoutTranslationResult?.connectionErrorContent?.buttonConnectionErrorRetry?.setOnClickListener{ this.clickOnRetryButton() }
+//        binding.layoutTranslationResult?.connectionSuccessfulContent?.fullscreenTranslatedWord?.setOnClickListener{ this.clickOnFullscreenButton() }
 //        mClearEditText.setOnClickListener{ this.clickOnClearEditText() }
-//        mButtonGetPhotoOrSourceVoice.setOnClickListener{ this.clickOnRecognizePhotoOrVocalizeSourceText() }
-//        mButtonGetAudioSpelling.setOnClickListener{ this.clickOnRecognizeSourceText() }
+//        binding.getSourceVoice?.setOnClickListener{ this.clickOnRecognizePhotoOrVocalizeSourceText() }
+//        binding.getAudioSpelling?.setOnClickListener{ this.clickOnRecognizeSourceText() }
 //        mButtonGetTargetVoice.setOnClickListener{ this.clickOnVocalizeTargetText() }
 //        mButtonSetFavorite.setOnClickListener{ clickOnSetFavoriteButton() }
-//        mButtonShare.setOnClickListener{ this.clickOnShareButton() }
+//        binding.layoutTranslationResult?.connectionSuccessfulContent?.shareTranslatedWord?.setOnClickListener{ this.clickOnShareButton() }
     }
 
     private fun findViewsOnActivity() {
@@ -286,9 +264,9 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     private fun findViewsOnActionBar() {
-        mButtonSwitchLang = translatorToolbar.findViewById(R.id.center_actionbar_button)
-        mButtonSrcLang = translatorToolbar.findViewById(R.id.left_actionbar_button)
-        mButtonTrgLang = translatorToolbar.findViewById(R.id.right_actionbar_button)
+        mButtonSwitchLang = binding.translatorToolbar?.findViewById(R.id.center_actionbar_button)
+        mButtonSrcLang = binding.translatorToolbar?.findViewById(R.id.left_actionbar_button)
+        mButtonTrgLang = binding.translatorToolbar?.findViewById(R.id.right_actionbar_button)
         val title = resources.getString(R.string.title_choose_lang)
         mSettings?.let {
             mButtonSrcLang!!.text = it.getString(SRC_LANG, title)
@@ -315,13 +293,13 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
         if (grantResults.size == 1 && grantResults[0] == PERMISSION_GRANTED) {
             //            mPresenter.recognizeSourceText();
-            mButtonGetAudioSpelling.setImageResource(R.drawable.tool_dark512)
+            binding.getAudioSpelling?.setImageResource(R.drawable.tool_dark512)
         } else {
             UIUtils.showToast(
                 context,
                 resources.getString(R.string.record_audio_not_granted)
             )
-            mButtonGetAudioSpelling.setImageResource(R.drawable.tool_light512)
+            binding.getAudioSpelling?.setImageResource(R.drawable.tool_light512)
         }
     }
 
@@ -331,43 +309,43 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun showClear() {
-        mClearEditText.visibility = View.VISIBLE
+        binding.layoutTranslationInput?.clearEdittext?.visibility = View.VISIBLE
     }
 
     override fun hideClear() {
-        mClearEditText.visibility = View.INVISIBLE
+        binding.layoutTranslationInput?.clearEdittext?.visibility = View.INVISIBLE
     }
 
     override fun showLoadingTargetVoice() {
-        mProgressTargetVoice.visibility = View.VISIBLE
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.getTargetVoiceProgress?.visibility = View.VISIBLE
     }
 
     override fun hideLoadingTargetVoice() {
-        mProgressTargetVoice.visibility = View.INVISIBLE
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.getTargetVoiceProgress?.visibility = View.INVISIBLE
     }
 
     override fun showIconTargetVoice() {
-        mButtonGetTargetVoice.visibility = View.VISIBLE
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.getTargetVoice?.visibility = View.VISIBLE
     }
 
     override fun hideIconTargetVoice() {
-        mButtonGetTargetVoice.visibility = View.INVISIBLE
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.getTargetVoice?.visibility = View.INVISIBLE
     }
 
     override fun showLoadingSourceVoice() {
-        mProgressSourceVoice.visibility = View.VISIBLE
+        binding.layoutTranslationInput?.getSourceVoiceProgress?.visibility = View.VISIBLE
     }
 
     override fun hideLoadingSourceVoice() {
-        mProgressSourceVoice.visibility = View.INVISIBLE
+        binding.layoutTranslationInput?.getSourceVoiceProgress?.visibility = View.INVISIBLE
     }
 
     override fun showIconSourceVoice() {
-        mButtonGetPhotoOrSourceVoice.visibility = View.VISIBLE
+        binding.getSourceVoice?.visibility = View.VISIBLE
     }
 
     override fun hideIconSourceVoice() {
-        mButtonGetPhotoOrSourceVoice.visibility = View.INVISIBLE
+        binding.getSourceVoice?.visibility = View.INVISIBLE
     }
 
     override fun activateVoiceRecognizer() {
@@ -380,7 +358,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun deactivateVoiceRecognizer() {
-        if (!mCustomEditText.text.toString().isEmpty()) {
+        if (!binding.layoutTranslationInput?.edittext?.text.toString().isEmpty()) {
             showClear()
         } else {
             hideClear()
@@ -393,7 +371,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun showAnimationMicroWaves() {
-        mCircleFirst.alpha = 1f
+        binding.includeContentMicroWaves?.circleFirst?.alpha = 1f
 
         mAnimatorSecond = AnimatorInflater.loadAnimator(context, R.animator.micro_waves_second)
         mAnimatorSecondBack = AnimatorInflater.loadAnimator(
@@ -413,12 +391,12 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             R.animator.micro_waves_forth_back
         )
 
-        mAnimatorSecond!!.setTarget(mCircleSecond)
-        mAnimatorSecondBack!!.setTarget(mCircleSecond)
-        mAnimatorThird!!.setTarget(mCircleThird)
-        mAnimatorThirdBack!!.setTarget(mCircleThird)
-        mAnimatorForth!!.setTarget(mCircleForth)
-        mAnimatorForthBack!!.setTarget(mCircleForth)
+        mAnimatorSecond!!.setTarget(binding.includeContentMicroWaves?.circleSecond)
+        mAnimatorSecondBack!!.setTarget(binding.includeContentMicroWaves?.circleSecond)
+        mAnimatorThird!!.setTarget(binding.includeContentMicroWaves?.circleThird)
+        mAnimatorThirdBack!!.setTarget(binding.includeContentMicroWaves?.circleThird)
+        mAnimatorForth!!.setTarget(binding.includeContentMicroWaves?.circleForth)
+        mAnimatorForthBack!!.setTarget(binding.includeContentMicroWaves?.circleForth)
 
         mAnimatorSet = AnimatorSet()
 
@@ -474,10 +452,10 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
         mAnimatorForth?.end()
         mAnimatorForthBack?.end()
 
-        mCircleFirst.alpha = 0f
-        mCircleSecond.alpha = 0f
-        mCircleThird.alpha = 0f
-        mCircleForth.alpha = 0f
+        binding.includeContentMicroWaves?.circleFirst?.alpha = 0f
+        binding.includeContentMicroWaves?.circleSecond?.alpha = 0f
+        binding.includeContentMicroWaves?.circleThird?.alpha = 0f
+        binding.includeContentMicroWaves?.circleForth?.alpha = 0f
     }
 
     override fun showKeyboard() {
@@ -493,7 +471,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun createPredictedTranslatedItem(): TranslatedItem {
-        val curEditTextContent = mCustomEditText.text.toString().trim { it <= ' ' }
+        val curEditTextContent = binding.layoutTranslationInput?.edittext?.text.toString().trim { it <= ' ' }
         val srcLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_SRC_LANG, "")
         val trgLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_TRG_LANG, "")
 
@@ -504,27 +482,27 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun showLoadingDictionary() {
-        mProgressDictionary.visibility = View.VISIBLE
+        binding.layoutTranslationResult?.fragmentTranslatorProgressbar?.visibility = View.VISIBLE
     }
 
     override fun hideLoadingDictionary() {
-        mProgressDictionary.visibility = View.INVISIBLE
+        binding.layoutTranslationResult?.fragmentTranslatorProgressbar?.visibility = View.INVISIBLE
     }
 
     override fun showRetry() {
-        mContainerError.visibility = View.VISIBLE
+        binding.layoutTranslationResult?.connectionErrorContent?.root?.visibility = View.VISIBLE
     }
 
     override fun hideRetry() {
-        mContainerError.visibility = View.INVISIBLE
+        binding.layoutTranslationResult?.connectionErrorContent?.root?.visibility = View.INVISIBLE
     }
 
     override fun showSuccess() {
-        mContainerSuccess.visibility = View.VISIBLE
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.root?.visibility = View.VISIBLE
     }
 
     override fun hideSuccess() {
-        mContainerSuccess.visibility = View.INVISIBLE
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.root?.visibility = View.INVISIBLE
     }
 
     override fun showActiveInput() {
@@ -556,10 +534,10 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 val result = data!!.getStringExtra(RESULT)
 
                 //                    if (!mButtonSrcLang.getText().equals(result) &&
-                //                            !mTranslatedResult.getText().toString().isEmpty()) {
+                //                            !binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.getText().toString().isEmpty()) {
                 //                        mButtonSrcLang.setText(mButtonTrgLang.getText());
                 //                        mButtonTrgLang.setText(result);
-                //                        mCustomEditText.setText(mTranslatedResult.getText());
+                //                        binding.layoutTranslationInput?.edittext?.setText(binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.getText());
 
                 //                        JsonObject languagesMap = JsonUtils.getJsonObjectFromAssetsFile(getContext(), "langs.json");
                 //
@@ -576,13 +554,13 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 //                    } else {
                 mButtonSrcLang!!.text = result
                 //                    }
-                if (!mCustomEditText.text.toString().isEmpty()) {
+                if (!binding.layoutTranslationInput?.edittext?.text.toString().isEmpty()) {
                     showLoadingDictionary()
                     hideSuccess()
 
                     val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
                     val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
-                    val inputText = mCustomEditText.getText().toString()
+                    val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
                     viewModel.translate(sourceLang, targetLang, inputText)
                     viewModel.loadDefinition(inputText, sourceLang, targetLang)
                 }
@@ -591,16 +569,16 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 val result = data!!.getStringExtra(RESULT)
                 //                    if (mButtonTrgLang.getText().equals(result)) {
                 //                        mButtonSrcLang.setText(mButtonTrgLang.getText());
-                //                        mCustomEditText.setText(mTranslatedResult.getText());
+                //                        binding.layoutTranslationInput?.edittext?.setText(binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.getText());
                 //                    }
                 mButtonTrgLang!!.text = result
-                if (!mCustomEditText.text.toString().isEmpty()) {
+                if (!binding.layoutTranslationInput?.edittext?.text.toString().isEmpty()) {
                     showLoadingDictionary()
                     hideSuccess()
 
                     val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
                     val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
-                    val inputText = mCustomEditText.getText().toString()
+                    val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
                     viewModel.translate(sourceLang, targetLang, inputText)
                     viewModel.loadDefinition(inputText, sourceLang, targetLang)
                 }
@@ -611,7 +589,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     override fun setHintOnInput() {
-        mCustomEditText.hint = resources.getString(R.string.translate_hint)
+        binding.layoutTranslationInput?.edittext?.hint = resources.getString(R.string.translate_hint)
     }
 
     override fun showError() {
@@ -627,22 +605,22 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun initCustomEditText() {
         mSettings?.let {
-            mCustomEditText.setText(it.getString(EDITTEXT_DATA, ""))
+            binding.layoutTranslationInput?.edittext?.setText(it.getString(EDITTEXT_DATA, ""))
         }
-        if (!mCustomEditText.text.toString().isEmpty()) {
+        if (!binding.layoutTranslationInput?.edittext?.text.toString().isEmpty()) {
             showClear()
         } else {
             hideClear()
         }
-        mCustomEditText.setRawInputType(InputType.TYPE_CLASS_TEXT)
+        binding.layoutTranslationInput?.edittext?.setRawInputType(InputType.TYPE_CLASS_TEXT)
 
-        mCustomEditText.setOnEditorActionListener { _, actionId, _ ->
-            val curEditTextContent = mCustomEditText.text.toString().trim { it <= ' ' }
+        binding.layoutTranslationInput?.edittext?.setOnEditorActionListener { _, actionId, _ ->
+            val curEditTextContent = binding.layoutTranslationInput?.edittext?.text.toString().trim { it <= ' ' }
             val maybeExistedItem = createPredictedTranslatedItem()
 
             val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
             val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
-            val inputText = mCustomEditText.getText().toString()
+            val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
 
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (!curEditTextContent.isEmpty()
@@ -650,32 +628,32 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                     viewModel.translate(sourceLang, targetLang, inputText)
                 } else {
                     viewModel.getTranslatedItemFromCache(maybeExistedItem)
-//                    mTranslatedResult.text = translatedItems[id].trgMeaning
+//                    binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text = translatedItems[id].trgMeaning
                 }
                 Timber.d("ACTION_DONE & customEditText is not empty")
             }
             false
         }
 
-        mCustomEditText.addTextChangedListener(object : TextWatcher {
+        binding.layoutTranslationInput?.edittext?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (mContainerError.visibility == View.VISIBLE)
+                if (binding.layoutTranslationResult?.connectionErrorContent?.root?.visibility == View.VISIBLE)
                     hideRetry()
-                if (mCustomEditText.text?.isNotEmpty() == true && !mClearEditText.isShown) {
+                if (binding.layoutTranslationInput?.edittext?.text?.isNotEmpty() == true && binding.layoutTranslationInput?.clearEdittext?.isShown == false) {
                     showClear()
-                    mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.volume_up_indicator_dark512)
-                } else if (mCustomEditText.text?.isEmpty() == true && mClearEditText.isShown) {
+                    binding.getSourceVoice?.setImageResource(R.drawable.volume_up_indicator_dark512)
+                } else if (binding.layoutTranslationInput?.edittext?.text?.isEmpty() == true && binding.layoutTranslationInput?.clearEdittext?.isShown == true) {
                     hideClear()
                     hideSuccess()
                     clearContainerSuccess()
-                    mButtonGetPhotoOrSourceVoice.setImageResource(R.drawable.camera_dark512)
+                    binding.getSourceVoice?.setImageResource(R.drawable.camera_dark512)
 
-                    val inputText = mCustomEditText.getText().toString()
+                    val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
                     val sourceLang = mButtonSrcLang?.getText().toString()
                     val targetLang = mButtonTrgLang?.getText().toString()
-                    val outputText = mTranslatedResult.getText().toString()
+                    val outputText = binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.getText().toString()
                     viewModel.saveToSharedPreferences(
                         sourceLang, targetLang, inputText, outputText
                     )
@@ -684,16 +662,16 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
             override fun afterTextChanged(s: Editable) {}
         })
-        mCustomEditText.setOnClickListener{ this.handleRecognizerOnEdittext() }
+        binding.layoutTranslationInput?.edittext?.setOnClickListener{ this.handleRecognizerOnEdittext() }
     }
 
     private fun setHintRecognizer() {
-        mCustomEditText.hint = resources.getString(R.string.recognizer_hint)
+        binding.layoutTranslationInput?.edittext?.hint = resources.getString(R.string.recognizer_hint)
     }
 
     private fun showActiveBorderInput() {
         try {
-            mCustomEditText.background = ContextCompat.getDrawable(
+            binding.layoutTranslationInput?.edittext?.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.selector_edittext_border_active
             )
@@ -706,7 +684,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun hideActiveBorderInput() {
         try {
-            mCustomEditText.background = ContextCompat.getDrawable(
+            binding.layoutTranslationInput?.edittext?.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.selector_edittext_border
             )
@@ -719,7 +697,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
     private fun showActiveRecognizerInput() {
         try {
-            mCustomEditText.background = ContextCompat.getDrawable(
+            binding.layoutTranslationInput?.edittext?.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.selector_edittext_recognizer_active
             )
@@ -731,11 +709,11 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     private fun hideCursorInput() {
-        mCustomEditText.isCursorVisible = false
+        binding.layoutTranslationInput?.edittext?.isCursorVisible = false
     }
 
     private fun showCursorInput() {
-        mCustomEditText.isCursorVisible = true
+        binding.layoutTranslationInput?.edittext?.isCursorVisible = true
     }
 
     private fun handleRecognizerOnEdittext() {
@@ -743,7 +721,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     fun clearContainerSuccess() {
-        mTranslatedResult.text = ""
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text = ""
         mTranslations.clear()
         adapter?.notifyDataSetChanged()
         viewModel.clearContainerSuccess()
@@ -757,12 +735,12 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 //                showActiveInput()
 //            } else if (!isOpen && isAdded) {
 //                hideActiveInput()
-//                //                        if (!mCustomEditText.getText().toString().isEmpty() &&
+//                //                        if (!binding.layoutTranslationInput?.edittext?.getText().toString().isEmpty() &&
 //                //                                mSaver != null &&
 //                //                                mSaver.getCurTranslatedItem() != null &&
 //                //                                !mSaver.getCurTranslatedItem()
 //                //                                        .getSrcMeaning()
-//                //                                        .equals(mCustomEditText.getText().toString())) {
+//                //                                        .equals(binding.layoutTranslationInput?.edittext?.getText().toString())) {
 //                //                            showLoadingDictionary();
 //                //                            viewModel.translate();
 //                //                        }
@@ -785,11 +763,11 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
     }
 
     private fun setupRecycler() {
-        mTranslateRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.containerDictDefin?.layoutManager = LinearLayoutManager(requireContext())
         adapter = TranslatorRecyclerAdapter(
             mOnItemClickListener = { _, text -> this.clickOnSynonymItem(text) }
         )
-        mTranslateRecyclerView.adapter = adapter
+        binding.layoutTranslationResult?.connectionSuccessfulContent?.containerDictDefin?.adapter = adapter
     }
 
     private fun clickOnGeneralContainer(): Boolean {
@@ -806,7 +784,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
         val srcLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_SRC_LANG, "") ?: ""
         val trgLangAPI = mSettings!!.getString(CUR_SELECTED_ITEM_TRG_LANG, "") ?: ""
-        val inputText = mCustomEditText.getText().toString()
+        val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
 
         mSettings?.let {
             it.edit().apply {
@@ -820,7 +798,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
                 viewModel.translate(srcLangAPI, trgLangAPI, inputText)
             } else {
                 viewModel.getTranslatedItemFromCache(createPredictedTranslatedItem())
-//                mTranslatedResult.text = translatedItems[id].trgMeaning
+//                binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text = translatedItems[id].trgMeaning
             }
         }
     }
@@ -842,7 +820,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
         val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
         val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
-        val inputText = mCustomEditText.getText().toString()
+        val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
         viewModel.translate(sourceLang, targetLang, inputText)
     }
 
@@ -862,7 +840,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
             hideIconSourceVoice()
 
 //            viewModel.vocalizeText(
-//                text = mCustomEditText.text.toString(),
+//                text = binding.layoutTranslationInput?.edittext?.text.toString(),
 //                language = Language.ENGLISH
 //            )
         } else {
@@ -936,7 +914,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
             val sourceLang = mButtonSrcLang?.getText().toString().toLowerCase()
             val targetLang = mButtonTrgLang?.getText().toString().toLowerCase()
-            val inputText = mCustomEditText.getText().toString()
+            val inputText = binding.layoutTranslationInput?.edittext?.getText().toString()
             viewModel.translate(sourceLang, targetLang, inputText)
         }
     }
@@ -948,7 +926,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
 
 //            viewModel.vocalizeText(
-//                text = mTranslatedResult.text.toString(),
+//                text = binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text.toString(),
 //                language = Language.RUSSIAN
 //            )
         } else {
@@ -1008,7 +986,7 @@ class TranslatorFragment @Inject constructor() : Fragment(), TranslatorContract.
 
                 }
                 is ContentResult.Success -> {
-                    mTranslatedResult.text = it.content.text?.get(0)
+                    binding.layoutTranslationResult?.connectionSuccessfulContent?.textviewTranslateResult?.text = it.content.text?.get(0)
                     showLoadingDictionary()
                     hideSuccess()
                 }

@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 import com.romankaranchuk.translator.common.Constants;
 import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository;
-import com.romankaranchuk.translator.data.datasource.LanguagesDataSource;
+import com.romankaranchuk.translator.data.datasource.LanguagesLocalDataSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +17,10 @@ public class TextDataStorageImpl implements TextDataStorage {
     private TranslationSaver mSaver;
     private Gson mGson;
 
-    public TextDataStorageImpl(Context context, Gson gson, SharedPreferences sharedPreferences, LanguagesDataSource languagesDataSource, TranslatorLocalRepository translatorLocalRepository) {
+    public TextDataStorageImpl(Context context, Gson gson, SharedPreferences sharedPreferences, LanguagesLocalDataSource languagesLocalDataSource, TranslatorLocalRepository translatorLocalRepository) {
         mSettings = sharedPreferences;
         mGson = gson;
-        mSaver = new TranslationSaver(context, mGson, sharedPreferences,languagesDataSource, translatorLocalRepository);
+        mSaver = new TranslationSaver(context, mGson, sharedPreferences, languagesLocalDataSource, translatorLocalRepository);
     }
 
     @Override

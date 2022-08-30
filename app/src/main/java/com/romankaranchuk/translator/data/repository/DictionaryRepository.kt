@@ -9,8 +9,8 @@ interface DictionaryRepository {
 
     suspend fun getDictDefinition(
         text: String,
-        lang: String
-    ): DictDefinition
+        langs: List<String>
+    ): DictDefinition?
 }
 
 class DictionaryRepositoryImpl(
@@ -20,8 +20,9 @@ class DictionaryRepositoryImpl(
 
     override suspend fun getDictDefinition(
         text: String,
-        lang: String
-    ): DictDefinition {
-        return api.getDictDefinition(environmentHolder.YANDEX_DICTIONARY_API_KEY, text, lang)
+        langs: List<String>
+    ): DictDefinition? {
+        val langsFormatted = "${langs[0]}-${langs[1]}"
+        return api.getDictDefinition(environmentHolder.YANDEX_DICTIONARY_API_KEY, text, langsFormatted)
     }
 }

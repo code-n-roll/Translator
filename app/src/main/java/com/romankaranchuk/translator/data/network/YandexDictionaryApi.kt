@@ -11,5 +11,5 @@ interface YandexDictionaryApi {
         @Query("key") key: String,
         @Query("text") text: String,
         @Query("lang") lang: String
-    ): DictDefinition
+    ): DictDefinition?
 }

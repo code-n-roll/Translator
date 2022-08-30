@@ -3,8 +3,7 @@ package com.romankaranchuk.translator.di.module
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
-import com.romankaranchuk.translator.data.datasource.ILanguagesDataSource
-import com.romankaranchuk.translator.data.datasource.LanguagesDataSource
+import com.romankaranchuk.translator.data.datasource.LanguagesLocalDataSource
 import dagger.Module
 import dagger.Provides
 
@@ -16,7 +15,7 @@ class DataSourceModule {
         context: Context,
         gson: Gson,
         sharedPrefs: SharedPreferences
-    ): LanguagesDataSource {
-        return LanguagesDataSource(context, gson, sharedPrefs)
+    ): LanguagesLocalDataSource {
+        return LanguagesLocalDataSource(context, gson, sharedPrefs)
     }
 }

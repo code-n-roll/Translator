@@ -11,7 +11,7 @@ import com.romankaranchuk.translator.data.database.repository.TranslatorReposito
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
 import com.romankaranchuk.translator.data.database.storage.TextDataStorageImpl
 import com.romankaranchuk.translator.data.database.storage.TranslationSaver
-import com.romankaranchuk.translator.data.datasource.LanguagesDataSource
+import com.romankaranchuk.translator.data.datasource.LanguagesLocalDataSource
 import com.romankaranchuk.translator.ui.stored.history.HistoryContract
 import com.romankaranchuk.translator.ui.stored.history.HistoryPresenterImpl
 import dagger.Module
@@ -39,14 +39,14 @@ class ApplicationModule(private val application: TranslatorApplication) {
         context: Context,
         gson: Gson,
         sharedPreferences: SharedPreferences,
-        languagesDataSource: LanguagesDataSource,
+        languagesLocalDataSource: LanguagesLocalDataSource,
         translatorLocalRepository: TranslatorLocalRepository
     ): TextDataStorage {
         return TextDataStorageImpl(
             context,
             gson,
             sharedPreferences,
-            languagesDataSource,
+            languagesLocalDataSource,
             translatorLocalRepository
         )
     }
@@ -80,11 +80,11 @@ class ApplicationModule(private val application: TranslatorApplication) {
     fun provideTranslationSaver(
         context: Context,
         gson: Gson,
-        languagesDataSource: LanguagesDataSource,
+        languagesLocalDataSource: LanguagesLocalDataSource,
         sharedPreferences: SharedPreferences,
         translatorLocalRepository: TranslatorLocalRepository
     ): TranslationSaver {
-        return TranslationSaver(context, gson, sharedPreferences, languagesDataSource, translatorLocalRepository)
+        return TranslationSaver(context, gson, sharedPreferences, languagesLocalDataSource, translatorLocalRepository)
     }
 
     @Provides

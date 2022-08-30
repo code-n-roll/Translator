@@ -1,12 +1,10 @@
 package com.romankaranchuk.translator.di.module
 
 import com.romankaranchuk.translator.common.EnvironmentHolder
+import com.romankaranchuk.translator.data.datasource.LanguagesLocalDataSource
 import com.romankaranchuk.translator.data.network.YandexDictionaryApi
 import com.romankaranchuk.translator.data.network.YandexTranslateApi
-import com.romankaranchuk.translator.data.repository.DictionaryRepository
-import com.romankaranchuk.translator.data.repository.DictionaryRepositoryImpl
-import com.romankaranchuk.translator.data.repository.TranslateRepository
-import com.romankaranchuk.translator.data.repository.TranslateRepositoryImpl
+import com.romankaranchuk.translator.data.repository.*
 import dagger.Module
 import dagger.Provides
 
@@ -27,5 +25,12 @@ class RepositoryModule {
         environmentHolder: EnvironmentHolder
     ): DictionaryRepository {
         return DictionaryRepositoryImpl(environmentHolder, api)
+    }
+
+    @Provides
+    fun provideLanguagesRepository(
+        languagesLocalDataSource: LanguagesLocalDataSource
+    ): ILanguagesRepository {
+        return LanguagesRepository(languagesLocalDataSource)
     }
 }

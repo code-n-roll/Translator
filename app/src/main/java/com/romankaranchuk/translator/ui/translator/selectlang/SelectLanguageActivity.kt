@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +16,7 @@ import com.romankaranchuk.translator.R
 import com.romankaranchuk.translator.databinding.ActivitySelectLanguageBinding
 import com.romankaranchuk.translator.utils.UIUtils
 import dagger.android.AndroidInjection
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SelectLanguageActivity : AppCompatActivity() {
@@ -53,17 +57,21 @@ class SelectLanguageActivity : AppCompatActivity() {
     }
 
     private fun bindViewModel() {
-        viewModel.viewState.observe(this) { viewState ->
-            when (viewState) {
-                is SelectLanguageViewModel.ViewState.ShowLanguageSelected -> {
-                    UIUtils.showToast(applicationContext, "selected ${viewState.language}")
-                    setResult(RESULT_OK, Intent().apply {
-                        putExtra("result", viewState.language.name)
-                    })
-                    finish()
-                }
-                is SelectLanguageViewModel.ViewState.ShowLanguages -> {
-                    adapter?.updateAll(viewState.languages, viewState.selectedId)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewState.collect { viewState ->
+                    when (viewState) {
+                        is SelectLanguageViewModel.ViewState.ShowLanguageSelected -> {
+                            UIUtils.showToast(applicationContext, "selected ${viewState.language}")
+                            setResult(RESULT_OK, Intent().apply {
+                                putExtra("result", viewState.language.name)
+                            })
+                            finish()
+                        }
+                        is SelectLanguageViewModel.ViewState.ShowLanguages -> {
+                            adapter?.updateAll(viewState.languages, viewState.selectedId)
+                        }
+                    }
                 }
             }
         }

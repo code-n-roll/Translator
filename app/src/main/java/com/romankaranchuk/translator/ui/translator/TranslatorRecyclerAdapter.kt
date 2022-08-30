@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.romankaranchuk.translator.R
+import com.romankaranchuk.translator.data.database.model.DictDefinition
 import com.romankaranchuk.translator.data.database.model.PartOfSpeech
 import com.romankaranchuk.translator.data.database.model.Translation
 import com.romankaranchuk.translator.ui.view.CustomSynonyms
@@ -34,15 +35,15 @@ class TranslatorRecyclerAdapter(
         return mItems.size
     }
 
-    fun updateAll(
-        newItems: List<Translation>,
-        partsOfSpeech: List<PartOfSpeech>
-    ) {
+    fun updateAll(dictDefinition: DictDefinition?) {
+        val translations = dictDefinition?.partsOfSpeech?.flatMap { it.translations } ?: emptyList()
+        val partsOfSpeech = dictDefinition?.partsOfSpeech ?: emptyList()
+
         mPartsOfSpeech.clear()
         mPartsOfSpeech.addAll(partsOfSpeech)
 
         mItems.clear()
-        mItems.addAll(newItems)
+        mItems.addAll(translations)
 
         notifyDataSetChanged()
     }

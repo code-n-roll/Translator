@@ -25,10 +25,6 @@ class DictDefinition(
 
     val translations: List<Translation>
         get() {
-            val translations: MutableList<Translation> = ArrayList()
-            for (POS in partsOfSpeech) {
-                translations.addAll(POS.translations)
-            }
-            return translations
+            return partsOfSpeech.flatMap { it.translations }
         }
 }

@@ -9,8 +9,8 @@ interface TranslateRepository {
 
     suspend fun getTranslation(
         text: String,
-        lang: String
-    ): TranslationResponse
+        langs: List<String>
+    ): String
 }
 
 class TranslateRepositoryImpl(
@@ -20,8 +20,9 @@ class TranslateRepositoryImpl(
 
     override suspend fun getTranslation(
         text: String,
-        lang: String
-    ): TranslationResponse {
-        return TranslationResponse()//api.getTranslation(environmentHolder.YANDEX_TRANSLATE_API_KEY, text, lang)
+        langs: List<String>
+    ): String {
+        val translationDirection = "${langs[0]}-${langs[1]}"
+        return "mocked translation"//api.getTranslation(environmentHolder.YANDEX_TRANSLATE_API_KEY, text, translationDirection).text?.get(0)
     }
 }

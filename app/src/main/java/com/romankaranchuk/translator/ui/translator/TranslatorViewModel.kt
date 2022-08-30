@@ -1,49 +1,39 @@
 package com.romankaranchuk.translator.ui.translator
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.lifecycle.MutableLiveData
-import com.google.gson.Gson
-import com.romankaranchuk.translator.common.Constants
 //import com.romankaranchuk.translator.common.Recognizer
 //import com.romankaranchuk.translator.common.Vocalizer
-import com.romankaranchuk.translator.data.database.TablePersistenceContract.*
+//import ru.yandex.speechkit.Language
+import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.romankaranchuk.translator.common.Constants
+import com.romankaranchuk.translator.data.database.TablePersistenceContract.TranslatedItemEntry
 import com.romankaranchuk.translator.data.database.model.*
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepository
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepositoryImpl.HistoryTranslatedItemsRepositoryObserver
 import com.romankaranchuk.translator.data.database.storage.TextDataStorage
 import com.romankaranchuk.translator.data.database.storage.TranslationSaver
-import com.romankaranchuk.translator.data.datasource.LanguagesDataSource
-import com.romankaranchuk.translator.data.repository.DictionaryRepository
-import com.romankaranchuk.translator.data.repository.TranslateRepository
+import com.romankaranchuk.translator.domain.IGetDefinitionUseCase
+import com.romankaranchuk.translator.domain.IGetTranslationUseCase
 import com.romankaranchuk.translator.ui.base.BaseViewModel
 import com.romankaranchuk.translator.ui.base.launchOnIO
 import com.romankaranchuk.translator.ui.base.switchToUi
-import com.romankaranchuk.translator.utils.network.ContentResult
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-//import ru.yandex.speechkit.Language
 import timber.log.Timber
-import java.util.HashMap
 import javax.inject.Inject
 
 class TranslatorViewModel @Inject constructor(
-    private val context: Context,
     private val sharedPrefs: SharedPreferences,
     private val gson: Gson,
     private val translationSaver: TranslationSaver,
-    private val translateRepository: TranslateRepository,
-    private val dictionaryRepository: DictionaryRepository,
     private val translatorRepository: TranslatorRepository,
 //    private val vocalizer: Vocalizer,
 //    private val recognizer: Recognizer,
     private val textDataStorage: TextDataStorage,
-    private val languagesDataSource: LanguagesDataSource
+    private val getDefinitionUseCase: IGetDefinitionUseCase,
+    private val getTranslationUseCase: IGetTranslationUseCase
 ) : BaseViewModel(), HistoryTranslatedItemsRepositoryObserver {
 
-    val translationsLiveData = MutableLiveData<Pair<List<Translation>, List<PartOfSpeech>>>()
-    val translateLiveData = MutableLiveData<ContentResult<TranslationResponse>>()
-    val definitionLiveData = MutableLiveData<ContentResult<DictDefinition>>()
     private val _viewState = MutableSharedFlow<ViewState>()
     val viewState = _viewState.asSharedFlow()
 
@@ -73,23 +63,13 @@ class TranslatorViewModel @Inject constructor(
     fun loadTranslations() = launchOnIO {
         val dictDefString = sharedPrefs.getString(Constants.TRANSL_CONTENT, "") ?: ""
 
-        val translations: MutableList<Translation> = mutableListOf()
-
         var dictDefinition: DictDefinition? = null
         if (dictDefString.isNotEmpty()) {
             dictDefinition = gson.fromJson(dictDefString, DictDefinition::class.java)
-            if (dictDefinition != null) {
-                for (POS in dictDefinition.partsOfSpeech) {
-                    translations.addAll(POS.translations)
-                }
-            }
         }
 
         switchToUi {
-            translationsLiveData.value = Pair(
-                translations,
-                dictDefinition?.partsOfSpeech ?: emptyList()
-            )
+            _viewState.emit(ViewState.ShowTranslations(dictDefinition))
         }
     }
 
@@ -98,61 +78,46 @@ class TranslatorViewModel @Inject constructor(
         targetLang: String,
         inputText: String
     ) = launchOnIO {
-        val langs: List<String> = languagesDataSource.getLanguagesFromJson(Constants.LANGS_FILE_NAME, sourceLang, targetLang)
-
-        val currentTranslatedItem = translationSaver.curTranslatedItem
-        if (currentTranslatedItem != null && currentTranslatedItem.srcMeaning != inputText
-            || currentTranslatedItem == null
-        ) {
-            val srcLangAPI = langs.get(0)
-            val trgLangAPI = langs.get(1)
-            val mTranslationDirection = "$srcLangAPI-$trgLangAPI"
-            val translation: TranslationResponse
-            try {
-                translation = translateRepository.getTranslation(
-                    inputText,
-                    mTranslationDirection
-                )
-                this@TranslatorViewModel.translation = translation.text?.get(0)
-//                switchToUi {
-                    translateLiveData.postValue(ContentResult.Success(translation))
-//                }
-            } catch (e: Exception) {
-                switchToUi {
-                    translateLiveData.value = ContentResult.Error("translate is failed")
-                }
+        _viewState.emit(ViewState.ShowTranslationLoading())
+        try {
+            translation = getTranslationUseCase.getTranslation(inputText, sourceLang, targetLang)
+            val _translation = translation
+            if (_translation == null) {
+                _viewState.emit(ViewState.ShowTranslationError())
+            } else {
+                _viewState.emit(ViewState.ShowTranslationSuccess(_translation))
             }
-        } else {
+        } catch (e: Exception) {
+            _viewState.emit(ViewState.ShowTranslationError())
         }
     }
 
-    fun loadDefinition(
-        inputText: String,
+    fun define(
         sourceLang: String,
-        targetLang: String
+        targetLang: String,
+        inputText: String
     ) = launchOnIO {
-        val dictDefinition: DictDefinition?
-        val langs = languagesDataSource.getLanguagesFromJson(Constants.LANGS_FILE_NAME, sourceLang, targetLang)
+        _viewState.emit(ViewState.ShowDefinitionLoading())
         try {
-            dictDefinition = dictionaryRepository.getDictDefinition(
-                inputText,
-                "${langs.get(0)}-${langs.get(1)}"
-            )
-
-            switchToUi {
-                if (dictDefinition == null) {
-                    definitionLiveData.value = ContentResult.Error("response body is null")
-                } else {
-                    definitionLiveData.value = ContentResult.Success(dictDefinition)
-                    // TODO() disable temporarily
-//                    handleDictionaryResponse(inputText, dictDefinition)
+            val dictDefinition = getDefinitionUseCase.getDefinition(inputText, sourceLang, targetLang)
+            if (dictDefinition == null) {
+                _viewState.emit(ViewState.ShowDefinitionError())
+            } else {
+                val translations: MutableList<Translation> = ArrayList()
+                for (partOfSpeech in dictDefinition.partsOfSpeech) {
+                    translations.addAll(partOfSpeech.translations)
+                    for ((index, translation) in partOfSpeech.translations.withIndex()) {
+                        translation.number = "${index+1}"
+                    }
                 }
+
+                _viewState.emit(ViewState.ShowDefinitionSuccess(dictDefinition))
+                // TODO() disable temporarily
+//                    handleDictionaryResponse(inputText, dictDefinition)
             }
         } catch (e: Exception) {
             Timber.d(e.stackTraceToString())
-            switchToUi {
-                definitionLiveData.value = ContentResult.Error("getting definition is failed")
-            }
+            _viewState.emit(ViewState.ShowDefinitionError())
         }
     }
 
@@ -283,12 +248,13 @@ class TranslatorViewModel @Inject constructor(
     }
 
     sealed class ViewState {
-        class TranslateSuccess() : ViewState()
-        class TranslateError() : ViewState()
-        class TranslateLoading() : ViewState()
+        class ShowTranslationSuccess(val translation: String) : ViewState()
+        class ShowTranslationError() : ViewState()
+        class ShowTranslationLoading() : ViewState()
+        class ShowTranslations(val dictDefinition: DictDefinition?): ViewState()
 
-        class DictionarySuccess() : ViewState()
-        class DictionaryError() : ViewState()
-        class DictionaryLoading() : ViewState()
+        class ShowDefinitionSuccess(val dictDefinition: DictDefinition) : ViewState()
+        class ShowDefinitionError() : ViewState()
+        class ShowDefinitionLoading() : ViewState()
     }
 }

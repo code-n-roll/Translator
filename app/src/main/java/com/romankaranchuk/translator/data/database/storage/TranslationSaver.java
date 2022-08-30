@@ -3,13 +3,15 @@ package com.romankaranchuk.translator.data.database.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.romankaranchuk.translator.common.Constants;
 import com.romankaranchuk.translator.data.database.TablePersistenceContract;
 import com.romankaranchuk.translator.data.database.model.TranslatedItem;
 import com.romankaranchuk.translator.data.database.repository.TranslatorLocalRepository;
 import com.romankaranchuk.translator.data.database.repository.TranslatorRepository;
-import com.romankaranchuk.translator.data.datasource.LanguagesDataSource;
+import com.romankaranchuk.translator.data.datasource.LanguagesLocalDataSource;
 
 import java.util.List;
 import java.util.Map;
@@ -22,17 +24,18 @@ public class TranslationSaver implements Runnable {
     private List<TranslatedItem> mHistoryTranslatedItems;
     private Gson mGson;
     private Context context;
-    private LanguagesDataSource languagesDataSource;
+    private LanguagesLocalDataSource languagesLocalDataSource;
 
-    public TranslationSaver(Context context, Gson gson, SharedPreferences sharedPreferences, LanguagesDataSource languagesDataSource, TranslatorLocalRepository translatorLocalRepository) {
+    public TranslationSaver(Context context, Gson gson, SharedPreferences sharedPreferences, LanguagesLocalDataSource languagesLocalDataSource, TranslatorLocalRepository translatorLocalRepository) {
         mGson = gson;
         this.context = context;
         mCurTranslatedItem = mGson.fromJson(sharedPreferences.getString(Constants.CUR_TRANSLATED_ITEM, ""), TranslatedItem.class);
-        this.languagesDataSource = languagesDataSource;
+        this.languagesLocalDataSource = languagesLocalDataSource;
         mRepository = translatorLocalRepository;
         mHistoryTranslatedItems = mRepository.getTranslatedItems(TablePersistenceContract.TranslatedItemEntry.TABLE_NAME_HISTORY);
     }
 
+    @Nullable
     public TranslatedItem getCurTranslatedItem() {
         return mCurTranslatedItem;
     }
@@ -50,7 +53,7 @@ public class TranslationSaver implements Runnable {
     public void run() {
         String sourceLang = ((String) mSavedData.get(Constants.SRC_LANG)).toLowerCase();
         String targetLang = ((String) mSavedData.get(Constants.TRG_LANG)).toLowerCase();
-        List<String> mLanguagesMap = languagesDataSource.getLanguagesFromJson(Constants.LANGS_FILE_NAME, sourceLang, targetLang);
+        List<String> mLanguagesMap = languagesLocalDataSource.getLanguages(sourceLang, targetLang);
         mCurTranslatedItem = new TranslatedItem(
                 mLanguagesMap.get(0),
                 mLanguagesMap.get(1),

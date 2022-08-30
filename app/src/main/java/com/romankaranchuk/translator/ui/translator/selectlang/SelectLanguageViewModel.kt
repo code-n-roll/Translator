@@ -3,17 +3,17 @@ package com.romankaranchuk.translator.ui.translator.selectlang
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.romankaranchuk.translator.data.database.model.Language
-import com.romankaranchuk.translator.data.datasource.LanguagesDataSource
+import com.romankaranchuk.translator.data.datasource.LanguagesLocalDataSource
 import com.romankaranchuk.translator.ui.base.BaseViewModel
 import com.romankaranchuk.translator.ui.base.launchOnIO
 import com.romankaranchuk.translator.ui.base.switchToUi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 
 class SelectLanguageViewModel @Inject constructor(
-    private val languagesDataSource: LanguagesDataSource
+    private val languagesLocalDataSource: LanguagesLocalDataSource
 ) : BaseViewModel(), DefaultLifecycleObserver {
 
     private var _isSource = false
@@ -26,26 +26,26 @@ class SelectLanguageViewModel @Inject constructor(
         loadLanguages()
     }
 
-    private var _viewState = MutableLiveData<ViewState>()
-    val viewState: LiveData<ViewState> = _viewState
+    private var _viewState = MutableSharedFlow<ViewState>()
+    val viewState = _viewState.asSharedFlow()
 
     private fun loadLanguages() = launchOnIO {
-        val languagesSorted = languagesDataSource.getLanguagesFromJson()
+        val languagesSorted = languagesLocalDataSource.getLanguages().sorted()
 
-        val abbr = languagesDataSource.restoreSelectedLanguage(_isSource)
+        val abbr = languagesLocalDataSource.restoreSelectedLanguage(_isSource)
         val selectedLang = languagesSorted.find { it.abbr == abbr } ?: "Unknown"
         val selectedLangIndex = languagesSorted.indexOf(selectedLang)
 
         switchToUi {
-            _viewState.value = ViewState.ShowLanguages(languagesSorted, selectedLangIndex)
+            _viewState.emit(ViewState.ShowLanguages(languagesSorted, selectedLangIndex))
         }
     }
 
     fun onLanguageItemClick(language: Language) = launchOnIO {
-        languagesDataSource.saveSelectedLanguage(_isSource, language)
+        languagesLocalDataSource.saveSelectedLanguage(_isSource, language)
 
         switchToUi {
-            _viewState.value = ViewState.ShowLanguageSelected(language)
+            _viewState.emit(ViewState.ShowLanguageSelected(language))
         }
     }
 
